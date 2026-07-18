@@ -9,8 +9,8 @@ submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 date:
 consensus: true
 v: 3
-area: Security
-workgroup: Web Authorization Protocol
+area: "Security"
+workgroup: "Web Authorization Protocol"
 keyword:
  - agent
  - agentic commerce
@@ -24,11 +24,11 @@ keyword:
  - payment
 venue:
   github: "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens"
-#  group: WG
-#  type: Working Group
-#  mail: WG@example.com
-#  arch: https://example.com/WG
-  latest: "https://skyfire-xyz.github.io/draft-skyfire-oauth-using-kyapay-tokens/draft-skyfire-oauth-kyapay-token-exchange.html"
+  group: "Web Authorization Protocol"
+  type: "Working Group"
+  mail: "oauth@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/oauth/"
+  latest: "https://skyfire-xyz.github.io/draft-skyfire-oauth-using-kyapay-tokens/draft-skyfire-oauth-using-kyapay-tokens.html"
 
 author:
 -
