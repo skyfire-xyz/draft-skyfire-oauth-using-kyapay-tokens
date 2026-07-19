@@ -5,10 +5,10 @@
 Web Authorization Protocol                                    A. Agarwal
 Internet-Draft                                      Skyfire Systems Inc.
 Intended status: Standards Track                             M. B. Jones
-Expires: 19 January 2027                          Self-Issued Consulting
+Expires: 20 January 2027                          Self-Issued Consulting
                                                                S. Thumma
                                                                   Akamai
-                                                            18 July 2026
+                                                            19 July 2026
 
 
                           Using KYAPay Tokens
@@ -41,9 +41,14 @@ About This Document
 
    The latest revision of this draft can be found at https://skyfire-
    xyz.github.io/draft-skyfire-oauth-using-kyapay-tokens/draft-skyfire-
-   oauth-kyapay-token-exchange.html.  Status information for this
-   document may be found at https://datatracker.ietf.org/doc/draft-
-   skyfire-oauth-using-kyapay-tokens/.
+   oauth-using-kyapay-tokens.html.  Status information for this document
+   may be found at https://datatracker.ietf.org/doc/draft-skyfire-oauth-
+   using-kyapay-tokens/.
+
+   Discussion of this document takes place on the Web Authorization
+   Protocol Working Group mailing list (mailto:oauth@ietf.org), which is
+   archived at https://mailarchive.ietf.org/arch/browse/oauth/.
+   Subscribe at https://www.ietf.org/mailman/listinfo/oauth/.
 
    Source for this draft and an issue tracker can be found at
    https://github.com/skyfire-xyz/draft-skyfire-oauth-using-kyapay-
@@ -64,7 +69,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 January 2027.
+   This Internet-Draft will expire on 20 January 2027.
 
 Copyright Notice
 
@@ -785,10 +790,10 @@ Table of Contents
 
    This document does not define a wire mechanism for a Target to
    request step-up out of band from an issuer; that is an open item (see
-   Section 8 and the editor's notes).  Until such a mechanism is
-   standardized, verifiers SHOULD express assurance requirements as
-   local policy over the assurance signals in Section 6.2 and decline
-   actions whose required assurance is not met.
+   Section 8).  Until such a mechanism is standardized, verifiers SHOULD
+   express assurance requirements as local policy over the assurance
+   signals in Section 6.2 and decline actions whose required assurance
+   is not met.
 
 6.6.  Account-Takeover Protectors
 
@@ -921,14 +926,14 @@ Table of Contents
    This document does not define the mechanism, format, or trust model
    for this feedback channel; how a verifier authenticates to an issuer,
    how reports are structured, how issuers guard against false or
-   malicious reports, and what evidence is required are all open items
-   (see the editor's notes).  Feedback SHOULD be treated as sensitive:
-   reports identify principals, agents, or platforms and MUST be shared
-   only with the relevant issuer and handled per Section 9.  An issuer
-   SHOULD corroborate feedback (for example, requiring reputation,
-   multiple independent reports, or evidence) before taking action that
-   would affect a principal, so that the channel cannot itself be used
-   to deny service to legitimate initiators.
+   malicious reports, and what evidence is required are all open items.
+   Feedback SHOULD be treated as sensitive: reports identify principals,
+   agents, or platforms and MUST be shared only with the relevant issuer
+   and handled per Section 9.  An issuer SHOULD corroborate feedback
+   (for example, requiring reputation, multiple independent reports, or
+   evidence) before taking action that would affect a principal, so that
+   the channel cannot itself be used to deny service to legitimate
+   initiators.
 
 6.11.   Non-Payment and Hand-off Flows
 
