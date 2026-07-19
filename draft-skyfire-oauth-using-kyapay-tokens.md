@@ -476,7 +476,7 @@ A KYAPay token attests the assurance established at the time of issuance, which 
 A verifier SHOULD be able to require a higher assurance level for sensitive actions and to signal that requirement so that a fresh token can be obtained after additional verification of the human principal (for example, a step-up authentication such as a push-notification approval, a one-time code, or a re-run of identity verification).
 
 This document does not define a wire mechanism for a Target to request step-up out of band from an issuer;
-that is an open item (see {{SecCon}} and the editor's notes).
+that is an open item (see {{SecCon}}).
 Until such a mechanism is standardized, verifiers SHOULD express assurance requirements as local policy over the assurance signals in {{HumanPresence}} and decline actions whose required assurance is not met.
 
 ## Account-Takeover Protectors {#ATOProt}
@@ -540,7 +540,7 @@ On receiving such feedback, and subject to its own verification and anti-abuse s
 This mirrors the Certificate-Authority analogy of {{SecCon}}: just as a CA can stop issuing (and can revoke) certificates for a misbehaving subscriber, a KYAPay issuer can stop vouching for a misbehaving initiator.
 
 This document does not define the mechanism, format, or trust model for this feedback channel;
-how a verifier authenticates to an issuer, how reports are structured, how issuers guard against false or malicious reports, and what evidence is required are all open items (see the editor's notes).
+how a verifier authenticates to an issuer, how reports are structured, how issuers guard against false or malicious reports, and what evidence is required are all open items.
 Feedback SHOULD be treated as sensitive: reports identify principals, agents, or platforms and MUST be shared only with the relevant issuer and handled per {{PrivCon}}.
 An issuer SHOULD corroborate feedback (for example, requiring reputation, multiple independent reports, or evidence) before taking action that would affect a principal, so that the channel cannot itself be used to deny service to legitimate initiators.
 
