@@ -23,15 +23,15 @@ Abstract
    managers, account-takeover (ATO) protection systems, and customer
    identity and access management (CIAM) systems -- consume KYAPay
    tokens to answer a question that traditional bot detection cannot:
-   not "is this a human or a bot?", but "did a verified human authorize
-   this agent?".  It specifies how KYAPay tokens are carried in HTTP
+   "did a verified human authorize this agent?", rather than "is this a
+   human?".  It specifies how KYAPay tokens are carried in HTTP
    requests, how they are validated (including in combination with
    request-signing layers such as HTTP Message Signatures), and how the
    verified, layered identity in a token is used to make access,
-   routing, fraud, account-lifecycle, and step-up decisions.  It defines
-   the token-consuming "verifier" role that the KYAPay Token leaves
-   unspecified.  It is intentionally non-prescriptive about how tokens
-   are created, because agent architectures, agent-identity
+   routing, fraud detection, account-lifecycle, and step-up decisions.
+   It defines the token-consuming "verifier" role that the KYAPay Token
+   leaves unspecified.  It is intentionally non-prescriptive about how
+   tokens are created, because agent architectures, agent-identity
    technologies, and agent-communication protocols are diverse and still
    emerging; the token itself is the interoperability contract.
 
@@ -102,9 +102,9 @@ Table of Contents
      4.1.  KYA is an Issuer-Signed Bearer Token Today
      4.2.  Identity and Proof of Possession are Different Layers
      4.3.  The Proof-of-Possession Path (Planned Evolution)
-   5.  Carrying KYAPay Tokens in Requests
+   5.  Conveying KYAPay Tokens in Requests
      5.1.  The KYAPay-Token HTTP Header Field
-     5.2.  Carrying Tokens over Other Interfaces
+     5.2.  Conveying Tokens over Other Interfaces
      5.3.  Authenticating the Counterparty
    6.  Using KYAPay Tokens at Security Intermediaries
      6.1.  Common Processing Model
@@ -117,9 +117,9 @@ Table of Contents
      6.8.  Consistency Across Layers
      6.9.  Granular Bad-Actor Mitigation and Triage
      6.10.  Feedback to the Token Issuer
-     6.11.  Non-Payment and Hand-off Flows
+     6.11.  Non-Payment and Handoff Flows
    7.  Token Creation Considerations
-     7.1.  Why this Document is Not Prescriptive About Creation
+     7.1.  Why this Document is Not Prescriptive about Creation
      7.2.  Guidance for KYAPay Token Issuers
    8.  Security Considerations
      8.1.  Transport Confidentiality
@@ -171,17 +171,17 @@ Table of Contents
    Put succinctly, the distinction that matters is no longer human
    versus good bot versus bad bot; it is human-direct and human-via-
    agent, together, versus bots.  And the sharper form of the question
-   is not "is this a human or a bot?" but "did a verified human
-   authorize this agent?".  An AI agent is neither a bot to be managed
-   nor a human to be onboarded through a conventional flow; it is a new
-   category of legitimate client that existing bot and fraud detection
-   cannot, on its own, distinguish from malicious automation.
+   is "did a verified human authorize this agent?", rather than "is this
+   a human?".  An AI agent is neither a bot to be managed nor a human to
+   be onboarded through a conventional flow; it is a new category of
+   legitimate client that existing bot and fraud detection cannot, on
+   its own, distinguish from malicious automation.
 
    Bots were unwelcome, and they remain unwelcome.  The new requirement
-   is that both human requests and human-via-agent requests MUST be able
+   is that both human requests and human-via-agent requests must be able
    to succeed across the existing web security infrastructure.  A human-
-   via- agent request is, at the transport and application layers,
-   frequently indistinguishable from a bot: it is programmatic, it may
+   via-agent request is, at the transport and application layers,
+   frequently indistinguishable from a bot; it is programmatic, it may
    originate from data-center IP space, and it may not carry a
    conventional interactive browser fingerprint.  Absent a reliable
    signal, security intermediaries either block legitimate agents
@@ -199,7 +199,7 @@ Table of Contents
    principal (to some level of assurance) authorized this agent (running
    on this platform) to act on their behalf; a validated PAY token
    further asserts that a trusted issuer has authorized this agent to
-   pay a specific amount to a specific target.  Together they form a
+   pay a specific amount to a specific target.  Together, they form a
    chain of trust from the human principal to the action, and -- for
    payments -- to settlement.
 
@@ -207,7 +207,7 @@ Table of Contents
 
    This document describes how _consumers_ of KYAPay tokens -- in
    particular the security intermediaries that guard websites, APIs, and
-   accounts -- carry, validate, and act on KYAPay tokens.  It does not
+   accounts -- convey, validate, and act on KYAPay tokens.  It does not
    redefine the token; the claims, their meanings, and the base
    validation rules are specified in the KYAPay Token
    [I-D.skyfire-oauth-kyapay-token] and are referenced normatively here.
@@ -230,13 +230,16 @@ Table of Contents
    decision.  This document defines that role -- the _verifier_ (or
    relying party) -- and specifies its behavior.
 
-   Two related specifications define JWT claims and values that a
+   Three related specifications define JWT claims and values that a
    verifier can use to reason about how a principal was authenticated
    and verified, and that MAY appear in KYAPay tokens: the Additional
    Authentication Method Reference Values specification
-   [I-D.skyfire-oauth-amr-values], which extends the amr claim
-   [RFC8176], and the Identity Verification Methods Values specification
-   [I-D.skyfire-oauth-id-verification], which defines the ivm claim.
+   [I-D.skyfire-oauth-amr-values], which defines additional amr
+   [RFC8176] claim values, the Identity Verification Methods Values
+   specification [I-D.skyfire-oauth-id-verification], which defines the
+   ivm claim and values, and the Anti-Money Laundering Methods Values
+   specification [I-D.skyfire-oauth-aml-methods], which defines the aml
+   claim and values.
 
 2.  Conventions and Definitions
 
@@ -248,11 +251,12 @@ Table of Contents
 
 2.1.  Terminology
 
-   This document uses the following terms.  The Initiator/Target and
-   agent- identity terms (Initiator Agent, Initiator Principal, Agent
-   Platform, and the identity groupings hid, apd, and aid) are defined
-   in [I-D.skyfire-oauth-kyapay-token] and are used here with the same
-   meaning.
+   This specification uses the Initiator/Target and agent identity terms
+   Initiator Agent, Initiator Principal, Agent Platform, and the
+   identity grouping claims hid, apd, and aid defined by
+   [I-D.skyfire-oauth-kyapay-token].
+
+   This document defines the following terms:
 
    *Human-via-agent request*:  An HTTP request or protocol message
       issued by an agent that carries a valid KYAPay token attesting
@@ -268,9 +272,7 @@ Table of Contents
    *Verifier (Relying Party)*:  The entity that receives a KYAPay token,
       validates it, and acts on the result.  A verifier may be a
       security intermediary (below), a Target's own resource server, or
-      an edge/CDN provider acting on a Target's behalf.  This role is
-      not defined by [I-D.skyfire-oauth-kyapay-token]; it is defined by
-      this document.
+      an edge/CDN provider acting on a Target's behalf.
 
    *Security intermediary*:  A verifier, typically operated by a
       security vendor or by the Target, that inspects requests and makes
@@ -320,10 +322,9 @@ Table of Contents
    for a request must ultimately be assignable to a human party: the
    principal, the developer of the agent, the operator of the agent
    platform, or some other identified party.  KYAPay tokens are
-   structured to carry these identities in layers (hid, apd, and aid) so
-   that this auditable, cryptographically verifiable chain of
-   responsibility -- from agent action back to an accountable human --
-   can be established.
+   structured to convey these identities so that this auditable,
+   cryptographically verifiable chain of responsibility -- from agent
+   action back to an accountable human -- can be established.
 
 3.2.  Ubiquity of Access on the Existing Web
 
@@ -336,7 +337,7 @@ Table of Contents
    an agent at all.  The goal is therefore agentic access to the
    existing web, not a parallel, agent-only surface that must be set up
    in advance.  This goal can only be met if security intermediaries
-   admit legitimate human-via- agent requests by default when a valid
+   admit legitimate human-via-agent requests by default when a valid
    token is present.
 
 3.3.  Works with Today's Web at Zero Merchant Tech Lift
@@ -350,7 +351,7 @@ Table of Contents
    language models (LLMs) can frequently learn to use these interfaces
    automatically.  A protocol for delivering agent identity and payment
    credentials should therefore work with today's web without requiring
-   merchants to build new APIs.  KYAPay meets this by carrying
+   merchants to build new APIs.  KYAPay meets this by conveying
    credentials in the HTTP request itself (Section 5), which requires no
    change to how a merchant's site is built.
 
@@ -392,11 +393,12 @@ Table of Contents
    short-lived bearer token.  Its single most valuable operational
    property is that a Target has to do almost nothing to consume it:
    verify a JWT against the issuer's public key via JWKS, exactly as it
-   would verify any OpenID Connect or OAuth token.  Any Target with a
-   standard JWT library can participate, including those behind CDNs,
-   API gateways, and serverless platforms.  Preserving that low bar is a
-   primary design goal (Section 3); mechanisms that would raise it are
-   weighed against the adoption they would cost.
+   would verify any OpenID Connect [OpenID.Core] or OAuth [RFC6749]
+   token.  Any Target with a standard JWT library can participate,
+   including those behind CDNs, API gateways, and serverless platforms.
+   Preserving that low bar is a primary design goal (Section 3);
+   mechanisms that would raise it are weighed against the adoption they
+   would cost.
 
    A bearer token establishes identity but not proof of possession:
    possession of the token is all that is needed to present it, so a
@@ -436,13 +438,13 @@ Table of Contents
    *  _Did the sender actually hold the credential's key?_ This is proof
       of possession, which a bearer token does not provide.
       Establishing it requires the agent to sign the request itself;
-      over HTTP, HTTP Message Signatures [RFC9421] are the mechanism for
+      over HTTP, HTTP Message Signatures [RFC9421] are a mechanism for
       this.  A signature proves control of a key but says nothing about
       whose key it is -- it is a _verb_, not an identity format.
 
    Because these are different layers, HTTP Message Signatures [RFC9421]
    and similar request-signing mechanisms are complementary to KYA, not
-   alternatives to it: request signing supplies authenticity and
+   alternatives to it; request signing supplies authenticity and
    possession, while KYA supplies identity, authorization, and payment.
    A complete proof-of-possession design uses both, bound together, as
    described next.
@@ -488,10 +490,10 @@ Table of Contents
    Until fast, secure signing and a workable anti-replay approach exist
    that keep the Target's job about as simple as verifying a JWT, KYA
    remains a bearer token by default and proof of possession is an
-   optional, forward- compatible upgrade rather than a precondition for
+   optional, forward-compatible upgrade rather than a precondition for
    participation.
 
-5.  Carrying KYAPay Tokens in Requests
+5.  Conveying KYAPay Tokens in Requests
 
 5.1.  The KYAPay-Token HTTP Header Field
 
@@ -503,28 +505,25 @@ Table of Contents
    form fields at checkout); for a human-via-agent request, they are
    carried in the KYAPay-Token header field defined here.
 
-   The KYAPay-Token header field is a request header field whose value
-   is the JWS Compact Serialization [RFC7515] of a KYA, PAY, or KYA-PAY
-   token as defined in [I-D.skyfire-oauth-kyapay-token].  HTTP field
-   names are case-insensitive [RFC9110]; early deployments write this
-   field in lowercase as kyapay-token.
+   The KYAPay-Token header field is an HTTP request header field whose
+   value is a KYA, PAY, or KYA-PAY token, as defined in
+   [I-D.skyfire-oauth-kyapay-token].  HTTP field names are case-
+   insensitive [RFC9110].
 
-   KYAPay-Token = token-jws *( OWS "," OWS token-jws )
-   token-jws    = 1*( ALPHA / DIGIT / "-" / "_" / "." )
+   KYAPay-Token = token-jwt *( OWS "," OWS token-jwt )
+   token-jwt    = 1*( ALPHA / DIGIT / "-" / "_" / "." )
 
-   A request MAY carry more than one token (for example, a separate KYA
-   token and PAY token) either as a comma-separated list in a single
-   KYAPay-Token header field or as multiple KYAPay-Token header fields;
-   per Section 5.2 of [RFC9110], multiple field lines with the same name
-   are equivalent to a single comma-separated field line.  Because the
-   JWS Compact Serialization uses only the base64url alphabet plus the
-   period (".") separator, it never contains a comma, so list parsing is
-   unambiguous.
+   A request MAY convey more than one token (for example, separate KYA
+   and PAY tokens) either as a comma-separated list in a single KYAPay-
+   Token header field or as multiple KYAPay-Token header fields; per
+   Section 5.2 of [RFC9110], multiple field lines with the same name are
+   equivalent to a single comma-separated field line.  Because a JWT
+   uses only the base64url alphabet plus the period (".") separator, it
+   never contains a comma, so list parsing is unambiguous.
 
    A sender:
 
-   *  MUST place exactly one JWS Compact Serialization in each list
-      member;
+   *  MUST place exactly one JWT in each list member;
 
    *  SHOULD NOT send more than one token of the same typ
       ([I-D.skyfire-oauth-kyapay-token]) in a single request; and
@@ -538,7 +537,7 @@ Table of Contents
       parameter ([I-D.skyfire-oauth-kyapay-token]), not from its
       position; and
 
-   *  MUST ignore a KYAPay-Token member it cannot parse as a JWS, while
+   *  MUST ignore a KYAPay-Token member it cannot parse as a JWT, while
       continuing to process the remaining members, unless local policy
       requires rejecting the whole request.
 
@@ -549,13 +548,13 @@ Table of Contents
    participants (see Section 9).
 
    The KYAPay-Token header field is intended for use over TLS.  A token
-   MUST NOT be sent over a non-TLS-protected connection.  Where the
-   token carries a proof-of-possession key (Section 4), it SHOULD be
+   MUST NOT be sent over a non-TLS-protected connection.  When the token
+   carries a proof-of-possession key (Section 4), it SHOULD be
    accompanied by a request Message Signature [RFC9421] over that key;
    otherwise it is a bearer token, subject to the controls and accepted
    risks in Section 8.
 
-5.2.  Carrying Tokens over Other Interfaces
+5.2.  Conveying Tokens over Other Interfaces
 
    Beyond HTTP requests to websites and APIs, agents interact through a
    growing set of interfaces and protocols, including agent-to-tool
@@ -576,11 +575,11 @@ Table of Contents
    specifies only the HTTP header binding in Section 5.1; bindings for
    other protocols are expected to be defined by those protocols or by
    companion specifications.  In all cases, the validation and usage
-   rules of Section 6 apply to the token once received.
+   rules of Section 6 apply to the token, once received.
 
 5.3.  Authenticating the Counterparty
 
-   Carrying a token securely also requires that the sending agent
+   Conveying a token securely also requires that the sending agent
    deliver it to the intended recipient and that the recipient be able
    to bind the token to itself.  The aud claim, together with the
    optional tdm (target domain) and tsi (target service identifier)
@@ -631,20 +630,21 @@ Table of Contents
        described in Section 8.
 
    6.  MUST confirm that the env claim (for example, production) matches
-       the environment the intermediary is operating in.  Where the
-       token carries a proof-of-possession key (the cnf claim [RFC7800],
+       the environment the intermediary is operating in.  When the token
+       carries a proof-of-possession key (the cnf claim [RFC7800],
        Section 4), MUST verify that the request is signed by that key --
        over HTTP, using HTTP Message Signatures [RFC9421] -- and reject
        the request if the signature is absent or invalid.
 
-   7.  Where the token carries no such key, it is a bearer token: the
+   7.  When the token carries no such key, it is a bearer token: the
        intermediary MUST rely on the controls in Section 8 (short
        lifetime, audience binding, TLS, issuer-gated onboarding) and
        MUST NOT assume that mere presentation of the token proves the
        sender holds a key bound to it.
 
-   8.  Only after successful validation, SHOULD use the token's claims
-       to inform its decision as described in the following subsections.
+   8.  SHOULD use the token's claims to inform its decision, as
+       described in the following subsections, only after successful
+       validation.
 
    A security intermediary MUST NOT treat the mere presence of a KYAPay-
    Token header field as a human presence signal; only a successfully
@@ -663,8 +663,9 @@ Table of Contents
       verified status and verifier ([I-D.skyfire-oauth-kyapay-token]),
       and, where a deployment conveys it, an identity-proofing assurance
       level (such as an Identity Assurance Level per [NIST-800-63A]) and
-      the amr [I-D.skyfire-oauth-amr-values] and ivm
-      [I-D.skyfire-oauth-id-verification] claims describing how the
+      the amr [I-D.skyfire-oauth-amr-values], ivm
+      [I-D.skyfire-oauth-id-verification], and aml
+      [I-D.skyfire-oauth-aml-methods] claims describing how the
       principal was authenticated and verified;
 
    *  the agent platform (apd): the identity of the operator that built
@@ -705,15 +706,14 @@ Table of Contents
    latency.  KYAPay tokens are well suited to this role:
 
    *  *Low Latency.* Because the token is a self-contained, signed JWT,
-      the bot manager performs standard JOSE/JWK Set verification and
-      needs no per-request callout to a third party.  Issuer keys SHOULD
-      be cached.
+      the bot manager performs standard JWT verification and needs no
+      per-request callout to a third party.  Issuer keys SHOULD be
+      cached.
 
    *  *Access Control by Identity.* A validated token gives the bot
-      manager verified initiator identity (and, where the request
-      targets an agent, target identity), which it MAY use to admit the
-      request rather than challenging or blocking it as suspected
-      automation.
+      manager verified initiator identity (and, when the request targets
+      an agent, target identity), which it MAY use to admit the request
+      rather than challenging or blocking it as suspected automation.
 
    *  *Replay Resistance.* A bearer token captured within its validity
       window can be replayed; a bot manager bounds this with short
@@ -751,9 +751,10 @@ Table of Contents
       reputable platform from a weakly verified or anonymous one.
 
    *  It SHOULD use the verifier/verified/verification_id sub-claims,
-      and the amr [I-D.skyfire-oauth-amr-values] and ivm
-      [I-D.skyfire-oauth-id-verification] claims where present, to
-      weight how the principal was authenticated and verified.
+      and the amr [I-D.skyfire-oauth-amr-values] ivm
+      [I-D.skyfire-oauth-id-verification], and aml
+      [I-D.skyfire-oauth-aml-methods] claims where present, to weight
+      how the principal was authenticated and verified.
 
    *  For pay+jwt and kya-pay+jwt tokens, it SHOULD use the payment
       context (amt, cur, stp, sti, and the pricing claims tpr and tps)
@@ -769,8 +770,8 @@ Table of Contents
    script running on the Target's page captures the KYAPay-Token value
    and sends it to the fraud manager before the request reaches the
    Target's application).  The same token MAY be inspected before the
-   action, after it, or both.  In all of these arrangements the token
-   issuer is not in the transaction path: the fraud manager verifies the
+   action, after it, or both.  In all of these arrangements, the token
+   issuer is not in the transaction path; the fraud manager verifies the
    self-contained token locally by JWKS, as described in Section 6.1.
    The fraud manager MAY continue to apply its existing behavioral and
    device models; the token supplements, and does not replace, those
@@ -778,7 +779,7 @@ Table of Contents
 
 6.5.  Step-Up Authentication
 
-   Not all actions carry the same risk: viewing a loyalty balance is far
+   Not all actions carry the same risk; viewing a loyalty balance is far
    less sensitive than making a large payment.  A KYAPay token attests
    the assurance established at the time of issuance, which may be
    insufficient for a high-value action.  A verifier SHOULD be able to
@@ -808,13 +809,14 @@ Table of Contents
       session rather than an unattended attack, and SHOULD record that
       distinction for auditing.
 
-   *  Where the agent needs to act within an existing account, the token
-      MAY be exchanged for an OAuth access token using OAuth 2.0 Token
-      Exchange [RFC8693]: a Security Token Service, Identity Provider,
-      or OAuth 2.0 [RFC6749] Authorization Server validates the KYA
-      token, extracts principal claims such as the email address from
-      hid, and issues an access token that the agent uses against the
-      Target.
+   *  When the agent needs to act within an existing account, the token
+      MAY be exchanged for an OAuth access token using KYAPay Token
+      Exchange [I-D.skyfire-oauth-kyapay-token-exchange] or OAuth 2.0
+      Token Exchange [RFC8693].  A Security Token Service, Identity
+      Provider, or OAuth 2.0 [RFC6749] Authorization Server validates
+      the KYA token, extracts principal claims such as the email address
+      from hid, and issues an access token that the agent uses against
+      the Target.
 
    *  The access token resulting from such an exchange SHOULD be sender-
       constrained (for example, via DPoP [RFC9449] or mutual TLS
@@ -844,11 +846,12 @@ Table of Contents
       drawing account attributes such as the email address from the hid
       claim.
 
-   *  It SHOULD use the OAuth 2.0 Token Exchange pattern [RFC8693] to
-      exchange a KYA token for an access token, enabling logged-in
-      experiences (loyalty, saved preferences, offers) for human-via-
-      agent sessions, applying the sender-constraining and cross-domain-
-      trust considerations of Section 6.6.
+   *  It SHOULD use KYAPay Token Exchange
+      [I-D.skyfire-oauth-kyapay-token-exchange] or OAuth 2.0 Token
+      Exchange [RFC8693] to exchange a KYA token for an access token,
+      enabling logged-in experiences (loyalty, saved preferences,
+      offers) for human-via-agent sessions, applying the sender-
+      constraining and cross-domain-trust considerations of Section 6.6.
 
    *  It SHOULD maintain the linkage between a human principal and the
       agents authorized to act for them, so that a principal can be
@@ -884,14 +887,14 @@ Table of Contents
       systematically abusive, unresponsive, or untrusted, block or de-
       rate all traffic from that platform.
 
-   The same granularity supports responses short of a block, such as
-   throttling, requiring step-up (Section 6.5), or lowering an assurance
-   score, applied at whichever tier is appropriate.  Choosing the
-   tightest effective scope isolates threats while protecting the
-   reputation of well-behaved platforms and avoiding collateral damage
-   to legitimate human-via-agent requests; reserving platform-wide
-   action for cases that genuinely warrant it keeps that option
-   available without making it the default.
+   The same granularity supports responses short of blocking the
+   requests, such as throttling, requiring step-up (Section 6.5), or
+   lowering an assurance score, applied at whichever tier is
+   appropriate.  Choosing the tightest effective scope isolates threats
+   while protecting the reputation of well-behaved platforms and
+   avoiding collateral damage to legitimate human-via-agent requests;
+   reserving platform-wide action for cases that genuinely warrant it
+   keeps that option available without making it the default.
 
 6.10.   Feedback to the Token Issuer
 
@@ -935,16 +938,16 @@ Table of Contents
    the channel cannot itself be used to deny service to legitimate
    initiators.
 
-6.11.   Non-Payment and Hand-off Flows
+6.11.   Non-Payment and Handoff Flows
 
    Not every human-via-agent flow includes a payment made by the agent.
    In a common pattern, the agent performs discovery and assembles a
    cart but does not pay; it then hands off to the human, who completes
    checkout in a browser, in a later session, or even in a physical
-   store.  In such flows the KYA token (carried without a PAY token)
+   store.  In such flows, the KYA token (carried without a PAY token)
    still provides the human presence signal that lets a security
    intermediary admit the agent's discovery and cart-building activity.
-   Intermediaries SHOULD accept KYA-only requests (those carrying a KYA
+   Intermediaries SHOULD accept KYA-only requests (those conveying a KYA
    token but no PAY token) for actions that do not themselves settle a
    payment, and MUST NOT treat the absence of a PAY token as a reason to
    classify an otherwise valid human-via-agent request as a bot.
@@ -966,7 +969,7 @@ Table of Contents
    in Section 6; how a given agent obtains a valid token is an
    implementation and architecture choice.
 
-7.1.  Why this Document is Not Prescriptive About Creation
+7.1.  Why this Document is Not Prescriptive about Creation
 
    Readers accustomed to fixed API contracts may expect a specification
    to prescribe exactly how a credential is minted.  For agents, such
@@ -982,7 +985,7 @@ Table of Contents
       agent for a regulated workflow, or anything in between.
 
    *  *Credentials may need to be shielded from the LLM.* In many
-      designs it is desirable that the LLM driving an agent never sees
+      designs, it is desirable that the LLM driving an agent never sees
       raw credentials.  Token creation may therefore be placed inside
       deterministic tools that the LLM can invoke but whose outputs (the
       tokens, or the secrets used to mint them) it cannot read.  Whether
@@ -1052,8 +1055,9 @@ Table of Contents
    lightweight check (such as email verification) and stepping up as a
    Target's requirements demand.  Consumers observe the result of these
    choices through the verified/verifier sub-claims and, where used, the
-   ivm [I-D.skyfire-oauth-id-verification] and amr
-   [I-D.skyfire-oauth-amr-values] claims, rather than through any
+   ivm [I-D.skyfire-oauth-id-verification], amr
+   [I-D.skyfire-oauth-amr-values], and aml
+   [I-D.skyfire-oauth-aml-methods] claims, rather than through any
    mandated creation flow.
 
    The objective of all of the above is a single outcome: a valid KYAPay
@@ -1070,7 +1074,7 @@ Table of Contents
 
 8.1.  Transport Confidentiality
 
-   KYAPay tokens carry identity and, for PAY tokens, payment
+   KYAPay tokens convey identity and, for PAY tokens, payment
    credentials.  They MUST be transmitted over TLS and MUST NOT be sent
    in the clear.
 
@@ -1111,7 +1115,7 @@ Table of Contents
 
    Malware resident on the agent's host can drive the agent's legitimate
    key as a signing oracle for as long as it is present.  Proof of
-   possession does not prevent this: the malware's requests carry valid
+   possession does not prevent this: the malware's requests convey valid
    bindings and are indistinguishable from the real agent's.  This risk
    is bounded not by the token bindings but by short token lifetimes --
    so anything signed during a compromise expires quickly once the
@@ -1170,8 +1174,8 @@ Table of Contents
    assurance level or a boolean verified status rather than underlying
    identity documents or personally identifying verification data.
    Because KYA tokens are JWTs, selective disclosure (for example, SD-
-   JWT) is a forward-compatible path to revealing only the claims a
-   given Target needs.
+   JWT [RFC9901]) is a forward-compatible path to revealing only the
+   claims a given Target needs.
 
 9.2.  Consent
 
@@ -1193,7 +1197,8 @@ Table of Contents
 10.1.  HTTP Field Name Registration
 
    IANA is requested to register the following entry in the "Hypertext
-   Transfer Protocol (HTTP) Field Name" registry defined in [RFC9110]:
+   Transfer Protocol (HTTP) Field Name" registry established by
+   [RFC9110]:
 
    *  Field Name: KYAPay-Token
 
@@ -1203,16 +1208,16 @@ Table of Contents
 
    *  Reference: Section 5.1 of this document
 
-   *  Comments: Carries one or more KYAPay tokens (JWS Compact
-      Serialization) on an HTTP request.
+   *  Comments: Carries one or more KYAPay tokens in an HTTP request
 
 10.2.  JWT and Media Type Registrations
 
    This document defines no new JWT claims, JWT confirmation methods, or
    media types.  The claims and media types used by KYAPay tokens are
-   registered by [I-D.skyfire-oauth-kyapay-token]; the amr extensions
-   and the ivm claim are registered by [I-D.skyfire-oauth-amr-values]
-   and [I-D.skyfire-oauth-id-verification] respectively.
+   registered by [I-D.skyfire-oauth-kyapay-token].  The amr extensions
+   and the ivm and aml claims and values are registered by
+   [I-D.skyfire-oauth-amr-values], [I-D.skyfire-oauth-id-verification],
+   and [I-D.skyfire-oauth-aml-methods], respectively.
 
 11.  References
 
@@ -1224,6 +1229,13 @@ Table of Contents
               token-00, 5 July 2026,
               <https://datatracker.ietf.org/doc/html/draft-skyfire-
               oauth-kyapay-token-00>.
+
+   [I-D.skyfire-oauth-kyapay-token-exchange]
+              Agarwal, A. and M. B. Jones, "KYAPay Token Exchange", Work
+              in Progress, Internet-Draft, draft-skyfire-oauth-kyapay-
+              token-exchange-00, 6 July 2026,
+              <https://datatracker.ietf.org/doc/html/draft-skyfire-
+              oauth-kyapay-token-exchange-00>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -1273,6 +1285,13 @@ Table of Contents
               <https://datatracker.ietf.org/doc/html/draft-ietf-oauth-
               client-id-metadata-document-02>.
 
+   [I-D.skyfire-oauth-aml-methods]
+              Agarwal, A., Jones, M. B., and N. Ali, "Anti-Money
+              Laundering Methods Values", Work in Progress, Internet-
+              Draft, draft-skyfire-oauth-aml-methods-00, 18 July 2026,
+              <https://datatracker.ietf.org/doc/html/draft-skyfire-
+              oauth-aml-methods-00>.
+
    [I-D.skyfire-oauth-amr-values]
               Agarwal, A. and M. B. Jones, "Additional Authentication
               Method Reference Values", Work in Progress, Internet-
@@ -1302,6 +1321,12 @@ Table of Contents
               (NIST SP 800-63A)",
               <https://pages.nist.gov/800-63-3/sp800-63a.html>.
 
+   [OpenID.Core]
+              Sakimura, N., Bradley, J., Jones, M. B., Medeiros, B. de.,
+              and C. Mortimore, "OpenID Connect Core 1.0 incorporating
+              errata set 2", 15 December 2023,
+              <https://openid.net/specs/openid-connect-core-1_0.html>.
+
    [RFC6749]  Hardt, D., Ed., "The OAuth 2.0 Authorization Framework",
               RFC 6749, DOI 10.17487/RFC6749, October 2012,
               <https://www.rfc-editor.org/rfc/rfc6749>.
@@ -1326,6 +1351,11 @@ Table of Contents
               Possession (DPoP)", RFC 9449, DOI 10.17487/RFC9449,
               September 2023, <https://www.rfc-editor.org/rfc/rfc9449>.
 
+   [RFC9901]  Fett, D., Yasuda, K., and B. Campbell, "Selective
+              Disclosure for JSON Web Tokens", RFC 9901,
+              DOI 10.17487/RFC9901, November 2025,
+              <https://www.rfc-editor.org/rfc/rfc9901>.
+
    [SPIFFE]   SPIFFE Project / Cloud Native Computing Foundation,
               "Secure Production Identity Framework for Everyone
               (SPIFFE)",
@@ -1342,10 +1372,11 @@ Table of Contents
 Acknowledgments
 
    The authors thank the contributors to the KYAPay Token
-   [I-D.skyfire-oauth-kyapay-token] and the partners in the KYAPay
-   consortium (see [KYAPAY-ORG]) -- including bot-management, fraud,
-   CIAM, and ATO vendors -- whose deployment and review experience
-   informed the usage patterns and open issues described here.
+   [I-D.skyfire-oauth-kyapay-token] specification and the partners in
+   the KYAPay consortium (see [KYAPAY-ORG]) -- including bot-management,
+   fraud, CIAM, and ATO vendors and merchants -- whose deployment and
+   review experience informed the usage patterns and open issues
+   described here.
 
 Document History
 
