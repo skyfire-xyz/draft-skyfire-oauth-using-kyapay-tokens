@@ -5,10 +5,10 @@
 Web Authorization Protocol                                    A. Agarwal
 Internet-Draft                                      Skyfire Systems Inc.
 Intended status: Standards Track                             M. B. Jones
-Expires: 20 January 2027                          Self-Issued Consulting
+Expires: 28 February 2027                         Self-Issued Consulting
                                                                S. Thumma
                                                                   Akamai
-                                                            19 July 2026
+                                                          27 August 2026
 
 
                           Using KYAPay Tokens
@@ -69,7 +69,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 January 2027.
+   This Internet-Draft will expire on 28 February 2027.
 
 Copyright Notice
 
@@ -461,7 +461,11 @@ Table of Contents
        issuer;
 
    3.  the issuer binds that public key into the KYA token using the JWT
-       confirmation claim cnf (cnf.jkt or cnf.jwk) [RFC7800]; and
+       confirmation claim cnf [RFC7800].  The token MUST carry cnf.jwk,
+       the key itself, wherever the verifier may not already hold that
+       key, because a thumbprint cannot be resolved to a key; cnf.jkt
+       [RFC9449] MAY be used instead only where the key is already held,
+       such as on a resumed session or for a pre-registered agent; and
 
    4.  the agent signs each request in place -- a signature over the
        request (method, path, body digest, timestamp/nonce) using
@@ -1226,9 +1230,9 @@ Table of Contents
    [I-D.skyfire-oauth-kyapay-token]
               Agarwal, A. and M. B. Jones, "KYAPay Token", Work in
               Progress, Internet-Draft, draft-skyfire-oauth-kyapay-
-              token-00, 5 July 2026,
+              token-01, 19 July 2026,
               <https://datatracker.ietf.org/doc/html/draft-skyfire-
-              oauth-kyapay-token-00>.
+              oauth-kyapay-token-01>.
 
    [I-D.skyfire-oauth-kyapay-token-exchange]
               Agarwal, A., Jones, M. B., Hingnikar, A., and J. Hickman,
@@ -1272,6 +1276,11 @@ Table of Contents
    [RFC9421]  Backman, A., Ed., Richer, J., Ed., and M. Sporny, "HTTP
               Message Signatures", RFC 9421, DOI 10.17487/RFC9421,
               February 2024, <https://www.rfc-editor.org/rfc/rfc9421>.
+
+   [RFC9449]  Fett, D., Campbell, B., Bradley, J., Lodderstedt, T.,
+              Jones, M., and D. Waite, "OAuth 2.0 Demonstrating Proof of
+              Possession (DPoP)", RFC 9449, DOI 10.17487/RFC9449,
+              September 2023, <https://www.rfc-editor.org/rfc/rfc9449>.
 
 11.2.  Informative References
 
@@ -1346,11 +1355,6 @@ Table of Contents
               Current Practices", BCP 225, RFC 8725,
               DOI 10.17487/RFC8725, February 2020,
               <https://www.rfc-editor.org/rfc/rfc8725>.
-
-   [RFC9449]  Fett, D., Campbell, B., Bradley, J., Lodderstedt, T.,
-              Jones, M., and D. Waite, "OAuth 2.0 Demonstrating Proof of
-              Possession (DPoP)", RFC 9449, DOI 10.17487/RFC9449,
-              September 2023, <https://www.rfc-editor.org/rfc/rfc9449>.
 
    [RFC9901]  Fett, D., Yasuda, K., and B. Campbell, "Selective
               Disclosure for JSON Web Tokens", RFC 9901,
