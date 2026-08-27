@@ -57,6 +57,7 @@ normative:
   RFC9110: # HTTP Semantics
   RFC9421: # HTTP Message Signatures
   RFC7800: # JWT proof-of-possession (cnf)
+  RFC9449: # DPoP -- defines the cnf.jkt confirmation method
   I-D.skyfire-oauth-kyapay-token:
   I-D.skyfire-oauth-kyapay-token-exchange:
 
@@ -65,7 +66,6 @@ informative:
   RFC8725: # JWT BCP
   RFC8176: # AMR values
   RFC8705: # OAuth 2.0 Mutual-TLS
-  RFC9449: # DPoP
   RFC9901: # SD-JWT
   I-D.skyfire-oauth-amr-values:
   I-D.skyfire-oauth-id-verification:
@@ -325,7 +325,7 @@ When per-request signing becomes practical at scale, the planned evolution of KY
 
 1. the issuer onboards the agent as a CA would;
 1. the agent generates a key pair and provides its public key to the issuer;
-1. the issuer binds that public key into the KYA token using the JWT confirmation claim `cnf` (`cnf.jkt` or `cnf.jwk`) {{RFC7800}}; and
+1. the issuer binds that public key into the KYA token using the JWT confirmation claim `cnf` {{RFC7800}}. The token MUST carry `cnf.jwk`, the key itself, wherever the verifier may not already hold that key, because a thumbprint cannot be resolved to a key; `cnf.jkt` {{RFC9449}} MAY be used instead only where the key is already held, such as on a resumed session or for a pre-registered agent; and
 1. the agent signs each request in place -- a signature over the request (method, path, body digest, timestamp/nonce) using {{RFC9421}} -- verified against the key in `cnf`, with no separate proof-of-possession token.
 
 This yields an unbroken chain from request to key to identity: the request is signed by a key, and that key is vouched for as the initiator's by the issuer.
