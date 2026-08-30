@@ -400,12 +400,15 @@ Throughout, "validate the token" means to perform the validation procedure defin
 On receiving a request that carries one or more KYAPay tokens, a security intermediary:
 
 1. MUST extract each token as described in {{ConveyingRequests}}.
+1. MUST confirm that the token's issuer is one the verifier trusts for the claims being relied upon (see {{SecCon}}).
+   This check MUST precede any processing that resolves a value taken from the token, and in particular any network retrieval driven by the `iss` claim.
+   Until the token has been verified, `iss` is supplied by the sender: resolving it before the issuer is known to be trusted would allow an unauthenticated request to cause an outbound fetch to an arbitrary URL of the sender's choosing.
+   The trusted-issuer set is configured out of band and is not derived from the token.
 1. MUST validate each token as specified in {{I-D.skyfire-oauth-kyapay-token}}, Section 4.
    A token that fails validation MUST NOT be treated as conveying a human presence signal, and the intermediary MUST fall back to its default (token-absent) policy for that request.
 1. MUST verify the token signature against a key obtained from the issuer's JWK Set, discovered via the `iss` claim using the `/.well-known/jwks.json` mechanism ({{I-D.skyfire-oauth-kyapay-token}}).
    Because KYAPay tokens are self-contained, this verification SHOULD be performed locally, without a synchronous callout to the issuer per request;
    issuer keys SHOULD be cached and refreshed according to standard JWK Set practice.
-1. MUST confirm that the token's issuer is one the verifier trusts for the claims being relied upon (see {{SecCon}}).
 1. MUST confirm that the token is intended for this recipient by checking the `aud` claim (and, if used, the `tdm` and `tsi` claims) as described in {{SecCon}}.
 1. MUST confirm that the `env` claim (for example, `production`) matches the environment the intermediary is operating in.
    When the token carries a proof-of-possession key (the `cnf` claim {{RFC7800}}, Section 4), MUST verify that the request is signed by that key -- over HTTP, using HTTP Message Signatures {{RFC9421}} -- and reject the request if the signature is absent or invalid.
