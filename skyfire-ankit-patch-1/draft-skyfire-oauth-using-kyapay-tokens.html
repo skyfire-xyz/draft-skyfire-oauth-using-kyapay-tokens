@@ -1779,16 +1779,19 @@ Throughout, "validate the token" means to perform the validation procedure defin
             <p id="section-6.1-2.1.1"><span class="bcp14">MUST</span> extract each token as described in <a href="#ConveyingRequests" class="auto internal xref">Section 5</a>.<a href="#section-6.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.2">
-            <p id="section-6.1-2.2.1"><span class="bcp14">MUST</span> validate each token as specified in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, Section 4.
-A token that fails validation <span class="bcp14">MUST NOT</span> be treated as conveying a human presence signal, and the intermediary <span class="bcp14">MUST</span> fall back to its default (token-absent) policy for that request.<a href="#section-6.1-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-2.2.1"><span class="bcp14">MUST</span> confirm that the token's issuer is one the verifier trusts for the claims being relied upon (see <a href="#SecCon" class="auto internal xref">Section 8</a>).
+This check <span class="bcp14">MUST</span> precede any processing that resolves a value taken from the token, and in particular any network retrieval driven by the <code>iss</code> claim.
+Until the token has been verified, <code>iss</code> is supplied by the sender: resolving it before the issuer is known to be trusted would allow an unauthenticated request to cause an outbound fetch to an arbitrary URL of the sender's choosing.
+The trusted-issuer set is configured out of band and is not derived from the token.<a href="#section-6.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.3">
-            <p id="section-6.1-2.3.1"><span class="bcp14">MUST</span> verify the token signature against a key obtained from the issuer's JWK Set, discovered via the <code>iss</code> claim using the <code>/.well-known/jwks.json</code> mechanism (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>).
-Because KYAPay tokens are self-contained, this verification <span class="bcp14">SHOULD</span> be performed locally, without a synchronous callout to the issuer per request;
-issuer keys <span class="bcp14">SHOULD</span> be cached and refreshed according to standard JWK Set practice.<a href="#section-6.1-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-2.3.1"><span class="bcp14">MUST</span> validate each token as specified in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, Section 4.
+A token that fails validation <span class="bcp14">MUST NOT</span> be treated as conveying a human presence signal, and the intermediary <span class="bcp14">MUST</span> fall back to its default (token-absent) policy for that request.<a href="#section-6.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.4">
-            <p id="section-6.1-2.4.1"><span class="bcp14">MUST</span> confirm that the token's issuer is one the verifier trusts for the claims being relied upon (see <a href="#SecCon" class="auto internal xref">Section 8</a>).<a href="#section-6.1-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-2.4.1"><span class="bcp14">MUST</span> verify the token signature against a key obtained from the issuer's JWK Set, discovered via the <code>iss</code> claim using the <code>/.well-known/jwks.json</code> mechanism (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>).
+Because KYAPay tokens are self-contained, this verification <span class="bcp14">SHOULD</span> be performed locally, without a synchronous callout to the issuer per request;
+issuer keys <span class="bcp14">SHOULD</span> be cached and refreshed according to standard JWK Set practice.<a href="#section-6.1-2.4.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.5">
             <p id="section-6.1-2.5.1"><span class="bcp14">MUST</span> confirm that the token is intended for this recipient by checking the <code>aud</code> claim (and, if used, the <code>tdm</code> and <code>tsi</code> claims) as described in <a href="#SecCon" class="auto internal xref">Section 8</a>.<a href="#section-6.1-2.5.1" class="pilcrow">¶</a></p>
