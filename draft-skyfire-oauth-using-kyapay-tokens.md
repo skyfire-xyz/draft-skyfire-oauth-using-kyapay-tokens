@@ -202,38 +202,48 @@ and the identity grouping claims `hid`, `apd`, and `aid` defined by {{I-D.skyfir
 
 This document defines the following terms:
 
+{:vspace}
 **Human-via-agent request**:
 : An HTTP request or protocol message issued by an agent that carries a valid KYAPay token attesting that the agent is acting on behalf of an identified, authorizing human principal (an individual or an organization).
 
+{:vspace}
 **Bot**:
 : Unattended automation that is not acting on behalf of, or with the authorization of, an identified human principal, and that does not present a valid KYAPay token.
   This document does not attempt to further classify bots;
   existing "good bot" / "bad bot" mechanisms are orthogonal and continue to apply.
 
+{:vspace}
 **Verifier (Relying Party)**:
 : The entity that receives a KYAPay token, validates it, and acts on the result.
   A verifier may be a security intermediary (below), a Target's own resource server, or an edge/CDN provider acting on a Target's behalf.
 
+{:vspace}
 **Security intermediary**:
 : A verifier, typically operated by a security vendor or by the Target, that inspects requests and makes an admission, routing, scoring, or lifecycle decision before or as the request reaches the Target's application.
   This document addresses four common (and often overlapping) kinds of security intermediary:
 
+  {:vspace}
   **Bot manager**:
   : A system operating primarily at the network and transport layer that decides whether to admit, challenge, throttle, or block a request based on whether it appears to be automated.
 
+  {:vspace}
   **Fraud manager**:
   : An application-layer system that scores the risk of a transaction or action, typically using identity, reputation, behavioral, and device signals.
 
+  {:vspace}
   **Account-takeover (ATO) protector**:
   : A system that detects and prevents unauthorized access to existing accounts, for example by distinguishing legitimate sessions from hijacked or automated ones.
 
+  {:vspace}
   **CIAM (customer identity and access management) system**:
   : A system that manages account creation, authentication, and login for a Target's customers.
 
+{:vspace}
 **Human presence signal**:
 : The aggregate assurance, derived from a validated KYAPay token, that a request is authorized by an identified human principal.
   See {{HumanPresence}}.
 
+{:vspace}
 **Assurance level**:
 : A per-entity indication of how strongly an identity in the token was verified (for example, the identity-proofing level of the human principal).
   See {{HumanPresence}}.
@@ -759,6 +769,10 @@ The authors thank the contributors to the KYAPay Token {{I-D.skyfire-oauth-kyapa
 {: numbered="false"}
 
 [[ to be removed by the RFC Editor before publication as an RFC ]]
+
+-01
+
+* Added {:vspace} syntax to definition list entries.
 
 -00
 
