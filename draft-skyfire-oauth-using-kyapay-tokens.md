@@ -325,7 +325,7 @@ When per-request signing becomes practical at scale, the planned evolution of KY
 
 1. the issuer onboards the agent as a CA would;
 1. the agent generates a key pair and provides its public key to the issuer;
-1. the issuer binds that public key into the KYA token using the JWT confirmation claim `cnf` (`cnf.jkt` or `cnf.jwk`) {{RFC7800}}; and
+1. the issuer binds that public key into the KYA token using the JWT confirmation claim `cnf` {{RFC7800}}. The token MUST carry `cnf.jwk` -- the key itself. A key identifier would satisfy {{RFC7800}} only on its own terms, which hold "provided the recipient is able to obtain the identified key": a verifier meeting the agent for the first time holds no such key, and a thumbprint is a one-way hash from which none can be recovered. The issuer cannot determine when that proviso is met -- it knows neither which verifiers a token will reach, nor the initiator's intent, nor the state of any interaction between initiator and target. Nor can it rely on continuity between tokens: where a target de-duplicates on `jti` to prevent replay, each token is fresh and must stand on its own. Carrying the key is therefore the only form that works in the general case. Other confirmation members MAY additionally be present; a verifier MUST NOT be required to obtain the key by any means other than reading `cnf.jwk`; and
 1. the agent signs each request in place -- a signature over the request (method, path, body digest, timestamp/nonce) using {{RFC9421}} -- verified against the key in `cnf`, with no separate proof-of-possession token.
 
 This yields an unbroken chain from request to key to identity: the request is signed by a key, and that key is vouched for as the initiator's by the issuer.
@@ -400,12 +400,15 @@ Throughout, "validate the token" means to perform the validation procedure defin
 On receiving a request that carries one or more KYAPay tokens, a security intermediary:
 
 1. MUST extract each token as described in {{ConveyingRequests}}.
+1. MUST confirm that the token's issuer is one the verifier trusts for the claims being relied upon (see {{SecCon}}).
+   This check MUST precede any processing that resolves a value taken from the token, and in particular any network retrieval driven by the `iss` claim.
+   Until the token has been verified, `iss` is supplied by the sender: resolving it before the issuer is known to be trusted would allow an unauthenticated request to cause an outbound fetch to an arbitrary URL of the sender's choosing.
+   The trusted-issuer set is configured out of band and is not derived from the token.
 1. MUST validate each token as specified in {{I-D.skyfire-oauth-kyapay-token}}, Section 4.
    A token that fails validation MUST NOT be treated as conveying a human presence signal, and the intermediary MUST fall back to its default (token-absent) policy for that request.
 1. MUST verify the token signature against a key obtained from the issuer's JWK Set, discovered via the `iss` claim using the `/.well-known/jwks.json` mechanism ({{I-D.skyfire-oauth-kyapay-token}}).
    Because KYAPay tokens are self-contained, this verification SHOULD be performed locally, without a synchronous callout to the issuer per request;
    issuer keys SHOULD be cached and refreshed according to standard JWK Set practice.
-1. MUST confirm that the token's issuer is one the verifier trusts for the claims being relied upon (see {{SecCon}}).
 1. MUST confirm that the token is intended for this recipient by checking the `aud` claim (and, if used, the `tdm` and `tsi` claims) as described in {{SecCon}}.
 1. MUST confirm that the `env` claim (for example, `production`) matches the environment the intermediary is operating in.
    When the token carries a proof-of-possession key (the `cnf` claim {{RFC7800}}, Section 4), MUST verify that the request is signed by that key -- over HTTP, using HTTP Message Signatures {{RFC9421}} -- and reject the request if the signature is absent or invalid.
