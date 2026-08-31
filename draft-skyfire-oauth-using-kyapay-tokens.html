@@ -30,14 +30,14 @@ the token itself is the interoperability contract.
 <meta content="draft-skyfire-oauth-using-kyapay-tokens-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.34.0
-    Python 3.14.5
+    Python 3.14.7
     ConfigArgParse 1.7.5
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.10.1
+    platformdirs 4.11.5
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
@@ -77,7 +77,6 @@ the token itself is the interoperability contract.
   src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
   unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: italic;
@@ -126,7 +125,6 @@ the token itself is the interoperability contract.
   src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: normal;
@@ -191,7 +189,6 @@ the token itself is the interoperability contract.
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
 }
 
 @font-face {
@@ -1060,11 +1057,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Using KYAPay Tokens</td>
-<td class="right">July 2026</td>
+<td class="right">August 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Agarwal, et al.</td>
-<td class="center">Expires 20 January 2027</td>
+<td class="center">Expires 4 March 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1077,12 +1074,12 @@ svg {
 <dd class="internet-draft">draft-skyfire-oauth-using-kyapay-tokens-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-07-19" class="published">19 July 2026</time>
+<time datetime="2026-08-31" class="published">31 August 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-01-20">20 January 2027</time></dd>
+<dd class="expires"><time datetime="2027-03-04">4 March 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1145,7 +1142,7 @@ the token itself is the interoperability contract.<a href="#section-abstract-1" 
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 20 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 4 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1668,7 +1665,7 @@ A complete proof-of-possession design uses both, bound together, as described ne
             <p id="section-4.3-2.2.1">the agent generates a key pair and provides its public key to the issuer;<a href="#section-4.3-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-4.3-2.3">
-            <p id="section-4.3-2.3.1">the issuer binds that public key into the KYA token using the JWT confirmation claim <code>cnf</code> (<code>cnf.jkt</code> or <code>cnf.jwk</code>) <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span>; and<a href="#section-4.3-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-4.3-2.3.1">the issuer binds that public key into the KYA token using the JWT confirmation claim <code>cnf</code> <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span>. The token <span class="bcp14">MUST</span> carry <code>cnf.jwk</code> -- the key itself. A key identifier would satisfy <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span> only on its own terms, which hold "provided the recipient is able to obtain the identified key": a verifier meeting the agent for the first time holds no such key, and a thumbprint is a one-way hash from which none can be recovered. The issuer cannot determine when that proviso is met -- it knows neither which verifiers a token will reach, nor the initiator's intent, nor the state of any interaction between initiator and target. Nor can it rely on continuity between tokens: where a target de-duplicates on <code>jti</code> to prevent replay, each token is fresh and must stand on its own. Carrying the key is therefore the only form that works in the general case. Other confirmation members <span class="bcp14">MAY</span> additionally be present; a verifier <span class="bcp14">MUST NOT</span> be required to obtain the key by any means other than reading <code>cnf.jwk</code>; and<a href="#section-4.3-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-4.3-2.4">
             <p id="section-4.3-2.4.1">the agent signs each request in place -- a signature over the request (method, path, body digest, timestamp/nonce) using <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> -- verified against the key in <code>cnf</code>, with no separate proof-of-possession token.<a href="#section-4.3-2.4.1" class="pilcrow">¶</a></p>
@@ -1782,16 +1779,19 @@ Throughout, "validate the token" means to perform the validation procedure defin
             <p id="section-6.1-2.1.1"><span class="bcp14">MUST</span> extract each token as described in <a href="#ConveyingRequests" class="auto internal xref">Section 5</a>.<a href="#section-6.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.2">
-            <p id="section-6.1-2.2.1"><span class="bcp14">MUST</span> validate each token as specified in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, Section 4.
-A token that fails validation <span class="bcp14">MUST NOT</span> be treated as conveying a human presence signal, and the intermediary <span class="bcp14">MUST</span> fall back to its default (token-absent) policy for that request.<a href="#section-6.1-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-2.2.1"><span class="bcp14">MUST</span> confirm that the token's issuer is one the verifier trusts for the claims being relied upon (see <a href="#SecCon" class="auto internal xref">Section 8</a>).
+This check <span class="bcp14">MUST</span> precede any processing that resolves a value taken from the token, and in particular any network retrieval driven by the <code>iss</code> claim.
+Until the token has been verified, <code>iss</code> is supplied by the sender: resolving it before the issuer is known to be trusted would allow an unauthenticated request to cause an outbound fetch to an arbitrary URL of the sender's choosing.
+The trusted-issuer set is configured out of band and is not derived from the token.<a href="#section-6.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.3">
-            <p id="section-6.1-2.3.1"><span class="bcp14">MUST</span> verify the token signature against a key obtained from the issuer's JWK Set, discovered via the <code>iss</code> claim using the <code>/.well-known/jwks.json</code> mechanism (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>).
-Because KYAPay tokens are self-contained, this verification <span class="bcp14">SHOULD</span> be performed locally, without a synchronous callout to the issuer per request;
-issuer keys <span class="bcp14">SHOULD</span> be cached and refreshed according to standard JWK Set practice.<a href="#section-6.1-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-2.3.1"><span class="bcp14">MUST</span> validate each token as specified in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, Section 4.
+A token that fails validation <span class="bcp14">MUST NOT</span> be treated as conveying a human presence signal, and the intermediary <span class="bcp14">MUST</span> fall back to its default (token-absent) policy for that request.<a href="#section-6.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.4">
-            <p id="section-6.1-2.4.1"><span class="bcp14">MUST</span> confirm that the token's issuer is one the verifier trusts for the claims being relied upon (see <a href="#SecCon" class="auto internal xref">Section 8</a>).<a href="#section-6.1-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-2.4.1"><span class="bcp14">MUST</span> verify the token signature against a key obtained from the issuer's JWK Set, discovered via the <code>iss</code> claim using the <code>/.well-known/jwks.json</code> mechanism (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>).
+Because KYAPay tokens are self-contained, this verification <span class="bcp14">SHOULD</span> be performed locally, without a synchronous callout to the issuer per request;
+issuer keys <span class="bcp14">SHOULD</span> be cached and refreshed according to standard JWK Set practice.<a href="#section-6.1-2.4.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.5">
             <p id="section-6.1-2.5.1"><span class="bcp14">MUST</span> confirm that the token is intended for this recipient by checking the <code>aud</code> claim (and, if used, the <code>tdm</code> and <code>tsi</code> claims) as described in <a href="#SecCon" class="auto internal xref">Section 8</a>.<a href="#section-6.1-2.5.1" class="pilcrow">¶</a></p>
@@ -2329,11 +2329,11 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
 <dl class="references">
 <dt id="I-D.skyfire-oauth-kyapay-token">[I-D.skyfire-oauth-kyapay-token]</dt>
         <dd>
-<span class="refAuthor">Agarwal, A.</span> and <span class="refAuthor">M. B. Jones</span>, <span class="refTitle">"KYAPay Token"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-kyapay-token-00</span>, <time datetime="2026-07-05" class="refDate">5 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-00">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-00</a>&gt;</span>. </dd>
+<span class="refAuthor">Agarwal, A.</span> and <span class="refAuthor">M. B. Jones</span>, <span class="refTitle">"KYAPay Token"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-kyapay-token-01</span>, <time datetime="2026-07-19" class="refDate">19 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-01">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.skyfire-oauth-kyapay-token-exchange">[I-D.skyfire-oauth-kyapay-token-exchange]</dt>
         <dd>
-<span class="refAuthor">Agarwal, A.</span> and <span class="refAuthor">M. B. Jones</span>, <span class="refTitle">"KYAPay Token Exchange"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-kyapay-token-exchange-00</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-exchange-00">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-exchange-00</a>&gt;</span>. </dd>
+<span class="refAuthor">Agarwal, A.</span>, <span class="refAuthor">Jones, M. B.</span>, <span class="refAuthor">Hingnikar, A.</span>, and <span class="refAuthor">J. Hickman</span>, <span class="refTitle">"KYAPay Token Exchange"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-kyapay-token-exchange-01</span>, <time datetime="2026-07-19" class="refDate">19 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-exchange-01">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-exchange-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
@@ -2390,11 +2390,11 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
 <dd class="break"></dd>
 <dt id="I-D.skyfire-oauth-amr-values">[I-D.skyfire-oauth-amr-values]</dt>
         <dd>
-<span class="refAuthor">Agarwal, A.</span> and <span class="refAuthor">M. B. Jones</span>, <span class="refTitle">"Additional Authentication Method Reference Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-amr-values-00</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-amr-values-00">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-amr-values-00</a>&gt;</span>. </dd>
+<span class="refAuthor">Agarwal, A.</span>, <span class="refAuthor">Jones, M. B.</span>, <span class="refAuthor">Ali, N.</span>, and <span class="refAuthor">Srinivasa</span>, <span class="refTitle">"Additional Authentication Method Reference Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-amr-values-01</span>, <time datetime="2026-07-19" class="refDate">19 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-amr-values-01">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-amr-values-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.skyfire-oauth-id-verification">[I-D.skyfire-oauth-id-verification]</dt>
         <dd>
-<span class="refAuthor">Agarwal, A.</span> and <span class="refAuthor">M. B. Jones</span>, <span class="refTitle">"Identity Verification Methods Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-id-verification-00</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-id-verification-00">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-id-verification-00</a>&gt;</span>. </dd>
+<span class="refAuthor">Agarwal, A.</span>, <span class="refAuthor">Jones, M. B.</span>, <span class="refAuthor">Ali, N.</span>, and <span class="refAuthor">Srinivasa</span>, <span class="refTitle">"Identity Verification Methods Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-id-verification-01</span>, <time datetime="2026-07-19" class="refDate">19 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-id-verification-01">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-id-verification-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="KYAPAY-ORG">[KYAPAY-ORG]</dt>
         <dd>

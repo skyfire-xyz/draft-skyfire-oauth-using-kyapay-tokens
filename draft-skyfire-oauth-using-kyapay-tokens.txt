@@ -5,10 +5,10 @@
 Web Authorization Protocol                                    A. Agarwal
 Internet-Draft                                      Skyfire Systems Inc.
 Intended status: Standards Track                             M. B. Jones
-Expires: 20 January 2027                          Self-Issued Consulting
+Expires: 4 March 2027                             Self-Issued Consulting
                                                                S. Thumma
                                                                   Akamai
-                                                            19 July 2026
+                                                          31 August 2026
 
 
                           Using KYAPay Tokens
@@ -69,7 +69,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 January 2027.
+   This Internet-Draft will expire on 4 March 2027.
 
 Copyright Notice
 
@@ -461,7 +461,21 @@ Table of Contents
        issuer;
 
    3.  the issuer binds that public key into the KYA token using the JWT
-       confirmation claim cnf (cnf.jkt or cnf.jwk) [RFC7800]; and
+       confirmation claim cnf [RFC7800].  The token MUST carry cnf.jwk
+       -- the key itself.  A key identifier would satisfy [RFC7800] only
+       on its own terms, which hold "provided the recipient is able to
+       obtain the identified key": a verifier meeting the agent for the
+       first time holds no such key, and a thumbprint is a one-way hash
+       from which none can be recovered.  The issuer cannot determine
+       when that proviso is met -- it knows neither which verifiers a
+       token will reach, nor the initiator's intent, nor the state of
+       any interaction between initiator and target.  Nor can it rely on
+       continuity between tokens: where a target de-duplicates on jti to
+       prevent replay, each token is fresh and must stand on its own.
+       Carrying the key is therefore the only form that works in the
+       general case.  Other confirmation members MAY additionally be
+       present; a verifier MUST NOT be required to obtain the key by any
+       means other than reading cnf.jwk; and
 
    4.  the agent signs each request in place -- a signature over the
        request (method, path, body digest, timestamp/nonce) using
@@ -608,22 +622,29 @@ Table of Contents
 
    1.  MUST extract each token as described in Section 5.
 
-   2.  MUST validate each token as specified in
+   2.  MUST confirm that the token's issuer is one the verifier trusts
+       for the claims being relied upon (see Section 8).  This check
+       MUST precede any processing that resolves a value taken from the
+       token, and in particular any network retrieval driven by the iss
+       claim.  Until the token has been verified, iss is supplied by the
+       sender: resolving it before the issuer is known to be trusted
+       would allow an unauthenticated request to cause an outbound fetch
+       to an arbitrary URL of the sender's choosing.  The trusted-issuer
+       set is configured out of band and is not derived from the token.
+
+   3.  MUST validate each token as specified in
        [I-D.skyfire-oauth-kyapay-token], Section 4.  A token that fails
        validation MUST NOT be treated as conveying a human presence
        signal, and the intermediary MUST fall back to its default
        (token-absent) policy for that request.
 
-   3.  MUST verify the token signature against a key obtained from the
+   4.  MUST verify the token signature against a key obtained from the
        issuer's JWK Set, discovered via the iss claim using the /.well-
        known/jwks.json mechanism ([I-D.skyfire-oauth-kyapay-token]).
        Because KYAPay tokens are self-contained, this verification
        SHOULD be performed locally, without a synchronous callout to the
        issuer per request; issuer keys SHOULD be cached and refreshed
        according to standard JWK Set practice.
-
-   4.  MUST confirm that the token's issuer is one the verifier trusts
-       for the claims being relied upon (see Section 8).
 
    5.  MUST confirm that the token is intended for this recipient by
        checking the aud claim (and, if used, the tdm and tsi claims) as
@@ -1226,16 +1247,16 @@ Table of Contents
    [I-D.skyfire-oauth-kyapay-token]
               Agarwal, A. and M. B. Jones, "KYAPay Token", Work in
               Progress, Internet-Draft, draft-skyfire-oauth-kyapay-
-              token-00, 5 July 2026,
+              token-01, 19 July 2026,
               <https://datatracker.ietf.org/doc/html/draft-skyfire-
-              oauth-kyapay-token-00>.
+              oauth-kyapay-token-01>.
 
    [I-D.skyfire-oauth-kyapay-token-exchange]
-              Agarwal, A. and M. B. Jones, "KYAPay Token Exchange", Work
-              in Progress, Internet-Draft, draft-skyfire-oauth-kyapay-
-              token-exchange-00, 6 July 2026,
-              <https://datatracker.ietf.org/doc/html/draft-skyfire-
-              oauth-kyapay-token-exchange-00>.
+              Agarwal, A., Jones, M. B., Hingnikar, A., and J. Hickman,
+              "KYAPay Token Exchange", Work in Progress, Internet-Draft,
+              draft-skyfire-oauth-kyapay-token-exchange-01, 19 July
+              2026, <https://datatracker.ietf.org/doc/html/draft-
+              skyfire-oauth-kyapay-token-exchange-01>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -1293,18 +1314,19 @@ Table of Contents
               oauth-aml-methods-00>.
 
    [I-D.skyfire-oauth-amr-values]
-              Agarwal, A. and M. B. Jones, "Additional Authentication
-              Method Reference Values", Work in Progress, Internet-
-              Draft, draft-skyfire-oauth-amr-values-00, 6 July 2026,
+              Agarwal, A., Jones, M. B., Ali, N., and Srinivasa,
+              "Additional Authentication Method Reference Values", Work
+              in Progress, Internet-Draft, draft-skyfire-oauth-amr-
+              values-01, 19 July 2026,
               <https://datatracker.ietf.org/doc/html/draft-skyfire-
-              oauth-amr-values-00>.
+              oauth-amr-values-01>.
 
    [I-D.skyfire-oauth-id-verification]
-              Agarwal, A. and M. B. Jones, "Identity Verification
-              Methods Values", Work in Progress, Internet-Draft, draft-
-              skyfire-oauth-id-verification-00, 6 July 2026,
-              <https://datatracker.ietf.org/doc/html/draft-skyfire-
-              oauth-id-verification-00>.
+              Agarwal, A., Jones, M. B., Ali, N., and Srinivasa,
+              "Identity Verification Methods Values", Work in Progress,
+              Internet-Draft, draft-skyfire-oauth-id-verification-01, 19
+              July 2026, <https://datatracker.ietf.org/doc/html/draft-
+              skyfire-oauth-id-verification-01>.
 
    [KYAPAY-ORG]
               Skyfire Systems Inc., "KYAPay: Verified Agent Identity and
