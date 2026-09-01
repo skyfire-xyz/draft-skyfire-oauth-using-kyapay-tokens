@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-30T00:04:57.312994+00:00",
+  "timestamp": "2026-09-01T00:05:12.870601+00:00",
   "repo": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
   "labels": [
     {
@@ -50,5 +50,90 @@
     }
   ],
   "issues": [],
-  "pulls": []
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOTVjRsc8AAAABBfl1_A",
+      "title": "Section 4.3: cite RFC 9449 for cnf.jkt, and say when each cnf form ap\u2026",
+      "url": "https://github.com/skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens/pull/1",
+      "state": "MERGED",
+      "author": "skyfire-ankit",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "\u2026plies\r\n\r\nClarified the use of JWT confirmation claims in KYA tokens and specified requirements for the 'cnf' key.",
+      "createdAt": "2026-08-30T09:15:59Z",
+      "updatedAt": "2026-08-31T09:02:36Z",
+      "baseRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
+      "baseRefName": "main",
+      "baseRefOid": "290628d36f280c854019f4c3ff5903305252c2b3",
+      "headRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
+      "headRefName": "skyfire-ankit-patch-1",
+      "headRefOid": "67a5590b82f386e1cb3737d1ecd4311738a7fe45",
+      "closedAt": "2026-08-31T09:02:36Z",
+      "mergedAt": "2026-08-31T09:02:36Z",
+      "mergedBy": "selfissued",
+      "mergeCommit": {
+        "oid": "656666ce35c7aa2126bb97bcbab34d00b51c27d7"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABLeHq5w",
+          "commit": {
+            "abbreviatedOid": "67a5590"
+          },
+          "author": "selfissued",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-31T09:02:28Z",
+          "updatedAt": "2026-08-31T09:02:28Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDOTVjRsc8AAAABBmGWOA",
+      "title": "Add {:vspace} syntax to definition list entries",
+      "url": "https://github.com/skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens/pull/2",
+      "state": "MERGED",
+      "author": "selfissued",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-08-31T11:55:19Z",
+      "updatedAt": "2026-08-31T14:48:32Z",
+      "baseRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
+      "baseRefName": "main",
+      "baseRefOid": "656666ce35c7aa2126bb97bcbab34d00b51c27d7",
+      "headRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
+      "headRefName": "mbj-vspace",
+      "headRefOid": "da6dcc1f93c61fc2ec126e2cdf635e2529f2aa77",
+      "closedAt": "2026-08-31T14:48:32Z",
+      "mergedAt": "2026-08-31T14:48:32Z",
+      "mergedBy": "skyfire-ankit",
+      "mergeCommit": {
+        "oid": "9ead66a26eda44a0b83e49809279a18fd09b007b"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABLhEb_w",
+          "commit": {
+            "abbreviatedOid": "da6dcc1"
+          },
+          "author": "skyfire-ankit",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "lgtm",
+          "createdAt": "2026-08-31T14:48:11Z",
+          "updatedAt": "2026-08-31T14:48:11Z",
+          "comments": []
+        }
+      ]
+    }
+  ]
 }
