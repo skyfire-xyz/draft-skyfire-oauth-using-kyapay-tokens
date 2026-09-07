@@ -224,7 +224,7 @@ This document defines the following terms:
 
   {:vspace}
   **Bot manager**:
-  : A system operating primarily at the network and transport layer that decides whether to admit, challenge, throttle, or block a request based on whether it appears to be automated.
+  : An inline application-layer system that detects automated traffic—using behavioral telemetry, fingerprinting, and network-derived signals—to decide whether to admit, challenge, throttle, or block a request.
 
   {:vspace}
   **Fraud manager**:
@@ -277,8 +277,7 @@ KYAPay meets this by conveying credentials in the HTTP request itself ({{Conveyi
 
 ## One Source of Truth Across All Layers of Defense
 
-Bot managers operate at the transport/network layer;
-fraud managers, ATO protectors, and CIAM systems operate at the application layer.
+Bot managers, fraud managers, ATO protectors, and CIAM systems all operate at the application layer.
 Today, each makes its decision in isolation, and their verdicts on the same request can contradict one another.
 A single validated KYAPay token gives every layer the same verified identity and, where present, payment context, so that their decisions are more likely to be consistent than conflicting.
 
@@ -459,29 +458,25 @@ A verifier MAY combine the token signal with its existing signals rather than re
 
 ## Bot Managers {#BotMgr}
 
-A bot manager operates at the transport/network layer and is chiefly concerned with admitting or blocking a request with minimal added latency.
-KYAPay tokens are well suited to this role:
+A bot manager sits inline in the request path to make per-request admission decisions with minimal added latency. Traditionally, it relies on a detection pipeline—client-side behavioral telemetry, browser fingerprinting, request timing, and network-signal analysis—to infer whether a request is automated and who operates it.
+
+KYAPay tokens transform this detection model into a self-identification model. By presenting a valid KYA token, an agent explicitly identifies itself as automated up front. The bot manager verifies the token—checking the cryptographic signature against the issuer's published keys, issuer trust, validity window, and audience—and classifies the request as a verified agent. 
+
+For token-bearing traffic, the identification question is settled: the bot manager does not need to execute its behavioral or fingerprinting detection heuristics to prove the request is automated. Untokened or unverifiable requests fall back to the standard detection pipeline.
+
+Settling identification, however, does not grant automatic access. Identification is distinct from admission: classifying a request as a verified agent simply provides authenticated context. The bot manager uses the token's verified identity layer—the human principal (`hid`), the agent platform (`apd`), and the agent instance (`aid`)—to select and evaluate the site's configured access policy to determine the final disposition (admit, rate-limit, require step-up, or deny) rather than applying bot-blocking challenges designed for unattended, unattributed automation.
+
+KYAPay tokens are well suited to inline bot management for several reasons:
 
 * **Low Latency.**
-  Because the token is a self-contained, signed JWT, the bot manager performs standard JWT verification and needs no per-request callout to a third party.
-  Issuer keys SHOULD be cached.
+Because the token is a self-contained, signed JWT, the bot manager performs standard JWT verification locally and needs no per-request callout to a third party. Issuer keys SHOULD be cached.
 
-* **Access Control by Identity.**
-  A validated token gives the bot manager verified initiator identity (and, when the request targets an agent, target identity), which it MAY use to admit the request rather than challenging or blocking it as suspected automation.
+* **Policy Selection via Identity Context.**
+A validated token provides verified initiator identity (and, when targeting an agent, target identity), which the bot manager uses to select and evaluate the appropriate site policy rather than treating the traffic as suspected automation. By contrast, network-origin claims (such as declared source IP ranges) are unreliable as proof of origin—addresses change and can be masked by VPNs, CGNAT, or shared pools—so a verifier MAY use them as a weak corroborating signal only, but MUST NOT treat an IP match alone as sufficient to bypass controls nor an IP mismatch as conclusive. Short lifetimes, audience binding, and proof-of-possession ({{TrustStack}}), not IP correlation, are the recommended controls against token misuse.
 
 * **Replay Resistance.**
-  A bearer token captured within its validity window can be replayed;
-  a bot manager bounds this with short lifetimes, audience binding, and TLS ({{SecCon}}).
-  Where a token carries a proof-of-possession key ({{TrustStack}}), the bot manager (or the edge/CDN provider acting for the Target) SHOULD additionally verify the per-request signature {{RFC9421}} against that key, which removes the in-window replay exposure.
-
-* **Routing.**
-  Target identity claims MAY be used for routing decisions.
-
-Network-origin claims (for example, an agent's declared source IP ranges) MAY be used as a weak corroborating signal only.
-They are unreliable as proof of origin -- addresses change and can be masked by VPNs, CGNAT, or shared pools -- and a verifier MUST NOT treat an IP match alone as sufficient to bypass other controls, nor treat an IP mismatch as conclusive.
-Short lifetimes and audience binding today, and proof-of-possession where available ({{TrustStack}}), not IP correlation, are the recommended controls against token misuse.
-
-A bot manager that completes the checks above SHOULD admit the request (subject to rate and abuse limits) rather than subjecting it to bot-blocking challenges designed for unattended automation.
+A bearer token captured within its validity window can be replayed; a bot manager bounds this with short lifetimes, audience binding, and TLS ({{SecCon}}). Where a token carries a proof-of-possession key ({{TrustStack}}), the bot manager (or the edge/CDN provider acting for the Target) SHOULD additionally verify the per-request signature {{RFC9421}} against that key, which removes in-window replay exposure.
+  
 
 ## Fraud Managers
 
