@@ -57,6 +57,7 @@ normative:
   RFC9110: # HTTP Semantics
   RFC9421: # HTTP Message Signatures
   RFC7800: # JWT proof-of-possession (cnf)
+  RFC6585: # 431 Request Header Fields Too Large
   I-D.skyfire-oauth-kyapay-token:
   I-D.skyfire-oauth-kyapay-token-exchange:
 
@@ -67,6 +68,7 @@ informative:
   RFC8705: # OAuth 2.0 Mutual-TLS
   RFC9449: # DPoP
   RFC9901: # SD-JWT
+  RFC9112: # HTTP/1.1 message syntax
   I-D.skyfire-oauth-amr-values:
   I-D.skyfire-oauth-id-verification:
   I-D.skyfire-oauth-aml-methods:
@@ -383,6 +385,52 @@ The `KYAPay-Token` header field is intended for use over TLS.
 A token MUST NOT be sent over a non-TLS-protected connection.
 When the token carries a proof-of-possession key ({{TrustStack}}), it SHOULD be accompanied by a request Message Signature {{RFC9421}} over that key;
 otherwise it is a bearer token, subject to the controls and accepted risks in {{SecCon}}.
+
+## Token Size {#TokenSize}
+
+A recipient MUST accept a `KYAPay-Token` field value of at least 6144 octets,
+and MUST apply that minimum to the field value as a whole rather than to an
+individual token: where a request conveys more than one token ({{HeaderField}}),
+the 6144 octets are shared across the list.
+
+A recipient MUST NOT truncate a `KYAPay-Token` field value, and MUST NOT attempt
+validation on a token reconstructed from a truncated value. A truncated JWT
+either fails signature verification or parses as a different, shorter token than
+the one that was sent; neither outcome is safe to act on. A recipient MUST NOT
+treat a request rejected for exceeding a size limit as a request that carried no
+token ({{ProcModel}}).
+
+Where a request is rejected because the field value exceeds a configured limit,
+the recipient SHOULD respond with 431 (Request Header Fields Too Large)
+{{RFC6585}} rather than 400 (Bad Request), so that a sender can distinguish a
+size limit from a malformed token and retry with a smaller one. Infrastructure
+ahead of the recipient commonly produces 400 for this condition.
+
+This minimum is a requirement on the recipient and deliberately not a limit on
+the sender. A limit on what a sender may emit is not enforceable, would render
+existing deployments non-conformant, and -- where a sender drops a claim to stay
+inside it -- deprives the intermediaries of {{SecInt}} of exactly the
+information they exist to act on. A floor on the recipient carries none of those
+costs, and gives an issuer a size it can rely on. The corresponding issuer-side
+guidance, which together with this minimum guarantees that a conformant token is
+accepted, is in {{I-D.skyfire-oauth-kyapay-token}}.
+
+The value follows the pattern of {{Section 3 of RFC9112}}, which recommends that
+HTTP senders and recipients support request-line lengths of at least 8000
+octets. {{RFC9112}} makes no equivalent recommendation for header field lengths;
+this section supplies one for this field.
+
+6144 octets is chosen against the smallest limit on the path, which is the
+per-field limit at the origin web server rather than any limit at an
+intermediary in front of it. Common origin defaults for a single header field
+are roughly an order of magnitude smaller than the total-header limits of common
+content delivery networks, so a deployment that verifies only against an
+intermediary's published limit may still be rejected at the origin. 6144 octets
+plus the field name leaves room for this field to coexist with the cookies,
+`User-Agent` and `Accept` fields an ordinary request already carries, and with
+the `Signature` and `Signature-Input` fields required whenever a token carries a
+proof-of-possession key ({{ProcModel}}). A larger minimum would not survive the
+hop this requirement exists to protect.
 
 ## Conveying Tokens over Other Interfaces
 
