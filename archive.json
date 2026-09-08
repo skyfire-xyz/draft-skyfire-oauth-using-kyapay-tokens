@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-06T00:04:53.110442+00:00",
+  "timestamp": "2026-09-08T00:04:35.617543+00:00",
   "repo": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
   "labels": [
     {
@@ -134,6 +134,32 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 3,
+      "id": "PR_kwDOTVjRsc8AAAABCk2dsQ",
+      "title": "Correct bot manager layer characterization (\u00a72.1, \u00a73.4, \u00a76.3)",
+      "url": "https://github.com/skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens/pull/3",
+      "state": "OPEN",
+      "author": "sthumma33",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Summary of Changes\r\nThis PR updates the architectural characterization of Bot Management Systems across \u00a72.1, \u00a73.4, and \u00a76.3 of draft-skyfire-oauth-using-kyapay-tokens-00. It shifts the definition of bot managers from network/transport-layer filters (L3/L4) to inline application-layer (L7) systems.\r\nAdditionally, it reframes \u00a76.3 around agent self-identification and policy-driven disposition:\r\nSelf-Identification Over Detection: Presenting a valid KYA token allows an agent to explicitly self-identify as automated up front. This settles the identification question and allows the bot manager to bypass redundant behavioral telemetry and fingerprinting heuristics.\r\nDecoupling Identification from Admission: Token verification provides authenticated context (hid, apd, aid), but leaves admission as a site-configured policy decision (admit, rate-limit,  deny) rather than a mandated bypass.",
+      "createdAt": "2026-09-07T21:20:32Z",
+      "updatedAt": "2026-09-07T21:20:33Z",
+      "baseRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
+      "baseRefName": "main",
+      "baseRefOid": "9ead66a26eda44a0b83e49809279a18fd09b007b",
+      "headRepository": "sthumma33/draft-skyfire-oauth-using-kyapay-tokens",
+      "headRefName": "patch-1",
+      "headRefOid": "0c88f219b061cf361ebbba13fef01f3787a51be7",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
