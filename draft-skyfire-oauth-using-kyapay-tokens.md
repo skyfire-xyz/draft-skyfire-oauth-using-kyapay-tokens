@@ -460,7 +460,7 @@ A verifier MAY combine the token signal with its existing signals rather than re
 
 A bot manager sits inline in the request path to make per-request admission decisions with minimal added latency. Traditionally, it relies on a detection pipeline—client-side behavioral telemetry, browser fingerprinting, request timing, and network-signal analysis—to infer whether a request is automated and who operates it.
 
-KYAPay tokens transform this detection model into a self-identification model. By presenting a valid KYA token, an agent explicitly identifies itself as automated up front. The bot manager verifies the token—checking the cryptographic signature against the issuer's published keys, issuer trust, validity window, and audience—and classifies the request as a verified agent. 
+KYAPay tokens transform this detection model into a self-identification model. By presenting a valid KYA token, an agent explicitly identifies itself as automated up front. The bot manager verifies the token—checking the cryptographic signature against the issuer's published keys, issuer trust, validity window, and audience—and classifies the request as a verified agent.
 
 For token-bearing traffic, the identification question is settled: the bot manager does not need to execute its behavioral or fingerprinting detection heuristics to prove the request is automated. Untokened or unverifiable requests fall back to the standard detection pipeline.
 
