@@ -476,7 +476,6 @@ A validated token provides verified initiator identity (and, when targeting an a
 
 * **Replay Resistance.**
 A bearer token captured within its validity window can be replayed; a bot manager bounds this with short lifetimes, audience binding, and TLS ({{SecCon}}). Where a token carries a proof-of-possession key ({{TrustStack}}), the bot manager (or the edge/CDN provider acting for the Target) SHOULD additionally verify the per-request signature {{RFC9421}} against that key, which removes in-window replay exposure.
-  
 
 ## Fraud Managers
 
