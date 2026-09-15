@@ -466,7 +466,7 @@ For token-bearing traffic, the identification question is settled: the bot manag
 
 Settling identification, however, does not grant automatic access. Identification is distinct from admission: classifying a request as a verified agent simply provides authenticated context. The bot manager uses the token's verified identity layer—the human principal (`hid`), the agent platform (`apd`), and the agent instance (`aid`)—to select and evaluate the site's configured access policy to determine the final disposition (admit, rate-limit, require step-up, or deny) rather than applying bot-blocking challenges designed for unattended, unattributed automation.
 
-KYAPay tokens are well suited to inline bot management for several reasons:
+KYAPay tokens are well-suited to inline bot management for several reasons:
 
 * **Low Latency.**
 Because the token is a self-contained, signed JWT, the bot manager performs standard JWT verification locally and needs no per-request callout to a third party. Issuer keys SHOULD be cached.
