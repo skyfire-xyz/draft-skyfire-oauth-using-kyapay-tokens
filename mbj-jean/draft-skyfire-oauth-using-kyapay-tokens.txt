@@ -5,10 +5,10 @@
 Web Authorization Protocol                                    A. Agarwal
 Internet-Draft                                      Skyfire Systems Inc.
 Intended status: Standards Track                             M. B. Jones
-Expires: 20 March 2027                            Self-Issued Consulting
+Expires: 21 March 2027                            Self-Issued Consulting
                                                                S. Thumma
                                                                   Akamai
-                                                       16 September 2026
+                                                       17 September 2026
 
 
                           Using KYAPay Tokens
@@ -69,7 +69,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 March 2027.
+   This Internet-Draft will expire on 21 March 2027.
 
 Copyright Notice
 
@@ -1405,6 +1405,9 @@ Acknowledgments
    fraud, CIAM, and ATO vendors and merchants -- whose deployment and
    review experience informed the usage patterns and open issues
    described here.
+
+   We would like to thank Jean Diaconu for his contributions to the
+   specification.
 
 Document History
 
