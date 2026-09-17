@@ -765,6 +765,11 @@ The `amr` extensions and the `ivm` and `aml` claims and values are registered by
 
 The authors thank the contributors to the KYAPay Token {{I-D.skyfire-oauth-kyapay-token}} specification and the partners in the KYAPay consortium (see {{KYAPAY-ORG}}) -- including bot-management, fraud, CIAM, and ATO vendors and merchants -- whose deployment and review experience informed the usage patterns and open issues described here.
 
+We would like to thank
+Jean Diaconu
+for his contributions to the specification.
+
+
 # Document History
 {: numbered="false"}
 
