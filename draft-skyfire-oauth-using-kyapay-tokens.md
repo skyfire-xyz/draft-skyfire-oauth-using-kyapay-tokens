@@ -156,7 +156,7 @@ And the sharper form of the question is "did a verified human authorize this age
 An AI agent is neither a bot to be managed nor a human to be onboarded through a conventional flow;
 it is a new category of legitimate client that existing bot and fraud detection cannot, on its own, distinguish from malicious automation.
 
-Bots were unwelcome, and they remain unwelcome.
+Bots were mostly unwelcome, and they remain so.
 The new requirement is that both human requests and human-via-agent requests must be able to succeed across the existing web security infrastructure.
 A human-via-agent request is, at the transport and application layers, frequently indistinguishable from a bot;
 it is programmatic, it may originate from data-center IP space, and it may not carry a conventional interactive browser fingerprint.
@@ -764,6 +764,11 @@ The `amr` extensions and the `ivm` and `aml` claims and values are registered by
 {:numbered="false"}
 
 The authors thank the contributors to the KYAPay Token {{I-D.skyfire-oauth-kyapay-token}} specification and the partners in the KYAPay consortium (see {{KYAPAY-ORG}}) -- including bot-management, fraud, CIAM, and ATO vendors and merchants -- whose deployment and review experience informed the usage patterns and open issues described here.
+
+We would like to thank
+Jean Diaconu
+for his contributions to the specification.
+
 
 # Document History
 {: numbered="false"}
