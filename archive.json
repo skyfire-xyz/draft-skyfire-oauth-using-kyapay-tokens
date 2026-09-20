@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-17T00:04:11.001589+00:00",
+  "timestamp": "2026-09-20T00:05:11.221193+00:00",
   "repo": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
   "labels": [
     {
@@ -140,25 +140,35 @@
       "id": "PR_kwDOTVjRsc8AAAABCk2dsQ",
       "title": "Correct bot manager layer characterization (\u00a72.1, \u00a73.4, \u00a76.3)",
       "url": "https://github.com/skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens/pull/3",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "sthumma33",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Summary of Changes\r\nThis PR updates the architectural characterization of Bot Management Systems across \u00a72.1, \u00a73.4, and \u00a76.3 of draft-skyfire-oauth-using-kyapay-tokens-00. It shifts the definition of bot managers from network/transport-layer filters (L3/L4) to inline application-layer (L7) systems.\r\nAdditionally, it reframes \u00a76.3 around agent self-identification and policy-driven disposition:\r\nSelf-Identification Over Detection: Presenting a valid KYA token allows an agent to explicitly self-identify as automated up front. This settles the identification question and allows the bot manager to bypass redundant behavioral telemetry and fingerprinting heuristics.\r\nDecoupling Identification from Admission: Token verification provides authenticated context (hid, apd, aid), but leaves admission as a site-configured policy decision (admit, rate-limit,  deny) rather than a mandated bypass.",
       "createdAt": "2026-09-07T21:20:32Z",
-      "updatedAt": "2026-09-15T23:43:19Z",
+      "updatedAt": "2026-09-18T21:59:59Z",
       "baseRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
       "baseRefName": "main",
       "baseRefOid": "9ead66a26eda44a0b83e49809279a18fd09b007b",
       "headRepository": "sthumma33/draft-skyfire-oauth-using-kyapay-tokens",
       "headRefName": "patch-1",
       "headRefOid": "192c0f9f69f4334369401552a4032c4524dd6d4d",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "closedAt": "2026-09-18T21:59:59Z",
+      "mergedAt": "2026-09-18T21:59:59Z",
+      "mergedBy": "selfissued",
+      "mergeCommit": {
+        "oid": "0b991d72a9e0c7b556804d5763acfa6696906496"
+      },
+      "comments": [
+        {
+          "author": "sthumma33",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Fixing bot manager layer characterization.",
+          "createdAt": "2026-09-18T20:57:59Z",
+          "updatedAt": "2026-09-18T20:57:59Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOTVjRsc8AAAABNvItXg",
@@ -307,13 +317,13 @@
       "labels": [],
       "body": "Cc: @jadiaconu",
       "createdAt": "2026-09-16T21:45:28Z",
-      "updatedAt": "2026-09-16T21:45:28Z",
+      "updatedAt": "2026-09-17T17:18:21Z",
       "baseRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
       "baseRefName": "main",
       "baseRefOid": "9ead66a26eda44a0b83e49809279a18fd09b007b",
       "headRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
       "headRefName": "mbj-jean",
-      "headRefOid": "8a8a21009881497a196873715ede39491368e98a",
+      "headRefOid": "da928a22ddceab7ca40d691c9453619ba92d1eba",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
