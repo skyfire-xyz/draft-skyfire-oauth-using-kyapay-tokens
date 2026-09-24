@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-22T00:04:52.844581+00:00",
+  "timestamp": "2026-09-24T00:04:12.636806+00:00",
   "repo": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
   "labels": [
     {
@@ -317,13 +317,53 @@
       "labels": [],
       "body": "Cc: @jadiaconu",
       "createdAt": "2026-09-16T21:45:28Z",
-      "updatedAt": "2026-09-17T17:18:21Z",
+      "updatedAt": "2026-09-22T09:49:34Z",
       "baseRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
       "baseRefName": "main",
       "baseRefOid": "9ead66a26eda44a0b83e49809279a18fd09b007b",
       "headRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
       "headRefName": "mbj-jean",
       "headRefOid": "da928a22ddceab7ca40d691c9453619ba92d1eba",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABOoB0Bw",
+          "commit": {
+            "abbreviatedOid": "da928a2"
+          },
+          "author": "jadiaconu",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-09-22T09:49:34Z",
+          "updatedAt": "2026-09-22T09:49:34Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "id": "PR_kwDOTVjRsc8AAAABEsP2sw",
+      "title": "Rewrite Introduction to frame agents as evolution of verified bot traffic",
+      "url": "https://github.com/skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens/pull/6",
+      "state": "OPEN",
+      "author": "sthumma33",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Establishes the document's core framing: KYAPay tokens are the cryptographic successor to the network metadata (IP ranges, ASNs, User-Agent strings) that intermediaries use to identify verified bots and apply policy.\r\n\r\n- Position AI agents as the functional evolution of existing legitimate automation, not a new category.\r\n- State what the token asserts: agent instance (aid), execution platform (apd), and authorizing human principal (hid), issuer-signed and verified against public keys.\r\n- Make explicit that identification is distinct from admission: the token is authenticated context for a site's policy engine, not an automatic pass.",
+      "createdAt": "2026-09-23T04:38:24Z",
+      "updatedAt": "2026-09-23T04:38:25Z",
+      "baseRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
+      "baseRefName": "main",
+      "baseRefOid": "0b991d72a9e0c7b556804d5763acfa6696906496",
+      "headRepository": "sthumma33/draft-skyfire-oauth-using-kyapay-tokens",
+      "headRefName": "patch-1",
+      "headRefOid": "017d2718414dd661a795b6048a7d4c7285979529",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
