@@ -138,36 +138,17 @@ the token itself is the interoperability contract.
 --- middle
 
 # Introduction
+Legitimate automated traffic acting on behalf of users is a long-standing feature of the web. Financial aggregation tools, automated booking agents, and data synchronizers routinely interact with web services at the direct behest of subscribers. To keep this legitimate automation from being blocked by defenses built for malicious bots, security intermediaries have relied on static network metadata—published IP ranges, Autonomous System Numbers (ASNs), and User-Agent strings—to identify verified bots and apply configured policies.
 
-For most of the history of the web, the operative question asked by web security infrastructure was binary: is this request from a human or from a bot?
-Bots were treated as unwelcome, and bot managers, web application firewalls, and related systems were built to detect and block automated traffic.
-As automation became more nuanced, the question evolved into a three-way distinction: human, "good bot" (such as a search-engine crawler or a monitoring probe), and "bad bot".
+This network-level model identifies the operating organization, but its verification mechanism is brittle. User-Agent headers are easily forged, IP ranges shift across cloud providers and shared egress pools, and network metadata cannot cryptographically prove which individual subscriber or session authorized a given request.
 
-The rise of capable AI agents changes the question again.
-The relevant distinction is now:
+AI agents are the functional evolution of this automated traffic. An account aggregation service re-implemented as an LLM-orchestrated agent performs the same task for the same subscriber, but through dynamic execution flows. Instead of relying on fragile network indicators to claim legitimacy, an agent presenting a KYAPay token identifies itself at the application layer through cryptographic self-identification.
 
-* a **human** interacting directly;
-* a **human acting through an agent** (a "human-via-agent" request), where a person or organization has authorized a software agent to act on their behalf; and
-* a **bot**: unattended automation acting without the authorization of, or on behalf of, an identified human principal.
+KYAPay tokens replace network-level inference with un-forgeable, issuer-signed assertions. Signed by a trusted issuer and verified against public keys, the token can carry the agent instance (aid), the execution platform (apd), and the identified principal the issuer asserts the agent acts for (hid). Where network indicators only establish that a request comes from a known operator's network, a KYAPay token establishes that a specific agent is acting for a specific, verified subscriber. 
 
-Put succinctly, the distinction that matters is no longer human versus good bot versus bad bot;
-it is human-direct and human-via-agent, together, versus bots.
-And the sharper form of the question is "did a verified human authorize this agent?", rather than "is this a human?".
-An AI agent is neither a bot to be managed nor a human to be onboarded through a conventional flow;
-it is a new category of legitimate client that existing bot and fraud detection cannot, on its own, distinguish from malicious automation.
+Crucially, identification is distinct from admission. Verifiers consume KYAPay tokens as authenticated context for site-configured policy engines, not as an automatic pass. A design goal of this specification is that verifiers can reliably distinguish attributable, human-authorized agentic traffic from unattributed automation, so that site operators can apply appropriate policy—admit, rate-limit, require step-up, or deny—based on verified identity rather than default blocking.
 
-Bots were unwelcome, and they remain unwelcome.
-The new requirement is that both human requests and human-via-agent requests must be able to succeed across the existing web security infrastructure.
-A human-via-agent request is, at the transport and application layers, frequently indistinguishable from a bot;
-it is programmatic, it may originate from data-center IP space, and it may not carry a conventional interactive browser fingerprint.
-Absent a reliable signal, security intermediaries either block legitimate agents (destroying utility for the human principal) or relax their defenses (admitting malicious bots).
-What has been missing is a consistent, verifiable signal of human authorization behind an otherwise programmatic request.
 
-KYAPay tokens {{I-D.skyfire-oauth-kyapay-token}} supply that signal.
-A KYAPay token is a signed JWT {{RFC7519}} {{RFC7515}} that conveys verified identity claims about the human principal, the agent, and the agent platform (the KYA, or "Know Your Agent", information), and optionally payment credentials (the PAY information).
-A validated KYA token asserts that a trusted issuer has verified that this human principal (to some level of assurance) authorized this agent (running on this platform) to act on their behalf;
-a validated PAY token further asserts that a trusted issuer has authorized this agent to pay a specific amount to a specific target.
-Together, they form a chain of trust from the human principal to the action, and -- for payments -- to settlement.
 
 ## Scope
 
