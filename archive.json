@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-24T00:04:12.636806+00:00",
+  "timestamp": "2026-09-27T00:05:03.082427+00:00",
   "repo": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
   "labels": [
     {
@@ -277,7 +277,7 @@
       "labels": [],
       "body": "This document defines the `KYAPay-Token` header field but says nothing about how large a value a recipient has to accept. Header field limits are set by deployment configuration and enforced at the origin, so a conformant token can be rejected before any claim is read, and an issuer has no size it can rely on.\r\n\r\n**This is the recipient half.** The issuer-side guidance that makes the guarantee work is a companion pull request against `kyapay-token`. Neither is much use without the other, so please read them together.\r\n\r\n### What it says\r\n\r\n- **A recipient MUST accept a `KYAPay-Token` field value of at least 6144 octets**, applied to **the field value as a whole**, not to an individual token.\r\n- **MUST NOT truncate** the field value, and MUST NOT validate a token reconstructed from a truncated one \u2014 a truncated JWT either fails signature verification or parses as a different, shorter token. Also MUST NOT treat a size rejection as a token-absent request, which would silently fall back to the bot policy.\r\n- **SHOULD respond 431 rather than 400**, so a sender can tell a size limit from a malformed token and retry smaller.\r\n- Adds `RFC6585` (normative) and `RFC9112` (informative).\r\n\r\n### Why per field value rather than per token\r\n\r\n\u00a75.1 registers this field with `Structured Type: List` and permits more than one token per request, and RFC 9110 \u00a75.2 lets a recipient coalesce multiple field lines into one. **A per-token minimum therefore bounds nothing at the origin:** two tokens at 6144 octets is 12,303 octets with the field name, against a single-field limit of roughly 8190 at common origin defaults.\r\n\r\nThis is not hypothetical for this document. \u00a76.1 opens *\"On receiving a request that carries one or more KYAPay tokens\"*, and \u00a76.10 makes the two-token case ordinary: KYA-only for discovery and cart-building, KYA plus PAY at checkout. So a per-token minimum would stop bounding anything at exactly the moment a payment happens.\r\n\r\n### Why 6144\r\n\r\nIt is chosen against the smallest limit on the path, which is the **per-field limit at the origin**, not any intermediary in front of it. Common origin defaults for a single field are roughly an order of magnitude below the total-header limits of common CDNs, so a deployment that checks only its CDN's published limit can still be rejected behind it.\r\n\r\n6144 plus the field name leaves room for the cookies, `User-Agent` and `Accept` an ordinary request already carries \u2014 and for `Signature` and `Signature-Input`, which \u00a74.3 and \u00a76.1 require whenever a token carries `cnf`. A larger minimum would not survive the hop the requirement exists to protect. 8192 plus the field name already exceeds it.\r\n\r\nOn the other side: a fully populated registered claim set is about 4200 octets serialized, so 4096 would reject a maximal conformant token. 6144 is the only value I could find that clears both constraints.\r\n\r\n### Framing\r\n\r\nDeliberately a requirement on the recipient and not a limit on the sender. A sender limit is unenforceable, would make existing deployments non-conformant, and \u2014 where a sender drops a claim to stay inside it \u2014 deprives the intermediaries of \u00a76 of exactly the information they exist to act on.\r\n\r\nWorth noting that MCP SEP-2243 considered a header size limit for the same reasons and declined one; every objection it raises is to a cap on senders, not to a floor on recipients, and it independently reports the same vendor range. Happy to add that as a reference if useful.\r\n\r\n### Two things I have not done\r\n\r\n- **No Document History entry**, because there is no `-02` block yet and the current rewrite of this document is not recorded in the history either. Glad to add both if you would like.\r\n- **Numbering:** the section is placed as a subsection of the header field section, since it is a property of that field. Happy to move it if you would rather it sat in \u00a78.\r\n\r\nOpened as a draft for review.",
       "createdAt": "2026-09-08T22:05:45Z",
-      "updatedAt": "2026-09-15T23:41:59Z",
+      "updatedAt": "2026-09-26T16:49:47Z",
       "baseRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
       "baseRefName": "main",
       "baseRefOid": "9ead66a26eda44a0b83e49809279a18fd09b007b",
@@ -288,7 +288,15 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "skyfire-ankit",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> I would condense this to just a few sentences\r\n\r\nAs we discussed. This is still a draft PR - not ready for review.",
+          "createdAt": "2026-09-26T16:49:47Z",
+          "updatedAt": "2026-09-26T16:49:47Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOTVjRsc8AAAABNvUW4A",
@@ -302,6 +310,19 @@
           "createdAt": "2026-09-15T23:41:59Z",
           "updatedAt": "2026-09-15T23:41:59Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABPVOcIw",
+          "commit": {
+            "abbreviatedOid": "78826d8"
+          },
+          "author": "selfissued",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "I would condense this to just a few sentences",
+          "createdAt": "2026-09-26T00:47:04Z",
+          "updatedAt": "2026-09-26T00:47:04Z",
+          "comments": []
         }
       ]
     },
@@ -310,24 +331,26 @@
       "id": "PR_kwDOTVjRsc8AAAABD1lN2w",
       "title": "Address review comments by Jean Diaconu",
       "url": "https://github.com/skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens/pull/5",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "selfissued",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Cc: @jadiaconu",
       "createdAt": "2026-09-16T21:45:28Z",
-      "updatedAt": "2026-09-22T09:49:34Z",
+      "updatedAt": "2026-09-26T00:11:33Z",
       "baseRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
       "baseRefName": "main",
       "baseRefOid": "9ead66a26eda44a0b83e49809279a18fd09b007b",
       "headRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
       "headRefName": "mbj-jean",
       "headRefOid": "da928a22ddceab7ca40d691c9453619ba92d1eba",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-09-26T00:11:33Z",
+      "mergedAt": "2026-09-26T00:11:33Z",
+      "mergedBy": "selfissued",
+      "mergeCommit": {
+        "oid": "3019cbfc6a749e62c98359c87e45882a2acaad75"
+      },
       "comments": [],
       "reviews": [
         {
@@ -341,6 +364,19 @@
           "body": "",
           "createdAt": "2026-09-22T09:49:34Z",
           "updatedAt": "2026-09-22T09:49:34Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABPSnVWA",
+          "commit": {
+            "abbreviatedOid": "da928a2"
+          },
+          "author": "skyfire-ankit",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "lgtm",
+          "createdAt": "2026-09-25T18:16:46Z",
+          "updatedAt": "2026-09-25T18:16:46Z",
           "comments": []
         }
       ]
@@ -357,19 +393,59 @@
       "labels": [],
       "body": "Establishes the document's core framing: KYAPay tokens are the cryptographic successor to the network metadata (IP ranges, ASNs, User-Agent strings) that intermediaries use to identify verified bots and apply policy.\r\n\r\n- Position AI agents as the functional evolution of existing legitimate automation, not a new category.\r\n- State what the token asserts: agent instance (aid), execution platform (apd), and authorizing human principal (hid), issuer-signed and verified against public keys.\r\n- Make explicit that identification is distinct from admission: the token is authenticated context for a site's policy engine, not an automatic pass.",
       "createdAt": "2026-09-23T04:38:24Z",
-      "updatedAt": "2026-09-23T04:38:25Z",
+      "updatedAt": "2026-09-25T18:46:24Z",
       "baseRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
       "baseRefName": "main",
       "baseRefOid": "0b991d72a9e0c7b556804d5763acfa6696906496",
       "headRepository": "sthumma33/draft-skyfire-oauth-using-kyapay-tokens",
       "headRefName": "patch-1",
-      "headRefOid": "017d2718414dd661a795b6048a7d4c7285979529",
+      "headRefOid": "bb574de9022244950983e84d17ed547675055e67",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABO91cgA",
+          "commit": {
+            "abbreviatedOid": "017d271"
+          },
+          "author": "sthumma33",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "Revised: KYAPay tokens replace network-level inference with un-forgeable, issuer-signed assertions. Signed by a trusted issuer and verified against public keys, the token can carry the agent instance (aid), the execution platform (apd), and the identified principal the issuer asserts the agent acts for (hid). Where network indicators only establish that a request comes from a known operator's network, a KYAPay token establishes that a specific agent is acting for a specific, verified subscriber.\u00a0",
+          "createdAt": "2026-09-24T03:25:46Z",
+          "updatedAt": "2026-09-24T03:25:46Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABPS6O-A",
+          "commit": {
+            "abbreviatedOid": "bb574de"
+          },
+          "author": "skyfire-ankit",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "I like all of what you wrote @sthumma33 . Can you find a way to retain the few parts that I highlighted?",
+          "createdAt": "2026-09-25T18:43:23Z",
+          "updatedAt": "2026-09-25T18:46:24Z",
+          "comments": [
+            {
+              "originalPosition": 43,
+              "body": "I think we should keep this as it explains the KYAPay token in relation to the introduction.",
+              "createdAt": "2026-09-25T18:43:23Z",
+              "updatedAt": "2026-09-25T18:46:24Z"
+            },
+            {
+              "originalPosition": 24,
+              "body": "I'd like us to keep the bullet list in some form because it frames the universe of actors in this new age of agents. Can you find a way to add this to your new introduction @sthumma33 ?",
+              "createdAt": "2026-09-25T18:45:39Z",
+              "updatedAt": "2026-09-25T18:46:24Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
