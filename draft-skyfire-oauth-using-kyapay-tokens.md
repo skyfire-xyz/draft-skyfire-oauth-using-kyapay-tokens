@@ -131,22 +131,29 @@ informative:
 The KYAPay Token is a JSON Web Token (JWT) that carries verified identity ("Know Your Agent", KYA) and payment (PAY) information for requests made by software agents on behalf of human principals.
 This document describes how security intermediaries -- bot managers, fraud managers, account-takeover (ATO) protection systems, and customer identity and access management (CIAM) systems -- consume KYAPay tokens to answer a question that traditional bot detection cannot: "did a verified human authorize this agent?", rather than "is this a human?".
 It specifies how KYAPay tokens are carried in HTTP requests, how they are validated (including in combination with request-signing layers such as HTTP Message Signatures), and how the verified, layered identity in a token is used to make access, routing, fraud detection, account-lifecycle, and step-up decisions.
-It defines the token-consuming "verifier" role that the KYAPay Token leaves unspecified.
+It defines the token-consuming "recipient" role that the KYAPay Token leaves unspecified.
 It is intentionally non-prescriptive about how tokens are created, because agent architectures, agent-identity technologies, and agent-communication protocols are diverse and still emerging;
 the token itself is the interoperability contract.
 
 --- middle
 
 # Introduction
-Legitimate automated traffic acting on behalf of users is a long-standing feature of the web. Financial aggregation tools, automated booking agents, and data synchronizers routinely interact with web services at the direction of their subscribers. To prevent legitimate automation from being blocked by defenses designed to detect malicious bots, security intermediaries have traditionally relied on static network metadata—including published IP ranges, Autonomous System Numbers (ASNs), and User-Agent strings—to identify bots and apply configured policies.
+
+Legitimate automated traffic acting on behalf of users is a long-standing feature of the web. Financial aggregation tools, automated booking agents, and data synchronizers routinely interact with web services at the direction of their subscribers. To prevent legitimate automation from being blocked by defenses designed to detect malicious bots, security intermediaries have traditionally relied on static network metadata -- including published IP ranges, Autonomous System Numbers (ASNs), and User-Agent strings -- to identify bots and apply configured policies.
 
 This network-level model identifies bots primarily by associating their traffic with a known operator or network. However, its verification mechanisms are brittle: User-Agent headers are easily forged, IP ranges change across cloud providers and shared egress infrastructure, and network metadata cannot establish which individual subscriber authorized a particular request. The result is that network-level bot identification can establish where automated traffic comes from, but not which principal it is acting for.
 
-The rise of capable AI agents makes this limitation more significant. An account aggregation service reimplemented as an LLM-orchestrated agent may perform the same task for the same subscriber, but through dynamic execution flows. The relevant distinction is therefore not simply between human and automated traffic, but between direct human interaction, a human or organization acting through an authorized agent, and unattended automation without verifiable authorization from an identified principal. Rather than relying on fragile network indicators to establish legitimacy, an agent presenting a KYAPay token can provide cryptographically verifiable assertions about the agent and the principal it is authorized to represent.
+The rise of capable AI agents makes this limitation more significant. An account aggregation service reimplemented as an LLM-orchestrated agent may perform the same task for the same subscriber, but through dynamic execution flows. The relevant distinction is therefore not simply between human and automated traffic, but between:
 
-KYAPay tokens provide issuer-signed assertions that can be verified against trusted public keys. A KYAPay token is a signed JSON Web Token (JWT) {{RFC7519}} {{RFC7515}} that can carry the agent instance (`aid`), the execution platform (`apd`), and the identified principal the issuer asserts the agent acts for (`hid`)—the KYA ("Know Your Agent") information—and optionally payment credentials (the PAY information). A validated KYA token asserts that a trusted issuer has verified, to an established level of assurance, that the identified principal authorized the identified agent, running on the identified platform, to act on their behalf. A validated PAY token further asserts that a trusted issuer has authorized the agent to execute a payment within specified parameters.
+* direct human interaction,
+* a human or organization acting through an authorized agent, and
+* unattended automation without verifiable authorization from an identified principal.
 
-Crucially, identification is distinct from admission. Verifiers consume KYAPay tokens as authenticated context for site-configured policy engines, not as an automatic grant of access. A design goal of this specification is that verifiers can reliably distinguish attributable, human-authorized agentic traffic from unattributed automation, so that site operators can apply appropriate policy—admit, rate-limit, require step-up, or deny—based on verified identity rather than default blocking.
+Rather than relying on fragile network indicators to establish legitimacy, an agent presenting a KYAPay token can provide cryptographically verifiable assertions about the agent and the principal it is authorized to represent.
+
+KYAPay tokens provide issuer-signed assertions that can be verified against trusted public keys. A KYAPay token is a signed JSON Web Token (JWT) {{RFC7519}} {{RFC7515}} that can carry the agent instance (`aid`), the execution platform (`apd`), and the identified principal the issuer asserts the agent acts for (`hid`) -- the KYA ("Know Your Agent") information -- and optionally payment credentials (the PAY information). A validated KYA token asserts that a trusted issuer has verified, to an established level of assurance, that the identified principal authorized the identified agent, running on the identified platform, to act on their behalf. A validated PAY token further asserts that a trusted issuer has authorized the agent to execute a payment within specified parameters.
+
+Crucially, identification is distinct from admission. Recipients consume KYAPay tokens as authenticated context for site-configured policy engines, not as an automatic grant of access. A design goal of this specification is that recipients can reliably distinguish attributable, human-authorized agentic traffic from unattributed automation, so that site operators can apply appropriate policy -- admit, rate-limit, require step-up, or deny -- based on verified identity rather than default blocking.
 
 ## Scope
 
@@ -163,9 +170,9 @@ the rationale is given in {{NonPrescCreat}}.
 
 This document builds directly on the KYAPay Token {{I-D.skyfire-oauth-kyapay-token}}, which defines the KYA, PAY, and KYA-PAY token types, the claim schema (including the layered identity claims `hid`, `apd`, and `aid`), and the core token validation procedure.
 The specification defines the token and the roles of issuer, initiator, and target, but it does not define the role of the party that receives and validates a token in order to make a security decision.
-This document defines that role -- the *verifier* (or relying party) -- and specifies its behavior.
+This document defines that role -- the *recipient* (or relying party) -- and specifies its behavior.
 
-Three related specifications define JWT claims and values that a verifier can use to reason about how a principal was authenticated and verified, and that MAY appear in KYAPay tokens:
+Three related specifications define JWT claims and values that a recipient can use to reason about how a principal was authenticated and verified, and that MAY appear in KYAPay tokens:
 the Additional Authentication Method Reference Values specification {{I-D.skyfire-oauth-amr-values}}, which defines additional `amr` {{RFC8176}} claim values,
 the Identity Verification Methods Values specification {{I-D.skyfire-oauth-id-verification}}, which defines the `ivm` claim and values, and
 the Anti-Money Laundering Methods Values specification {{I-D.skyfire-oauth-aml-methods}}, which defines the `aml` claim and values.
@@ -192,18 +199,18 @@ This document defines the following terms:
   existing "good bot" / "bad bot" mechanisms are orthogonal and continue to apply.
 
 {:vspace}
-**Verifier (Relying Party)**:
+**Recipient (Relying Party)**:
 : The entity that receives a KYAPay token, validates it, and acts on the result.
-  A verifier may be a security intermediary (below), a Target's own resource server, or an edge/CDN provider acting on a Target's behalf.
+  A recipient may be a security intermediary (below), a Target's own resource server, or an edge/CDN provider acting on a Target's behalf.
 
 {:vspace}
 **Security intermediary**:
-: A verifier, typically operated by a security vendor or by the Target, that inspects requests and makes an admission, routing, scoring, or lifecycle decision before or as the request reaches the Target's application.
+: A recipient, typically operated by a security vendor or by the Target, that inspects requests and makes an admission, routing, scoring, or lifecycle decision before or as the request reaches the Target's application.
   This document addresses four common (and often overlapping) kinds of security intermediary:
 
   {:vspace}
   **Bot manager**:
-  : An inline application-layer system that detects automated traffic—using behavioral telemetry, fingerprinting, and network-derived signals—to decide whether to admit, challenge, throttle, or block a request.
+  : An inline application-layer system that detects automated traffic -- using behavioral telemetry, fingerprinting, and network-derived signals -- to decide whether to admit, challenge, throttle, or block a request.
 
   {:vspace}
   **Fraud manager**:
@@ -269,7 +276,7 @@ As one illustration, a merchant that recognizes a KYAPay-bearing request MAY ada
 # The Trust Stack: Bearer Tokens Today, Proof of Possession Ahead {#TrustStack}
 
 This section is informative.
-It situates KYAPay tokens among the other mechanisms a verifier encounters and, importantly, distinguishes what is deployed today from the planned evolution, so that the consumption requirements in {{SecInt}} are read against the correct baseline.
+It situates KYAPay tokens among the other mechanisms a recipient encounters and, importantly, distinguishes what is deployed today from the planned evolution, so that the consumption requirements in {{SecInt}} are read against the correct baseline.
 
 ## KYA is an Issuer-Signed Bearer Token Today
 
@@ -291,7 +298,7 @@ The accepted residual threats, and the irreducible ones, are stated in {{SecCon}
 
 ## Identity and Proof of Possession are Different Layers
 
-It is useful to separate two questions a verifier may want answered:
+It is useful to separate two questions a recipient may want answered:
 
 * *Who is behind this request?*
   This is answered by the KYA token: a trusted, neutral issuer that performs KYC/KYB attests to the identity of the human principal (`hid`), agent platform (`apd`), and agent (`aid`), acting as a client-side trust anchor analogous to a Certificate Authority.
@@ -313,11 +320,11 @@ When per-request signing becomes practical at scale, the planned evolution of KY
 
 1. the issuer onboards the agent as a CA would;
 1. the agent generates a key pair and provides its public key to the issuer;
-1. the issuer binds that public key into the KYA token using the JWT confirmation claim `cnf` {{RFC7800}}. The token MUST carry `cnf.jwk` -- the key itself. A key identifier would satisfy {{RFC7800}} only on its own terms, which hold "provided the recipient is able to obtain the identified key": a verifier meeting the agent for the first time holds no such key, and a thumbprint is a one-way hash from which none can be recovered. The issuer cannot determine when that proviso is met -- it knows neither which verifiers a token will reach, nor the initiator's intent, nor the state of any interaction between initiator and target. Nor can it rely on continuity between tokens: where a target de-duplicates on `jti` to prevent replay, each token is fresh and must stand on its own. Carrying the key is therefore the only form that works in the general case. Other confirmation members MAY additionally be present; a verifier MUST NOT be required to obtain the key by any means other than reading `cnf.jwk`; and
+1. the issuer binds that public key into the KYA token using the JWT confirmation claim `cnf` {{RFC7800}}. The token MUST carry `cnf.jwk` -- the key itself. A key identifier would satisfy {{RFC7800}} only on its own terms, which hold "provided the recipient is able to obtain the identified key": a recipient meeting the agent for the first time holds no such key, and a thumbprint is a one-way hash from which none can be recovered. The issuer cannot determine when that proviso is met -- it knows neither which recipients a token will reach, nor the initiator's intent, nor the state of any interaction between initiator and target. Nor can it rely on continuity between tokens: where a target de-duplicates on `jti` to prevent replay, each token is fresh and must stand on its own. Carrying the key is therefore the only form that works in the general case. Other confirmation members MAY additionally be present; a recipient MUST NOT be required to obtain the key by any means other than reading `cnf.jwk`; and
 1. the agent signs each request in place -- a signature over the request (method, path, body digest, timestamp/nonce) using {{RFC9421}} -- verified against the key in `cnf`, with no separate proof-of-possession token.
 
 This yields an unbroken chain from request to key to identity: the request is signed by a key, and that key is vouched for as the initiator's by the issuer.
-Preferring a request signed against the `cnf` key over a detached, DPoP-style proof {{RFC9449}} keeps a single token -- the verifier validates the KYA token once (per session), caches the `cnf` key, then performs only a fast per-request signature check, instead of validating two artifacts and confirming they are bound to each other.
+Preferring a request signed against the `cnf` key over a detached, DPoP-style proof {{RFC9449}} keeps a single token -- the recipient validates the KYA token once (per session), caches the `cnf` key, then performs only a fast per-request signature check, instead of validating two artifacts and confirming they are bound to each other.
 When present, this binding is consumed as specified in {{ProcModel}} and closes the in-window replay and malicious-Target-reuse risks of the bearer model ({{SecCon}}).
 
 Adoption remains the constraint on when this becomes mandatory.
@@ -388,7 +395,7 @@ Throughout, "validate the token" means to perform the validation procedure defin
 On receiving a request that carries one or more KYAPay tokens, a security intermediary:
 
 1. MUST extract each token as described in {{ConveyingRequests}}.
-1. MUST confirm that the token's issuer is one the verifier trusts for the claims being relied upon (see {{SecCon}}).
+1. MUST confirm that the token's issuer is one the recipient trusts for the claims being relied upon (see {{SecCon}}).
    This check MUST precede any processing that resolves a value taken from the token, and in particular any network retrieval driven by the `iss` claim.
    Until the token has been verified, `iss` is supplied by the sender: resolving it before the issuer is known to be trusted would allow an unauthenticated request to cause an outbound fetch to an arbitrary URL of the sender's choosing.
    The trusted-issuer set is configured out of band and is not derived from the token.
@@ -409,7 +416,7 @@ only a successfully validated token from a trusted issuer conveys that signal.
 ## Determining Human Presence and Assurance {#HumanPresence}
 
 The core purpose of consuming a KYAPay token is to distinguish a human-via-agent request from a bot, and to gauge how strongly to trust it.
-After validation, a verifier SHOULD derive the human presence signal from the layered identity in the token, treating each layer as a distinct entity verified by distinct means:
+After validation, a recipient SHOULD derive the human presence signal from the layered identity in the token, treating each layer as a distinct entity verified by distinct means:
 
 * the human principal (`hid`): the presence and content of the human identity claim, and how strongly it was verified -- for example a verified status and verifier ({{I-D.skyfire-oauth-kyapay-token}}), and, where a deployment conveys it, an identity-proofing assurance level (such as an Identity Assurance Level per {{NIST-800-63A}}) and the
 `amr` {{I-D.skyfire-oauth-amr-values}},
@@ -421,9 +428,9 @@ claims describing how the principal was authenticated and verified;
 
 * the agent instance (`aid`): the specific agent, including a meaningful name and, where present, references to its OAuth identity ({{I-D.ietf-oauth-client-id-metadata-document}}) and a proof-of-possession key bound to the token via `cnf` {{RFC7800}} (or a request-signing key published in an A2A Agent Card {{A2A}}).
 
-Because these are different entities verified to different degrees, a verifier SHOULD NOT collapse them into a single yes/no signal.
+Because these are different entities verified to different degrees, a recipient SHOULD NOT collapse them into a single yes/no signal.
 Instead, it SHOULD apply per-entity, per-action policy.
-For example, a verifier might require a higher human-principal assurance level and a "registered" agent for a payment than for browsing:
+For example, a recipient might require a higher human-principal assurance level and a "registered" agent for a payment than for browsing:
 
     /checkout: require hid assurance >= document+biometric
 	       require apd verified as a business
@@ -432,18 +439,18 @@ For example, a verifier might require a higher human-principal assurance level a
 	       require hid authenticated with a hardware key
 	       require aid registered by its platform
 
-The strength of the human presence signal is a function of which identities are present, how strongly each was verified, and how much the verifier trusts the attesting issuer and verifier.
-A verifier MAY combine the token signal with its existing signals rather than replacing them, and MAY accept a lower assurance for low-risk actions while requiring step-up ({{StepUp}}) for higher-risk ones.
+The strength of the human presence signal is a function of which identities are present, how strongly each was verified, and how much the recipient trusts the attesting issuer and verifier.
+A recipient MAY combine the token signal with its existing signals rather than replacing them, and MAY accept a lower assurance for low-risk actions while requiring step-up ({{StepUp}}) for higher-risk ones.
 
 ## Bot Managers {#BotMgr}
 
-A bot manager sits inline in the request path to make per-request admission decisions with minimal added latency. Traditionally, it relies on a detection pipeline—client-side behavioral telemetry, browser fingerprinting, request timing, and network-signal analysis—to infer whether a request is automated and who operates it.
+A bot manager sits inline in the request path to make per-request admission decisions with minimal added latency. Traditionally, it relies on a detection pipeline -- client-side behavioral telemetry, browser fingerprinting, request timing, and network-signal analysis -- to infer whether a request is automated and who operates it.
 
-KYAPay tokens transform this detection model into a self-identification model. By presenting a valid KYA token, an agent explicitly identifies itself as automated up front. The bot manager verifies the token—checking the cryptographic signature against the issuer's published keys, issuer trust, validity window, and audience—and classifies the request as a verified agent.
+KYAPay tokens transform this detection model into a self-identification model. By presenting a valid KYA token, an agent explicitly identifies itself as automated up front. The bot manager verifies the token -- checking the cryptographic signature against the issuer's published keys, issuer trust, validity window, and audience -- and classifies the request as a verified agent.
 
 For token-bearing traffic, the identification question is settled: the bot manager does not need to execute its behavioral or fingerprinting detection heuristics to prove the request is automated. Untokened or unverifiable requests fall back to the standard detection pipeline.
 
-Settling identification, however, does not grant automatic access. Identification is distinct from admission: classifying a request as a verified agent simply provides authenticated context. The bot manager uses the token's verified identity layer—the human principal (`hid`), the agent platform (`apd`), and the agent instance (`aid`)—to select and evaluate the site's configured access policy to determine the final disposition (admit, rate-limit, require step-up, or deny) rather than applying bot-blocking challenges designed for unattended, unattributed automation.
+Settling identification, however, does not grant automatic access. Identification is distinct from admission: classifying a request as a verified agent simply provides authenticated context. The bot manager uses the token's verified identity layer -- the human principal (`hid`), the agent platform (`apd`), and the agent instance (`aid`) -- to select and evaluate the site's configured access policy to determine the final disposition (admit, rate-limit, require step-up, or deny) rather than applying bot-blocking challenges designed for unattended, unattributed automation.
 
 KYAPay tokens are well-suited to inline bot management for several reasons:
 
@@ -451,7 +458,7 @@ KYAPay tokens are well-suited to inline bot management for several reasons:
 Because the token is a self-contained, signed JWT, the bot manager performs standard JWT verification locally and needs no per-request callout to a third party. Issuer keys SHOULD be cached.
 
 * **Policy Selection via Identity Context.**
-A validated token provides verified initiator identity (and, when targeting an agent, target identity), which the bot manager uses to select and evaluate the appropriate site policy rather than treating the traffic as suspected automation. By contrast, network-origin claims (such as declared source IP ranges) are unreliable as proof of origin—addresses change and can be masked by VPNs, CGNAT, or shared pools—so a verifier MAY use them as a weak corroborating signal only, but MUST NOT treat an IP match alone as sufficient to bypass controls nor an IP mismatch as conclusive. Short lifetimes, audience binding, and proof-of-possession ({{TrustStack}}), not IP correlation, are the recommended controls against token misuse.
+A validated token provides verified initiator identity (and, when targeting an agent, target identity), which the bot manager uses to select and evaluate the appropriate site policy rather than treating the traffic as suspected automation. By contrast, network-origin claims (such as declared source IP ranges) are unreliable as proof of origin -- addresses change and can be masked by VPNs, CGNAT, or shared pools -- so a recipient MAY use them as a weak corroborating signal only, but MUST NOT treat an IP match alone as sufficient to bypass controls nor an IP mismatch as conclusive. Short lifetimes, audience binding, and proof-of-possession ({{TrustStack}}), not IP correlation, are the recommended controls against token misuse.
 
 * **Replay Resistance.**
 A bearer token captured within its validity window can be replayed; a bot manager bounds this with short lifetimes, audience binding, and TLS ({{SecCon}}). Where a token carries a proof-of-possession key ({{TrustStack}}), the bot manager (or the edge/CDN provider acting for the Target) SHOULD additionally verify the per-request signature {{RFC9421}} against that key, which removes in-window replay exposure.
@@ -485,11 +492,11 @@ the token supplements, and does not replace, those signals.
 Not all actions carry the same risk;
 viewing a loyalty balance is far less sensitive than making a large payment.
 A KYAPay token attests the assurance established at the time of issuance, which may be insufficient for a high-value action.
-A verifier SHOULD be able to require a higher assurance level for sensitive actions and to signal that requirement so that a fresh token can be obtained after additional verification of the human principal (for example, a step-up authentication such as a push-notification approval, a one-time code, or a re-run of identity verification).
+A recipient SHOULD be able to require a higher assurance level for sensitive actions and to signal that requirement so that a fresh token can be obtained after additional verification of the human principal (for example, a step-up authentication such as a push-notification approval, a one-time code, or a re-run of identity verification).
 
 This document does not define a wire mechanism for a Target to request step-up out of band from an issuer;
 that is an open item (see {{SecCon}}).
-Until such a mechanism is standardized, verifiers SHOULD express assurance requirements as local policy over the assurance signals in {{HumanPresence}} and decline actions whose required assurance is not met.
+Until such a mechanism is standardized, recipients SHOULD express assurance requirements as local policy over the assurance signals in {{HumanPresence}} and decline actions whose required assurance is not met.
 
 ## Account-Takeover Protectors {#ATOProt}
 
@@ -526,7 +533,7 @@ Because all of the intermediaries above validate the *same* token and draw on th
 ## Granular Bad-Actor Mitigation and Triage {#BadActor}
 
 The layered identity in a KYA token (`hid` for the principal, `apd` for the platform, `aid` for the agent instance) lets intermediaries choose the scope of a mitigation deliberately, rather than being forced into a single broad, "nuclear" block.
-Because every request carries all three identities, a verifier can select the narrowest scope that is effective and escalate only as warranted:
+Because every request carries all three identities, a recipient can select the narrowest scope that is effective and escalate only as warranted:
 
 * the individual **human principal** (`hid`) -- e.g., block or throttle one abusive user while all other users of the same agent continue to be served;
 
@@ -538,10 +545,10 @@ The same granularity supports responses short of blocking the requests, such as 
 Choosing the tightest effective scope isolates threats while protecting the reputation of well-behaved platforms and avoiding collateral damage to legitimate human-via-agent requests;
 reserving platform-wide action for cases that genuinely warrant it keeps that option available without making it the default.
 
-## Feedback to the Token Issuer {#IssuerFeedback}
+## Feedback to the Token Issuer {#IssuerFeedback}
 
-The mitigation described above is local: a verifier acts on its own traffic.
-Because the token issuer is the party that vouches for the initiator and can decline to vouch again, there is value in a feedback loop that lets a security intermediary report observed bad behavior back to the issuer, so that action can be taken at the source rather than only at each verifier independently.
+The mitigation described above is local: a recipient acts on its own traffic.
+Because the token issuer is the party that vouches for the initiator and can decline to vouch again, there is value in a feedback loop that lets a security intermediary report observed bad behavior back to the issuer, so that action can be taken at the source rather than only at each recipient independently.
 When a security intermediary observes abusive or anomalous behavior that it can attribute, using the layered identity in the token, to a particular entity, it MAY report that observation to the token's issuer (identified by `iss`).
 The attribution follows the same tiers as {{BadActor}}:
 
@@ -549,15 +556,15 @@ The attribution follows the same tiers as {{BadActor}}:
 * the specific agent instance (`aid`); or
 * the agent platform as a whole (`apd`).
 
-On receiving such feedback, and subject to its own verification and anti-abuse safeguards, the issuer MAY take appropriate action, up to and including ceasing to issue tokens to the implicated initiator, agent, or platform -- the issuance-side counterpart to a verifier's refusal to accept a token, and complementary to the token-lifetime and revocation considerations of {{SecCon}}.
+On receiving such feedback, and subject to its own verification and anti-abuse safeguards, the issuer MAY take appropriate action, up to and including ceasing to issue tokens to the implicated initiator, agent, or platform -- the issuance-side counterpart to a recipient's refusal to accept a token, and complementary to the token-lifetime and revocation considerations of {{SecCon}}.
 This mirrors the Certificate-Authority analogy of {{SecCon}}: just as a CA can stop issuing (and can revoke) certificates for a misbehaving subscriber, a KYAPay issuer can stop vouching for a misbehaving initiator.
 
 This document does not define the mechanism, format, or trust model for this feedback channel;
-how a verifier authenticates to an issuer, how reports are structured, how issuers guard against false or malicious reports, and what evidence is required are all open items.
+how a recipient authenticates to an issuer, how reports are structured, how issuers guard against false or malicious reports, and what evidence is required are all open items.
 Feedback SHOULD be treated as sensitive: reports identify principals, agents, or platforms and MUST be shared only with the relevant issuer and handled per {{PrivCon}}.
 An issuer SHOULD corroborate feedback (for example, requiring reputation, multiple independent reports, or evidence) before taking action that would affect a principal, so that the channel cannot itself be used to deny service to legitimate initiators.
 
-## Non-Payment and Handoff Flows
+## Non-Payment and Handoff Flows
 
 Not every human-via-agent flow includes a payment made by the agent.
 In a common pattern, the agent performs discovery and assembles a cart but does not pay;
@@ -619,7 +626,7 @@ The `iss` claim identifies the party that signs (issues) the token, while the op
 these can be the same entity or different entities.
 Likewise, the verified identity information carried in `hid` and `apd` may be supplied by the agent platform or a third-party verifier and merely attested by the issuer.
 Verification itself need not be completed up front: it can be progressive, beginning with a lightweight check (such as email verification) and stepping up as a Target's requirements demand.
-Consumers observe the result of these choices through the `verified`/`verifier` sub-claims and, where used, the
+Consumers observe the result of these choices through the `verifier`/`verified` sub-claims and, where used, the
 `ivm` {{I-D.skyfire-oauth-id-verification}},
 `amr` {{I-D.skyfire-oauth-amr-values}}, and
 `aml` {{I-D.skyfire-oauth-aml-methods}}
@@ -640,14 +647,14 @@ They MUST be transmitted over TLS and MUST NOT be sent in the clear.
 
 A long-lived token is a credential that can be captured, farmed, and resold for reuse against the same Target.
 The `exp` claim MUST be present;
-verifiers SHOULD require short lifetimes (for high-assurance actions, on the order of a few minutes) and MUST reject tokens whose lifetime exceeds their local policy maximum.
-Verifiers SHOULD reject tokens whose `iat` is outside an acceptable window.
+recipients SHOULD require short lifetimes (for high-assurance actions, on the order of a few minutes) and MUST reject tokens whose lifetime exceeds their local policy maximum.
+Recipients SHOULD reject tokens whose `iat` is outside an acceptable window.
 
 ## Replay and Proof of Possession
 
 A bare bearer token can be replayed by anyone who captures it within its validity window.
-As deployed today ({{TrustStack}}), KYAPay accepts this bounded in-window risk and mitigates rather than eliminates it: verifiers MUST validate the `aud` claim (and `tdm`/`tsi` where used) so that a token minted for one Target cannot be presented to another, MUST keep accepted lifetimes short, and SHOULD use the `jti` claim to detect replay to the same recipient.
-Where a token carries a proof-of-possession key (`cnf` {{RFC7800}}), verifiers MUST additionally verify a per-request signature {{RFC9421}} over that key ({{ProcModel}}), which removes the in-window replay exposure.
+As deployed today ({{TrustStack}}), KYAPay accepts this bounded in-window risk and mitigates rather than eliminates it: recipients MUST validate the `aud` claim (and `tdm`/`tsi` where used) so that a token minted for one Target cannot be presented to another, MUST keep accepted lifetimes short, and SHOULD use the `jti` claim to detect replay to the same recipient.
+Where a token carries a proof-of-possession key (`cnf` {{RFC7800}}), recipients MUST additionally verify a per-request signature {{RFC9421}} over that key ({{ProcModel}}), which removes the in-window replay exposure.
 Access tokens produced by token exchange ({{ATOProt}}) SHOULD be sender-constrained ({{RFC9449}}, {{RFC8705}}).
 
 ## Malicious or Compromised Target Reuse
@@ -655,7 +662,7 @@ Access tokens produced by token exchange ({{ATOProt}}) SHOULD be sender-constrai
 A Target that legitimately receives a bearer token can, within the token's window, reuse it to act elsewhere on the agent's behalf.
 Audience binding limits this to the intended Target;
 the proof-of-possession model ({{TrustStack}}), which binds each use to a fresh request signature, closes it.
-Verifiers and Targets MUST NOT forward received tokens to other parties (see {{PrivCon}}).
+Recipients and Targets MUST NOT forward received tokens to other parties (see {{PrivCon}}).
 
 ## Compromised Agent Host (Irreducible)
 
@@ -666,7 +673,7 @@ This risk is bounded not by the token bindings but by short token lifetimes -- s
 ## Issuer Trust
 
 A token is only as trustworthy as its issuer and the verifiers it cites.
-The system is federated: many issuers are possible, and a verifier MUST maintain an explicit set of trusted issuers and the claims and assurance levels it will accept from each.
+The system is federated: many issuers are possible, and a recipient MUST maintain an explicit set of trusted issuers and the claims and assurance levels it will accept from each.
 Establishing this trust at scale is an open problem analogous to the Certificate Authority model (audits, a maintained issuer list, a removal mechanism, and possibly transparency logs);
 this document does not define such a framework, and deployments should not assume one exists.
 Until it does, trust is established out of band (for example, configured relationships with well-known issuers).
@@ -675,13 +682,13 @@ Until it does, trust is established out of band (for example, configured relatio
 
 An agent whose platform is deregistered, or a human whose identity verification is revoked, may still hold unexpired tokens.
 This specification does not define a revocation mechanism.
-Verifiers SHOULD keep accepted lifetimes short to bound exposure, and SHOULD consult an issuer's live-status or revocation endpoint, where one is offered, for high-assurance or high-value actions.
+Recipients SHOULD keep accepted lifetimes short to bound exposure, and SHOULD consult an issuer's live-status or revocation endpoint, where one is offered, for high-assurance or high-value actions.
 
 ## Continuity of Human Control
 
 A valid token attests that the human principal authorized the agent at the time of issuance.
 It does not prove the human remains in control -- for example, if the agent is later prompt-injected, or if credentials are exfiltrated from the agent or its host.
-Verifiers SHOULD treat high-value actions as warranting step-up ({{StepUp}}) rather than relying solely on a previously issued token.
+Recipients SHOULD treat high-value actions as warranting step-up ({{StepUp}}) rather than relying solely on a previously issued token.
 
 ## Key Management
 
@@ -750,6 +757,8 @@ for his contributions to the specification.
 
 -01
 
+* Rewrote the Introduction to frame agents as an evolution of verified bot traffic.
+* Clarified the meaning of Verifier and differentiated from Recipient.
 * Added {:vspace} syntax to definition list entries.
 
 -00
