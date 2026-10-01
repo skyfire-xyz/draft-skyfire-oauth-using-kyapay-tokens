@@ -138,17 +138,11 @@ the token itself is the interoperability contract.
 --- middle
 
 # Introduction
-Legitimate automated traffic acting on behalf of users is a long-standing feature of the web. Financial aggregation tools, automated booking agents, and data synchronizers routinely interact with web services at the direct behest of subscribers. To keep this legitimate automation from being blocked by defenses built for malicious bots, security intermediaries have relied on static network metadata—published IP ranges, Autonomous System Numbers (ASNs), and User-Agent strings—to identify verified bots and apply configured policies.
-
-This network-level model identifies the operating organization, but its verification mechanism is brittle. User-Agent headers are easily forged, IP ranges shift across cloud providers and shared egress pools, and network metadata cannot cryptographically prove which individual subscriber or session authorized a given request.
-
-AI agents are the functional evolution of this automated traffic. An account aggregation service re-implemented as an LLM-orchestrated agent performs the same task for the same subscriber, but through dynamic execution flows. Instead of relying on fragile network indicators to claim legitimacy, an agent presenting a KYAPay token identifies itself at the application layer through cryptographic self-identification.
-
-KYAPay tokens replace network-level inference with un-forgeable, issuer-signed assertions. Signed by a trusted issuer and verified against public keys, the token can carry the agent instance (aid), the execution platform (apd), and the identified principal the issuer asserts the agent acts for (hid). Where network indicators only establish that a request comes from a known operator's network, a KYAPay token establishes that a specific agent is acting for a specific, verified subscriber. 
-
-Crucially, identification is distinct from admission. Verifiers consume KYAPay tokens as authenticated context for site-configured policy engines, not as an automatic pass. A design goal of this specification is that verifiers can reliably distinguish attributable, human-authorized agentic traffic from unattributed automation, so that site operators can apply appropriate policy—admit, rate-limit, require step-up, or deny—based on verified identity rather than default blocking.
-
-
+Legitimate automated traffic acting on behalf of users is a long-standing feature of the web. Financial aggregation tools, automated booking agents, and data synchronizers routinely interact with web services at the direction of their subscribers. To prevent legitimate automation from being blocked by defenses designed to detect malicious bots, security intermediaries have traditionally relied on static network metadata—including published IP ranges, Autonomous System Numbers (ASNs), and User-Agent strings—to identify bots and apply configured policies.
+This network-level model identifies bots primarily by associating their traffic with a known operator or network. However, its verification mechanisms are brittle: User-Agent headers are easily forged, IP ranges change across cloud providers and shared egress infrastructure, and network metadata cannot establish which individual subscriber authorized a particular request. The result is that network-level bot identification can establish where automated traffic comes from, but not which principal it is acting for.
+The rise of capable AI agents makes this limitation more significant. An account aggregation service reimplemented as an LLM-orchestrated agent may perform the same task for the same subscriber, but through dynamic execution flows. The relevant distinction is therefore not simply between human and automated traffic, but between direct human interaction, a human or organization acting through an authorized agent, and unattended automation without verifiable authorization from an identified principal. Rather than relying on fragile network indicators to establish legitimacy, an agent presenting a KYAPay token can provide cryptographically verifiable assertions about the agent and the principal it is authorized to represent.
+KYAPay tokens provide issuer-signed assertions that can be verified against trusted public keys. A KYAPay token is a signed JSON Web Token (JWT) {{RFC7519}} {{RFC7515}} that conveys verified identity claims about the principal (hid), agent instance (aid), and execution platform (apd)—the KYA ("Know Your Agent") information—and optionally payment credentials (the PAY information). A validated KYA token asserts that a trusted issuer has verified, to an established level of assurance, that the identified principal authorized the identified agent, running on the identified platform, to act on their behalf. A validated PAY token further asserts that a trusted issuer has authorized the agent to execute a payment within specified parameters.
+Crucially, identification is distinct from admission. Verifiers consume KYAPay tokens as authenticated context for site-configured policy engines, not as an automatic grant of access. A design goal of this specification is to enable verifiers to distinguish attributable, principal-authorized agentic traffic from automation lacking verifiable delegation, so that site operators can apply appropriate policy—including admission, rate limiting, step-up challenges, or denial—based on verified identity and authorization rather than default blocking.
 
 ## Scope
 
@@ -739,6 +733,11 @@ The `amr` extensions and the `ivm` and `aml` claims and values are registered by
 {:numbered="false"}
 
 The authors thank the contributors to the KYAPay Token {{I-D.skyfire-oauth-kyapay-token}} specification and the partners in the KYAPay consortium (see {{KYAPAY-ORG}}) -- including bot-management, fraud, CIAM, and ATO vendors and merchants -- whose deployment and review experience informed the usage patterns and open issues described here.
+
+We would like to thank
+Jean Diaconu
+for his contributions to the specification.
+
 
 # Document History
 {: numbered="false"}
