@@ -1057,11 +1057,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Using KYAPay Tokens</td>
-<td class="right">September 2026</td>
+<td class="right">October 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Agarwal, et al.</td>
-<td class="center">Expires 30 March 2027</td>
+<td class="center">Expires 4 April 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1074,12 +1074,12 @@ svg {
 <dd class="internet-draft">draft-skyfire-oauth-using-kyapay-tokens-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-09-26" class="published">26 September 2026</time>
+<time datetime="2026-10-01" class="published">1 October 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-03-30">30 March 2027</time></dd>
+<dd class="expires"><time datetime="2027-04-04">4 April 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1142,7 +1142,7 @@ the token itself is the interoperability contract.<a href="#section-abstract-1" 
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 30 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 4 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1373,38 +1373,11 @@ the token itself is the interoperability contract.<a href="#section-abstract-1" 
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">For most of the history of the web, the operative question asked by web security infrastructure was binary: is this request from a human or from a bot?
-Bots were treated as unwelcome, and bot managers, web application firewalls, and related systems were built to detect and block automated traffic.
-As automation became more nuanced, the question evolved into a three-way distinction: human, "good bot" (such as a search-engine crawler or a monitoring probe), and "bad bot".<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">The rise of capable AI agents changes the question again.
-The relevant distinction is now:<a href="#section-1-2" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-1-3.1">
-          <p id="section-1-3.1.1">a <strong>human</strong> interacting directly;<a href="#section-1-3.1.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="section-1-3.2">
-          <p id="section-1-3.2.1">a <strong>human acting through an agent</strong> (a "human-via-agent" request), where a person or organization has authorized a software agent to act on their behalf; and<a href="#section-1-3.2.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="section-1-3.3">
-          <p id="section-1-3.3.1">a <strong>bot</strong>: unattended automation acting without the authorization of, or on behalf of, an identified human principal.<a href="#section-1-3.3.1" class="pilcrow">¶</a></p>
-</li>
-      </ul>
-<p id="section-1-4">Put succinctly, the distinction that matters is no longer human versus good bot versus bad bot;
-it is human-direct and human-via-agent, together, versus bots.
-And the sharper form of the question is "did a verified human authorize this agent?", rather than "is this a human?".
-An AI agent is neither a bot to be managed nor a human to be onboarded through a conventional flow;
-it is a new category of legitimate client that existing bot and fraud detection cannot, on its own, distinguish from malicious automation.<a href="#section-1-4" class="pilcrow">¶</a></p>
-<p id="section-1-5">Bots were mostly unwelcome, and they remain so.
-The new requirement is that both human requests and human-via-agent requests must be able to succeed across the existing web security infrastructure.
-A human-via-agent request is, at the transport and application layers, frequently indistinguishable from a bot;
-it is programmatic, it may originate from data-center IP space, and it may not carry a conventional interactive browser fingerprint.
-Absent a reliable signal, security intermediaries either block legitimate agents (destroying utility for the human principal) or relax their defenses (admitting malicious bots).
-What has been missing is a consistent, verifiable signal of human authorization behind an otherwise programmatic request.<a href="#section-1-5" class="pilcrow">¶</a></p>
-<p id="section-1-6">KYAPay tokens <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span> supply that signal.
-A KYAPay token is a signed JWT <span>[<a href="#RFC7519" class="cite xref">RFC7519</a>]</span> <span>[<a href="#RFC7515" class="cite xref">RFC7515</a>]</span> that conveys verified identity claims about the human principal, the agent, and the agent platform (the KYA, or "Know Your Agent", information), and optionally payment credentials (the PAY information).
-A validated KYA token asserts that a trusted issuer has verified that this human principal (to some level of assurance) authorized this agent (running on this platform) to act on their behalf;
-a validated PAY token further asserts that a trusted issuer has authorized this agent to pay a specific amount to a specific target.
-Together, they form a chain of trust from the human principal to the action, and -- for payments -- to settlement.<a href="#section-1-6" class="pilcrow">¶</a></p>
+<p id="section-1-1">Legitimate automated traffic acting on behalf of users is a long-standing feature of the web. Financial aggregation tools, automated booking agents, and data synchronizers routinely interact with web services at the direction of their subscribers. To prevent legitimate automation from being blocked by defenses designed to detect malicious bots, security intermediaries have traditionally relied on static network metadata—including published IP ranges, Autonomous System Numbers (ASNs), and User-Agent strings—to identify bots and apply configured policies.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">This network-level model identifies bots primarily by associating their traffic with a known operator or network. However, its verification mechanisms are brittle: User-Agent headers are easily forged, IP ranges change across cloud providers and shared egress infrastructure, and network metadata cannot establish which individual subscriber authorized a particular request. The result is that network-level bot identification can establish where automated traffic comes from, but not which principal it is acting for.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">The rise of capable AI agents makes this limitation more significant. An account aggregation service reimplemented as an LLM-orchestrated agent may perform the same task for the same subscriber, but through dynamic execution flows. The relevant distinction is therefore not simply between human and automated traffic, but between direct human interaction, a human or organization acting through an authorized agent, and unattended automation without verifiable authorization from an identified principal. Rather than relying on fragile network indicators to establish legitimacy, an agent presenting a KYAPay token can provide cryptographically verifiable assertions about the agent and the principal it is authorized to represent.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">KYAPay tokens provide issuer-signed assertions that can be verified against trusted public keys. A KYAPay token is a signed JSON Web Token (JWT) <span>[<a href="#RFC7519" class="cite xref">RFC7519</a>]</span> <span>[<a href="#RFC7515" class="cite xref">RFC7515</a>]</span> that can carry the agent instance (<code>aid</code>), the execution platform (<code>apd</code>), and the identified principal the issuer asserts the agent acts for (<code>hid</code>)—the KYA ("Know Your Agent") information—and optionally payment credentials (the PAY information). A validated KYA token asserts that a trusted issuer has verified, to an established level of assurance, that the identified principal authorized the identified agent, running on the identified platform, to act on their behalf. A validated PAY token further asserts that a trusted issuer has authorized the agent to execute a payment within specified parameters.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">Crucially, identification is distinct from admission. Verifiers consume KYAPay tokens as authenticated context for site-configured policy engines, not as an automatic grant of access. A design goal of this specification is that verifiers can reliably distinguish attributable, human-authorized agentic traffic from unattributed automation, so that site operators can apply appropriate policy—admit, rate-limit, require step-up, or deny—based on verified identity rather than default blocking.<a href="#section-1-5" class="pilcrow">¶</a></p>
 <div id="scope">
 <section id="section-1.1">
         <h3 id="name-scope">
