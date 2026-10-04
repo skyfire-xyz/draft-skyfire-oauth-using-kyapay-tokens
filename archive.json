@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-01T00:05:26.267689+00:00",
+  "timestamp": "2026-10-04T00:49:37.877280+00:00",
   "repo": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
   "labels": [
     {
@@ -386,24 +386,26 @@
       "id": "PR_kwDOTVjRsc8AAAABEsP2sw",
       "title": "Rewrite Introduction to frame agents as evolution of verified bot traffic",
       "url": "https://github.com/skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens/pull/6",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "sthumma33",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Establishes the document's core framing: KYAPay tokens are the cryptographic successor to the network metadata (IP ranges, ASNs, User-Agent strings) that intermediaries use to identify verified bots and apply policy.\r\n\r\n- Position AI agents as the functional evolution of existing legitimate automation, not a new category.\r\n- State what the token asserts: agent instance (aid), execution platform (apd), and authorizing human principal (hid), issuer-signed and verified against public keys.\r\n- Make explicit that identification is distinct from admission: the token is authenticated context for a site's policy engine, not an automatic pass.",
       "createdAt": "2026-09-23T04:38:24Z",
-      "updatedAt": "2026-09-25T18:46:24Z",
+      "updatedAt": "2026-10-01T21:48:16Z",
       "baseRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
       "baseRefName": "main",
-      "baseRefOid": "0b991d72a9e0c7b556804d5763acfa6696906496",
+      "baseRefOid": "3019cbfc6a749e62c98359c87e45882a2acaad75",
       "headRepository": "sthumma33/draft-skyfire-oauth-using-kyapay-tokens",
       "headRefName": "patch-1",
-      "headRefOid": "bb574de9022244950983e84d17ed547675055e67",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "23e630868775635508360e0d09aa85d0cfc7c8dc",
+      "closedAt": "2026-10-01T21:48:16Z",
+      "mergedAt": "2026-10-01T21:48:16Z",
+      "mergedBy": "selfissued",
+      "mergeCommit": {
+        "oid": "b08ac4ac51b0981c317b5d1d79e2d52efc27ac0b"
+      },
       "comments": [],
       "reviews": [
         {
@@ -444,8 +446,102 @@
               "updatedAt": "2026-09-25T18:46:24Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABQFZVNw",
+          "commit": {
+            "abbreviatedOid": "23e6308"
+          },
+          "author": "sthumma33",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-01T02:47:52Z",
+          "updatedAt": "2026-10-01T02:47:52Z",
+          "comments": [
+            {
+              "originalPosition": 24,
+              "body": "Please review the updated text.",
+              "createdAt": "2026-10-01T02:47:52Z",
+              "updatedAt": "2026-10-01T02:47:52Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABQFZXmw",
+          "commit": {
+            "abbreviatedOid": "23e6308"
+          },
+          "author": "sthumma33",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-01T02:47:58Z",
+          "updatedAt": "2026-10-01T02:47:58Z",
+          "comments": [
+            {
+              "originalPosition": 43,
+              "body": "Please review the updated text.",
+              "createdAt": "2026-10-01T02:47:58Z",
+              "updatedAt": "2026-10-01T02:47:58Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABQF2BLg",
+          "commit": {
+            "abbreviatedOid": "23e6308"
+          },
+          "author": "selfissued",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Thanks for the updates, Srini",
+          "createdAt": "2026-10-01T04:02:52Z",
+          "updatedAt": "2026-10-01T04:02:52Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABQP2TMw",
+          "commit": {
+            "abbreviatedOid": "23e6308"
+          },
+          "author": "skyfire-ankit",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "lgtm",
+          "createdAt": "2026-10-01T20:47:21Z",
+          "updatedAt": "2026-10-01T20:47:21Z",
+          "comments": []
         }
       ]
+    },
+    {
+      "number": 7,
+      "id": "PR_kwDOTVjRsc8AAAABGMSCTA",
+      "title": "Clarify the meaning of Verifier",
+      "url": "https://github.com/skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens/pull/7",
+      "state": "MERGED",
+      "author": "selfissued",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Changes parallel those in https://github.com/skyfire-xyz/draft-skyfire-oauth-kyapay-token/pull/51.\r\n\r\nAlso minor tweaks to the Introduction to format interaction types as a bullet list.\r\n",
+      "createdAt": "2026-10-01T22:41:54Z",
+      "updatedAt": "2026-10-01T22:42:46Z",
+      "baseRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
+      "baseRefName": "main",
+      "baseRefOid": "b08ac4ac51b0981c317b5d1d79e2d52efc27ac0b",
+      "headRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
+      "headRefName": "mbj-verifier",
+      "headRefOid": "d9482dce1b2df6a0c91d2b3da452fed48918a9d5",
+      "closedAt": "2026-10-01T22:42:46Z",
+      "mergedAt": "2026-10-01T22:42:46Z",
+      "mergedBy": "selfissued",
+      "mergeCommit": {
+        "oid": "d82c2f0a5567fd50cf4a707622e9430e629127bf"
+      },
+      "comments": [],
+      "reviews": []
     }
   ]
 }
