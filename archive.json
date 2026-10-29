@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-27T00:04:06.851619+00:00",
+  "timestamp": "2026-10-29T00:03:15.438961+00:00",
   "repo": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
   "labels": [
     {
@@ -49,7 +49,24 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 8,
+      "id": "I_kwDOTVjRsc8AAAABahEMag",
+      "title": "Review of draft-skyfire-oauth-using-kyapay-tokens-01",
+      "url": "https://github.com/skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens/issues/8",
+      "state": "OPEN",
+      "author": "abr5427",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Hi,\n\nBelow is my review of \"Using KYAPay Tokens\" [USING-KYAPAY],\ndraft-skyfire-oauth-using-kyapay-tokens-01.\n\nSummary\n=======\n\nMost of the comments below come down to three high-level issues.\n\n1. The bearer token carries personal and payment data.\n\n   The token is a signed JWT, not an encrypted one (Section 4.1). In\n   [KYAPAY-TOKEN], hid requires email and may carry name and phone, and\n   sti carries settlement details. Anyone who sees the header during\n   its lifetime can read the data and replay the token anywhere within\n   its aud. Every hop that terminates TLS (CDN, WAF, bot manager,\n   origin) sees it. Sections 5.1 and 9.3 answer this with \"MUST NOT log\n   or forward\", which cannot be enforced or checked.\n\n2. Admission without challenge.\n\n   Section 6.3 says a bot manager \"SHOULD admit the request ... rather\n   than subjecting it to bot-blocking challenges.\" Combined with point\n   1, a captured or cheaply obtained token becomes an open gate at the\n   bot manager. Section 7.2 allows \"progressive\" verification that\n   starts with only an email check, so \"verified human\" can mean very\n   little. I don't have a good solution here, since the goal of the\n   draft is easy adoption using the existing OAuth and JWT framework.\n\n3. Some things to clarify to avoid implementation divergence.\n\n   a. How intermediaries learn the aud set. Section 6.1 says to check\n      that the token is \"intended for this recipient\", but an\n      intermediary is not the recipient; the Target is. How will the\n      intermediary know the audience set?\n\n   b. Single-use vs. reusable. Section 8.3 asks for jti replay\n      detection, while Section 4.3 validates \"once (per session)\" and\n      mnr implies multiple requests.\n\n   c. What the human authorized. Section 6.6 treats a valid token as\n      evidence of a legitimate session, but the token does not name an\n      account or an action. Is hid meant to equal the account? Nothing\n      in the draft says so. Again this goes back to proof of\n      possession.\n\nSecurity comments\n=================\n\nS1. The token does not say which account it is for (Sections 6.6, 6.7,\n    8.8)\n\nA valid token with hid = attacker@example can be presented while\nlogging into, or acting on, someone else's account. Section 6.6 says an\nATO protector \"SHOULD treat a validated KYAPay token ... as evidence\nthat a session is a human-initiated agentic session.\" That is true, but\nit can be misread as evidence that the session is legitimate for this\naccount. The authors have said there is no low-burden way to bind the\ntoken to an account today, and I agree.\n\nSuggestion:\n\n- Add a normative statement to 6.6 and 6.7, for example: \"A KYAPay\n  token attests the identity of the principal who authorized the agent.\n  It does not convey authority over any account at the Target. ATO\n  protectors and CIAM systems MUST NOT treat a validated token as\n  authorization to access an account unless the token's principal has\n  been linked to that account.\"\n\n- One possible path that keeps intermediary burden low is a DPoP change\n  I proposed on this list [DPOP-PROXY], which lets intermediaries\n  validate both the token and the sender.\n\nS2. Admission without challenge should depend on assurance (Sections\n    6.2, 6.3, 7.2)\n\nSection 6.3 says a bot manager \"SHOULD admit the request ...\nrather than subjecting it to bot-blocking challenges.\" Section 7.2\nallows verification to begin with an email check. A bearer token\nobtained with a throwaway email then bypasses bot defenses on login,\nsign-up and checkout.\n\nSuggestion. Make the admission SHOULD conditional: \"...SHOULD admit the\nrequest when the assurance levels in the token (Section 6.2) meet the\nTarget's policy for the requested action.\" Add that per-hid, per-aid\nand per-apd rate and abuse limits still apply, and that sensitive\nactions MAY still be challenged.\n\nS3. Say the token is reusable, and drop jti replay detection (Sections\n    4.1, 4.3, 8.3)\n\nThe token is meant to be reused within its roughly 5-minute lifetime.\nSection 4.3 validates it \"once (per session)\" and the payment\nclaim mnr allows multiple requests. Yet Section 8.3 says verifiers\n\"SHOULD use the jti claim to detect replay.\" That can't work in\npractice:\n\n- A Target is usually fronted by many intermediary instances (PoPs,\n  proxy fleets). Sharing jti state among them within the latency budget\n  in 6.3 (\"no per-request callout\") is not realistic.\n\n- Even a single-use token can't be enforced. Section 3.4 has the bot\n  manager, fraud manager, ATO protector and CIAM system all validate\n  the same token on the same request. Each layer would see the others'\n  use as a replay.\n\nSuggestion.\n\n- State in 4.1 that the token is reusable within its lifetime and aud.\n\n- List in-window replay within the aud set as an accepted risk of the\n  bearer model.\n\n- Reword 8.3 so jti is used for correlation, audit and issuer feedback\n  (6.10), not replay detection.\n\n- Point to proof of possession (4.3) as the only real fix, subject to\n  S8 below.\n\nS4. Define how intermediaries get the aud set (Sections 5.3, 6.1 step 5)\n\nIssue. aud works like a store-restricted gift card: the issuer limits\nwhich Targets can accept the token. An intermediary, though, is not the\naudience. Section 6.1 step 5 (\"intended for this recipient\") gives it\nno way to know which aud values are valid for the hosts it protects.\nMulti-tenant intermediaries front many Targets. How aud relates to tdm\nand tsi is also not stated.\n\nSuggestion.\n\n- Say that intermediaries obtain the acceptable aud (and tdm/tsi)\n  values per protected Target through configuration, for example as\n  part of each trusted issuer's configuration, and check the token\n  against that set.\n- Define the relationship between aud, tdm and tsi.\n- Say how an agent determines the aud for a given Target.\n\nS5. Check the issuer before fetching keys (Section 6.1 steps 3 and 4)\n\nStep 3 verifies the signature against the issuer's key set before\nstep 4 checks that the issuer is trusted. Keys are found at\niss + /.well-known/jwks.json, so a literal reading has verifiers\nfetching keys from any URL an attacker puts in iss (server-side request\nforgery, denial of service). Well-built verifiers already allowlist\nissuers, but the text should say so.\n\nSuggestion.\nSwap steps 3 and 4. Add: \"A verifier MUST NOT retrieve key material\nfor an issuer that is not in its configured set of trusted issuers.\"\n\nS6. Algorithm rules and token count (Sections 5.1, 6.1, References)\n\nThe draft sets no algorithm rules. JWT Best Current Practices\n[RFC8725] is only an informative reference.\n\nSuggestion.\n\n- Make [RFC8725] a normative reference.\n- Require verifiers to use an algorithm allowlist tied to each issuer's\n  keys, and to reject \"none\" and symmetric algorithms.\n- In 5.1, let recipients reject a header with more than one token per\n  typ (at most 3 tokens). This caps verification cost per request.\n\nS7. Token leakage through the agent's runtime (Section 8)\n\nTokens can leak through LLM transcripts, tool logs, and prompt\ninjection. Section 7.1 mentions keeping credentials from the LLM, but\nSection 8 does not cover the threat. Proposed text is in the \"Proposed\ntext: new Section 8.x\" part at the end of this message.\n\nS8. The planned proof-of-possession path reintroduces the rewriting\n    problem (Section 4.3)\n\nThe bearer design is right not to depend on end-to-end request signing\nsuch as Web Bot Auth. Signing the request's components is heavy, and\nrequests are routinely changed on the way to the origin. URL rewriting\nis common, and sites deliberately keep external and internal URLs\nseparate so they don't expose internal architecture. When the signed\nrequest is what the client sent, every proxy that rewrites the request\nbreaks verification or has to be given special handling.\n\nIn Section 4.3 the issuer binds the agent's public key into the\ntoken (cnf), and the agent then signs each request, \"a signature over\nthe request (method, path, body digest, timestamp/nonce) using\n[RFC9421]\", which is verified against cnf. The draft prefers this over\na detached, DPoP-style proof [RFC9449]. Because the signature covers\nthe path, the same rewriting fragility the bearer model avoids comes\nback: an intermediary that rewrites the URL, or an origin that sees\nonly the internal path, can no longer verify it. Section 4.3 also notes\nthat stopping replay of the signature \"requires either per-Target nonce\ncaches or binding the signature to the request content\". That is the\nsame shared-state problem across distributed intermediaries described\nin S3.\n\nSuggestion.\n\n- Make the rationale explicit in 4.2 and 4.3: why whole-request signing\n  is avoided, including the URL rewriting and internal/external URL\n  separation points above.\n- For the proof-of-possession path, say which components are covered,\n  and require a set that survives normal proxying. Alternatively, allow\n  verification at the first intermediary, before any rewrite.\n- Consider a DPoP-style proof designed for intermediaries as an\n  alternative. My DPoP proposal on this list [DPOP-PROXY] addresses\n  exactly this for URI-rewriting reverse proxies.\n\nPrivacy and PCI comments\n========================\n\nSending the JWT in the clear is a reasonable choice: it reuses existing\nOAuth/JWT infrastructure and keeps integration simple. The comments\nbelow keep that model. They change what goes in the token, not how it\nis carried.\n\nP1. Replace personal data with a per-Target pseudonymous identifier\n    (Sections 9.1, 9.3; hid in [KYAPAY-TOKEN])\n\nhid requires email and may carry name and phone. Every intermediary\nreceives it (9.3), and the same email reaches every Target, which\nlets sites track a person across all of them. Intermediaries don't\nneed this data: bot, fraud and ATO decisions (6.3 to 6.6) need a\nstable handle and assurance levels, not a name or email.\n\nSuggestion.\n\n- Carry an opaque, pseudonymous principal identifier that differs per\n  Target (pairwise, derived per aud), plus the verification and\n  assurance sub-claims.\n- A Target that needs the personal data (for example CIAM account\n  creation in 6.7) gets it from the issuer out of band, authenticated\n  as that Target, similar to the UserInfo endpoint in OpenID Connect\n  Core 1.0 [OIDC], Section 5.3.\n\n- Intermediaries can still rate-limit per principal, scope mitigations\n  (6.9) and send feedback (6.10) using the pseudonym.\n\n- Only the Target makes an issuer call, and only when it needs the\n  data, so the \"no per-request callout\" property in 6.3 holds for\n  intermediaries.\n\nP2. Keep payment data out of the token (Section 6.4; sti in\n    [KYAPAY-TOKEN])\n\nIf sti can contain card-related data, every hop that sees the\nheader may fall under PCI rules. Intermediary vendors and CDNs are\nunlikely to accept that.\n\nSuggestion.\nApply the P1 pattern: sti carries a reference that the Target\nredeems with the issuer or payment processor. Add: \"A KYAPay\ntoken MUST NOT contain primary account numbers or other cardholder\ndata.\" Amount, currency and limits (amt, cur, mnr) can stay, since\nfraud managers use them (6.4).\n\nP3. Make aid.creation_ip optional ([KYAPAY-TOKEN])\n\nIssue. creation_ip is REQUIRED. It is personal data, and Section 6.3\nalready says network-origin claims are \"a weak corroborating signal\nonly.\"\n\nSuggestion. Make it OPTIONAL.\n\nProtocol and compatibility comments\n===================================\n\nC1. Header grammar and Structured Fields disagree (Sections 5.1, 10.1)\n\nSection 5.1 defines its own ABNF, while 10.1 registers KYAPay-Token as\na Structured Field of type List. Under Structured Field Values for HTTP\n[RFC9651], a malformed member makes the whole field fail to parse. That\nconflicts with 5.1's \"MUST ignore a member it cannot parse ... while\ncontinuing to process the remaining members.\" Pick one: define the\nfield as an sf-list of sf-string (or sf-token) and drop the custom\nABNF, or drop the Structured Field registration.\n\nC2. Header size (Section 5.1)\n\nUp to three JWTs carrying identity and payment claims can exceed common\nheader limits (nginx header buffers, load balancer and CDN caps). Give\na recommended maximum field size, or at least a note. The P1 and P2\nchanges would shrink tokens considerably.\n\nC3. Browser agents and CORS (Sections 3.3, 5.1)\n\nA custom request header on a cross-origin fetch triggers a CORS\npreflight. Page scripts can't send it unless the site allows it in\nAccess-Control-Allow-Headers. Browser-use agents also can't easily add\nheaders to page navigations. Say which requests carry the token\n(top-level navigations, API calls, sub-resources), and qualify the\n\"zero merchant tech lift\" claim for browser-based agents.\n\nC4. No challenge or error response (Sections 6.5, 8.8)\n\nA Target cannot signal \"token required\", \"token rejected\" or \"higher\nassurance needed.\" For step-up, which 6.5 lists as open, consider\nreusing OAuth 2.0 Step Up Authentication Challenge Protocol [RFC9470],\nwhich already defines WWW-Authenticate challenges for insufficient\nauthentication. It would also help to explain why the draft uses a new\nheader rather than an Authorization scheme (presumably to avoid\nclashing with the site's own authentication).\n\nProposed text: new Section 8.x, Token Exposure in the Agent Runtime\n===================================================================\n\nSuggested for insertion after Section 8.5 (Compromised Agent Host). It\ncomplements 8.5: that section covers malware using the agent's key,\nwhile this one covers the token leaving the agent through its own\nnormal operation.\n\n   8.x. Token Exposure in the Agent Runtime\n\n   Agents driven by language models process untrusted content and\n   record their activity in ways that conventional HTTP clients do not.\n   A KYAPay token can therefore leave the agent through normal\n   operation, without the agent host being compromised. Examples\n   include:\n\n   o  the token appearing in model context, conversation transcripts,\n      or tool-call inputs and outputs that are logged, retained, or\n      sent to a model provider;\n\n   o  agent tracing, observability, or debugging systems that record\n      outbound request headers;\n\n   o  prompt injection, where content retrieved from a website or tool\n      instructs the agent to reveal the token or to include it in a\n      request to a party other than the intended Target.\n\n   For a bearer token (Section 4.1), anyone who obtains a leaked token\n   can use it at any audience in its aud until it expires. Audience\n   binding does not help if the attacker presents the token at a\n   legitimate Target.\n\n   Agent developers and KYAPay Token Issuers SHOULD mint and attach\n   tokens in deterministic components (Section 7.1) whose outputs are\n   not placed in model context. Agents SHOULD attach a token only to\n   requests whose destination matches the token's audience (aud, and\n   tdm or tsi where used), and the component that attaches it MUST\n   make that decision without relying on model output. Agent runtimes\n   MUST NOT record KYAPay token values in logs, traces, or\n   transcripts. Agents SHOULD request a new token for each Target and\n   task rather than reusing one broadly, and SHOULD request the\n   shortest lifetime that fits the task. Proof of possession (Section\n   4.3) reduces this exposure only if the private key is also kept out\n   of model context.\n\nReferences\n==========\n\n[USING-KYAPAY]\n   Agarwal, A., Jones, M. B., and S. Thumma, \"Using KYAPay Tokens\",\n   draft-skyfire-oauth-using-kyapay-tokens-01,\n   https://datatracker.ietf.org/doc/draft-skyfire-oauth-using-kyapay-tokens/\n   Editor's copy:\n   https://skyfire-xyz.github.io/draft-skyfire-oauth-using-kyapay-tokens/draft-skyfire-oauth-using-kyapay-tokens.html\n\n[KYAPAY-TOKEN]\n   Agarwal, A. and M. B. Jones, \"KYAPay Token\",\n   draft-skyfire-oauth-kyapay-token-01,\n   https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-01\n\n[DPOP-PROXY]\n   Allam, B., DPoP proposal for URI-rewriting reverse proxies, message\n   to the OAuth WG mailing list,\n   https://mailarchive.ietf.org/arch/msg/oauth/F-UUNUUuZJihx_Qpms6EGsItoyc/\n\n[RFC8725]\n   Sheffer, Y., Hardt, D., and M. Jones, \"JSON Web Token Best Current\n   Practices\", BCP 225, RFC 8725,\n   https://www.rfc-editor.org/rfc/rfc8725\n\n[RFC9421]\n   Backman, A., Ed., Richer, J., Ed., and M. Sporny, \"HTTP Message\n   Signatures\", RFC 9421,\n   https://www.rfc-editor.org/rfc/rfc9421\n\n[RFC9449]\n   Fett, D., Campbell, B., Bradley, J., Lodderstedt, T., Jones, M., and\n   D. Waite, \"OAuth 2.0 Demonstrating Proof of Possession (DPoP)\",\n   RFC 9449,\n   https://www.rfc-editor.org/rfc/rfc9449\n\n[RFC9470]\n   Bertocci, V. and B. Campbell, \"OAuth 2.0 Step Up Authentication\n   Challenge Protocol\", RFC 9470,\n   https://www.rfc-editor.org/rfc/rfc9470\n\n[RFC9651]\n   Nottingham, M. and P-H. Kamp, \"Structured Field Values for HTTP\",\n   RFC 9651,\n   https://www.rfc-editor.org/rfc/rfc9651\n\n[OIDC]\n   Sakimura, N., Bradley, J., Jones, M., de Medeiros, B., and C.\n   Mortimore, \"OpenID Connect Core 1.0\",\n   https://openid.net/specs/openid-connect-core-1_0.html\n\nThanks,\nBhasker Allam",
+      "createdAt": "2026-10-28T07:20:17Z",
+      "updatedAt": "2026-10-28T07:20:17Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": [
     {
       "number": 1,
@@ -542,6 +559,186 @@
       },
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 9,
+      "id": "PR_kwDOTVjRsc8AAAABLT5bvg",
+      "title": "Update draft-skyfire-oauth-using-kyapay-tokens.md",
+      "url": "https://github.com/skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens/pull/9",
+      "state": "OPEN",
+      "author": "dsenecal26",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Updated intro with more precise information on traditional bot detection methods and expanded section 6.3 (bot manager) with a custom error message in case of anomalies found when validating the token.",
+      "createdAt": "2026-10-28T16:30:58Z",
+      "updatedAt": "2026-10-28T19:31:00Z",
+      "baseRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
+      "baseRefName": "main",
+      "baseRefOid": "d82c2f0a5567fd50cf4a707622e9430e629127bf",
+      "headRepository": "dsenecal26/draft-skyfire-oauth-using-kyapay-tokens",
+      "headRefName": "patch-1",
+      "headRefOid": "acde45bdd2edc1f89a1d8463c573c4439a3f74b1",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABUvbCXg",
+          "commit": {
+            "abbreviatedOid": "acde45b"
+          },
+          "author": "selfissued",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-28T17:23:19Z",
+          "updatedAt": "2026-10-28T17:23:19Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "```suggestion\nLegitimate automated traffic acting on behalf of users is a long-standing feature of the web. Financial aggregation tools, automated booking agents, and data synchronizers routinely interact with web services at the direction of their subscribers. To prevent legitimate automation from being blocked by defenses designed to detect malicious bots, security intermediaries have traditionally relied on a combination of static network metadata -- including published IP ranges, Autonomous System Numbers (ASNs), HTTP header name/value pairs, use of a specific header name, or matching keyword in the User-Agent strings -- to identify bots that serve a legitimate and valuable purpose and apply configured policies.\n```\nUse of -- within a -- clause doesn't work.",
+              "createdAt": "2026-10-28T17:23:19Z",
+              "updatedAt": "2026-10-28T17:24:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABUvdENw",
+          "commit": {
+            "abbreviatedOid": "acde45b"
+          },
+          "author": "selfissued",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-28T17:25:49Z",
+          "updatedAt": "2026-10-28T17:25:49Z",
+          "comments": [
+            {
+              "originalPosition": 28,
+              "body": "```suggestion\n* **Token expired:** Tokens have a short validity time, and in some cases, bot managers may be able to detect it but the validation process may reveal that it has expired. The bot manager should return a HTTP 401 - Unauthorized status code with a custom message including the reason for the unauthorized access with a comma separated list of Token issuer to get a token from:\n```",
+              "createdAt": "2026-10-28T17:25:49Z",
+              "updatedAt": "2026-10-28T17:25:49Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABUveZ1A",
+          "commit": {
+            "abbreviatedOid": "acde45b"
+          },
+          "author": "selfissued",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-28T17:27:31Z",
+          "updatedAt": "2026-10-28T17:27:31Z",
+          "comments": [
+            {
+              "originalPosition": 39,
+              "body": "```suggestion\n* When a bot manager detects advanced automation with no KYA token, or other traditional form of identification, the detection engine should return a 401 - Unauthorized status code with a custom message including the reason for the unauthorized access with a comma separated list of preferred Token issuers:\n```",
+              "createdAt": "2026-10-28T17:27:31Z",
+              "updatedAt": "2026-10-28T17:27:31Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABUvgerg",
+          "commit": {
+            "abbreviatedOid": "acde45b"
+          },
+          "author": "selfissued",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-28T17:30:04Z",
+          "updatedAt": "2026-10-28T17:30:04Z",
+          "comments": [
+            {
+              "originalPosition": 41,
+              "body": "Some people will ask why this isn't being done in a machine-readable way with a WWW-Authenticate response.",
+              "createdAt": "2026-10-28T17:30:04Z",
+              "updatedAt": "2026-10-28T17:30:04Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABUviK1Q",
+          "commit": {
+            "abbreviatedOid": "acde45b"
+          },
+          "author": "selfissued",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Please also add a Document History entry for this change and add yourself to the Acknowledgements, David.",
+          "createdAt": "2026-10-28T17:32:12Z",
+          "updatedAt": "2026-10-28T17:32:12Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABUwRSJQ",
+          "commit": {
+            "abbreviatedOid": "acde45b"
+          },
+          "author": "skyfire-ankit",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-28T18:32:19Z",
+          "updatedAt": "2026-10-28T18:32:19Z",
+          "comments": [
+            {
+              "originalPosition": 41,
+              "body": "My understanding is that the WWW-Authenticate response assumes a human is present. It is supposed to trigger a browser window for the human to resolve the challenge immediately. This will likely not be possible with agents as the human may not be around, the agent may be running in the cloud somewhere, etc. In the discovery draft, I was going to propose a specific but distinct header response that would not overlap with this established behavior if the www-authenticate header. WDYT?",
+              "createdAt": "2026-10-28T18:32:19Z",
+              "updatedAt": "2026-10-28T18:32:20Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABUwgxZA",
+          "commit": {
+            "abbreviatedOid": "acde45b"
+          },
+          "author": "selfissued",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-28T18:51:36Z",
+          "updatedAt": "2026-10-28T18:51:36Z",
+          "comments": [
+            {
+              "originalPosition": 41,
+              "body": "Not true - it's non interactive. See the use of WWW-Authenticate by DPoP, for instance.",
+              "createdAt": "2026-10-28T18:51:36Z",
+              "updatedAt": "2026-10-28T18:51:36Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABUxBHBA",
+          "commit": {
+            "abbreviatedOid": "acde45b"
+          },
+          "author": "skyfire-ankit",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-10-28T19:31:00Z",
+          "updatedAt": "2026-10-28T19:31:00Z",
+          "comments": [
+            {
+              "originalPosition": 41,
+              "body": "I see it. Thanks for pointing it out. Another question though as I dug deeper\r\n- Is the WWW-Authenticate response header meant to be paired with the Authorization request header? Since KYA Tokens have their own request header, does it make sense to have its own response header?\r\n-- For example, HTTP Message Signatures (RFC 9421) hit the same problem. It defines its own Accept-Signature header for asking for a signature, not WWW-Authenticate.",
+              "createdAt": "2026-10-28T19:31:00Z",
+              "updatedAt": "2026-10-28T19:31:00Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
