@@ -5,10 +5,10 @@
 Web Authorization Protocol                                    A. Agarwal
 Internet-Draft                                      Skyfire Systems Inc.
 Intended status: Standards Track                             M. B. Jones
-Expires: 12 March 2027                            Self-Issued Consulting
+Expires: 4 May 2027                               Self-Issued Consulting
                                                                S. Thumma
                                                                   Akamai
-                                                        8 September 2026
+                                                         31 October 2026
 
 
                           Using KYAPay Tokens
@@ -69,7 +69,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 March 2027.
+   This Internet-Draft will expire on 4 May 2027.
 
 Copyright Notice
 
@@ -578,53 +578,15 @@ Table of Contents
 5.2.  Token Size
 
    A recipient MUST accept a KYAPay-Token field value of at least 6144
-   octets, and MUST apply that minimum to the field value as a whole
-   rather than to an individual token: where a request conveys more than
-   one token (Section 5.1), the 6144 octets are shared across the list.
-
-   A recipient MUST NOT truncate a KYAPay-Token field value, and MUST
-   NOT attempt validation on a token reconstructed from a truncated
-   value.  A truncated JWT either fails signature verification or parses
-   as a different, shorter token than the one that was sent; neither
-   outcome is safe to act on.  A recipient MUST NOT treat a request
-   rejected for exceeding a size limit as a request that carried no
-   token (Section 6.1).
-
-   Where a request is rejected because the field value exceeds a
-   configured limit, the recipient SHOULD respond with 431 (Request
-   Header Fields Too Large) [RFC6585] rather than 400 (Bad Request), so
-   that a sender can distinguish a size limit from a malformed token and
-   retry with a smaller one.  Infrastructure ahead of the recipient
-   commonly produces 400 for this condition.
-
-   This minimum is a requirement on the recipient and deliberately not a
-   limit on the sender.  A limit on what a sender may emit is not
-   enforceable, would render existing deployments non-conformant, and --
-   where a sender drops a claim to stay inside it -- deprives the
-   intermediaries of Section 6 of exactly the information they exist to
-   act on.  A floor on the recipient carries none of those costs, and
-   gives an issuer a size it can rely on.  The corresponding issuer-side
-   guidance, which together with this minimum guarantees that a
-   conformant token is accepted, is in [I-D.skyfire-oauth-kyapay-token].
-
-   The value follows the pattern of Section 3 of [RFC9112], which
-   recommends that HTTP senders and recipients support request-line
-   lengths of at least 8000 octets.  [RFC9112] makes no equivalent
-   recommendation for header field lengths; this section supplies one
-   for this field.
-
-   6144 octets is chosen against the smallest limit on the path, which
-   is the per-field limit at the origin web server rather than any limit
-   at an intermediary in front of it.  Common origin defaults for a
-   single header field are roughly an order of magnitude smaller than
-   the total-header limits of common content delivery networks, so a
-   deployment that verifies only against an intermediary's published
-   limit may still be rejected at the origin. 6144 octets plus the field
-   name leaves room for this field to coexist with the cookies, User-
-   Agent and Accept fields an ordinary request already carries, and with
-   the Signature and Signature-Input fields required whenever a token
-   carries a proof-of-possession key (Section 6.1).  A larger minimum
-   would not survive the hop this requirement exists to protect.
+   octets.  The minimum applies to the field value as a whole, however
+   many tokens it carries, and a recipient's parser MUST accept List
+   members of that length.  A recipient MUST NOT truncate the field
+   value, and MUST NOT treat a field it rejects for its size as absent.
+   When it rejects a field for its size, it SHOULD respond with 431
+   (Request Header Fields Too Large) [RFC6585]. 6144 octets fits a token
+   carrying every claim registered in [I-D.skyfire-oauth-kyapay-token]
+   and stays within common origin-server limits for a single header
+   field.
 
 5.3.  Conveying Tokens over Other Interfaces
 
@@ -1305,9 +1267,9 @@ Table of Contents
    [I-D.skyfire-oauth-kyapay-token]
               Agarwal, A. and M. B. Jones, "KYAPay Token", Work in
               Progress, Internet-Draft, draft-skyfire-oauth-kyapay-
-              token-01, 19 July 2026,
+              token-02, 1 October 2026,
               <https://datatracker.ietf.org/doc/html/draft-skyfire-
-              oauth-kyapay-token-01>.
+              oauth-kyapay-token-02>.
 
    [I-D.skyfire-oauth-kyapay-token-exchange]
               Agarwal, A., Jones, M. B., Hingnikar, A., and J. Hickman,
@@ -1371,24 +1333,24 @@ Table of Contents
    [I-D.skyfire-oauth-aml-methods]
               Agarwal, A., Jones, M. B., and N. Ali, "Anti-Money
               Laundering Methods Values", Work in Progress, Internet-
-              Draft, draft-skyfire-oauth-aml-methods-00, 18 July 2026,
+              Draft, draft-skyfire-oauth-aml-methods-01, 1 October 2026,
               <https://datatracker.ietf.org/doc/html/draft-skyfire-
-              oauth-aml-methods-00>.
+              oauth-aml-methods-01>.
 
    [I-D.skyfire-oauth-amr-values]
               Agarwal, A., Jones, M. B., Ali, N., and Srinivasa,
               "Additional Authentication Method Reference Values", Work
               in Progress, Internet-Draft, draft-skyfire-oauth-amr-
-              values-01, 19 July 2026,
+              values-02, 1 October 2026,
               <https://datatracker.ietf.org/doc/html/draft-skyfire-
-              oauth-amr-values-01>.
+              oauth-amr-values-02>.
 
    [I-D.skyfire-oauth-id-verification]
               Agarwal, A., Jones, M. B., Ali, N., and Srinivasa,
               "Identity Verification Methods Values", Work in Progress,
-              Internet-Draft, draft-skyfire-oauth-id-verification-01, 19
-              July 2026, <https://datatracker.ietf.org/doc/html/draft-
-              skyfire-oauth-id-verification-01>.
+              Internet-Draft, draft-skyfire-oauth-id-verification-02, 1
+              October 2026, <https://datatracker.ietf.org/doc/html/
+              draft-skyfire-oauth-id-verification-02>.
 
    [KYAPAY-ORG]
               Skyfire Systems Inc., "KYAPay: Verified Agent Identity and
@@ -1429,10 +1391,6 @@ Table of Contents
               Current Practices", BCP 225, RFC 8725,
               DOI 10.17487/RFC8725, February 2020,
               <https://www.rfc-editor.org/rfc/rfc8725>.
-
-   [RFC9112]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
-              Ed., "HTTP/1.1", STD 99, RFC 9112, DOI 10.17487/RFC9112,
-              June 2022, <https://www.rfc-editor.org/rfc/rfc9112>.
 
    [RFC9449]  Fett, D., Campbell, B., Bradley, J., Lodderstedt, T.,
               Jones, M., and D. Waite, "OAuth 2.0 Demonstrating Proof of

@@ -16,7 +16,7 @@ It defines the token-consuming "verifier" role that the KYAPay Token leaves unsp
 It is intentionally non-prescriptive about how tokens are created, because agent architectures, agent-identity technologies, and agent-communication protocols are diverse and still emerging;
 the token itself is the interoperability contract. 
     ' name="description">
-<meta content="xml2rfc 3.34.0" name="generator">
+<meta content="xml2rfc 3.34.1" name="generator">
 <meta content="agent" name="keyword">
 <meta content="agentic commerce" name="keyword">
 <meta content="agentic" name="keyword">
@@ -29,19 +29,19 @@ the token itself is the interoperability contract.
 <meta content="payment" name="keyword">
 <meta content="draft-skyfire-oauth-using-kyapay-tokens-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.34.0
-    Python 3.14.7
-    ConfigArgParse 1.7.5
+  xml2rfc 3.34.1
+    Python 3.14.8
+    ConfigArgParse 1.8.0
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.11.7
+    platformdirs 4.13.4
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.8.3
+    wcwidth 0.9.2
 -->
 <link href="draft-skyfire-oauth-using-kyapay-tokens.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1057,11 +1057,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Using KYAPay Tokens</td>
-<td class="right">September 2026</td>
+<td class="right">October 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Agarwal, et al.</td>
-<td class="center">Expires 12 March 2027</td>
+<td class="center">Expires 4 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1074,12 +1074,12 @@ svg {
 <dd class="internet-draft">draft-skyfire-oauth-using-kyapay-tokens-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-09-08" class="published">8 September 2026</time>
+<time datetime="2026-10-31" class="published">31 October 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-03-12">12 March 2027</time></dd>
+<dd class="expires"><time datetime="2027-05-04">4 May 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1142,7 +1142,7 @@ the token itself is the interoperability contract.<a href="#section-abstract-1" 
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 12 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 4 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1743,44 +1743,14 @@ otherwise it is a bearer token, subject to the controls and accepted risks in <a
         <h3 id="name-token-size">
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-token-size" class="section-name selfRef">Token Size</a>
         </h3>
-<p id="section-5.2-1">A recipient <span class="bcp14">MUST</span> accept a <code>KYAPay-Token</code> field value of at least 6144 octets,
-and <span class="bcp14">MUST</span> apply that minimum to the field value as a whole rather than to an
-individual token: where a request conveys more than one token (<a href="#HeaderField" class="auto internal xref">Section 5.1</a>),
-the 6144 octets are shared across the list.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2-2">A recipient <span class="bcp14">MUST NOT</span> truncate a <code>KYAPay-Token</code> field value, and <span class="bcp14">MUST NOT</span> attempt
-validation on a token reconstructed from a truncated value. A truncated JWT
-either fails signature verification or parses as a different, shorter token than
-the one that was sent; neither outcome is safe to act on. A recipient <span class="bcp14">MUST NOT</span>
-treat a request rejected for exceeding a size limit as a request that carried no
-token (<a href="#ProcModel" class="auto internal xref">Section 6.1</a>).<a href="#section-5.2-2" class="pilcrow">¶</a></p>
-<p id="section-5.2-3">Where a request is rejected because the field value exceeds a configured limit,
-the recipient <span class="bcp14">SHOULD</span> respond with 431 (Request Header Fields Too Large)
-<span>[<a href="#RFC6585" class="cite xref">RFC6585</a>]</span> rather than 400 (Bad Request), so that a sender can distinguish a
-size limit from a malformed token and retry with a smaller one. Infrastructure
-ahead of the recipient commonly produces 400 for this condition.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
-<p id="section-5.2-4">This minimum is a requirement on the recipient and deliberately not a limit on
-the sender. A limit on what a sender may emit is not enforceable, would render
-existing deployments non-conformant, and -- where a sender drops a claim to stay
-inside it -- deprives the intermediaries of <a href="#SecInt" class="auto internal xref">Section 6</a> of exactly the
-information they exist to act on. A floor on the recipient carries none of those
-costs, and gives an issuer a size it can rely on. The corresponding issuer-side
-guidance, which together with this minimum guarantees that a conformant token is
-accepted, is in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
-<p id="section-5.2-5">The value follows the pattern of <span><a href="https://rfc-editor.org/rfc/rfc9112#section-3" class="relref">Section 3</a> of [<a href="#RFC9112" class="cite xref">RFC9112</a>]</span>, which recommends that
-HTTP senders and recipients support request-line lengths of at least 8000
-octets. <span>[<a href="#RFC9112" class="cite xref">RFC9112</a>]</span> makes no equivalent recommendation for header field lengths;
-this section supplies one for this field.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
-<p id="section-5.2-6">6144 octets is chosen against the smallest limit on the path, which is the
-per-field limit at the origin web server rather than any limit at an
-intermediary in front of it. Common origin defaults for a single header field
-are roughly an order of magnitude smaller than the total-header limits of common
-content delivery networks, so a deployment that verifies only against an
-intermediary's published limit may still be rejected at the origin. 6144 octets
-plus the field name leaves room for this field to coexist with the cookies,
-<code>User-Agent</code> and <code>Accept</code> fields an ordinary request already carries, and with
-the <code>Signature</code> and <code>Signature-Input</code> fields required whenever a token carries a
-proof-of-possession key (<a href="#ProcModel" class="auto internal xref">Section 6.1</a>). A larger minimum would not survive the
-hop this requirement exists to protect.<a href="#section-5.2-6" class="pilcrow">¶</a></p>
+<p id="section-5.2-1">A recipient <span class="bcp14">MUST</span> accept a <code>KYAPay-Token</code> field value of at least 6144 octets. The
+minimum applies to the field value as a whole, however many tokens it carries, and
+a recipient's parser <span class="bcp14">MUST</span> accept List members of that length. A recipient <span class="bcp14">MUST NOT</span>
+truncate the field value, and <span class="bcp14">MUST NOT</span> treat a field it rejects for its size as
+absent. When it rejects a field for its size, it <span class="bcp14">SHOULD</span> respond with 431 (Request
+Header Fields Too Large) <span>[<a href="#RFC6585" class="cite xref">RFC6585</a>]</span>. 6144 octets fits a token carrying every
+claim registered in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span> and stays within common
+origin-server limits for a single header field.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conveying-tokens-over-other-interfaces">
@@ -2377,7 +2347,7 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
 <dl class="references">
 <dt id="I-D.skyfire-oauth-kyapay-token">[I-D.skyfire-oauth-kyapay-token]</dt>
         <dd>
-<span class="refAuthor">Agarwal, A.</span> and <span class="refAuthor">M. B. Jones</span>, <span class="refTitle">"KYAPay Token"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-kyapay-token-01</span>, <time datetime="2026-07-19" class="refDate">19 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-01">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-01</a>&gt;</span>. </dd>
+<span class="refAuthor">Agarwal, A.</span> and <span class="refAuthor">M. B. Jones</span>, <span class="refTitle">"KYAPay Token"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-kyapay-token-02</span>, <time datetime="2026-10-01" class="refDate">1 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-02">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-02</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.skyfire-oauth-kyapay-token-exchange">[I-D.skyfire-oauth-kyapay-token-exchange]</dt>
         <dd>
@@ -2438,15 +2408,15 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
 <dd class="break"></dd>
 <dt id="I-D.skyfire-oauth-aml-methods">[I-D.skyfire-oauth-aml-methods]</dt>
         <dd>
-<span class="refAuthor">Agarwal, A.</span>, <span class="refAuthor">Jones, M. B.</span>, and <span class="refAuthor">N. Ali</span>, <span class="refTitle">"Anti-Money Laundering Methods Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-aml-methods-00</span>, <time datetime="2026-07-18" class="refDate">18 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-aml-methods-00">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-aml-methods-00</a>&gt;</span>. </dd>
+<span class="refAuthor">Agarwal, A.</span>, <span class="refAuthor">Jones, M. B.</span>, and <span class="refAuthor">N. Ali</span>, <span class="refTitle">"Anti-Money Laundering Methods Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-aml-methods-01</span>, <time datetime="2026-10-01" class="refDate">1 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-aml-methods-01">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-aml-methods-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.skyfire-oauth-amr-values">[I-D.skyfire-oauth-amr-values]</dt>
         <dd>
-<span class="refAuthor">Agarwal, A.</span>, <span class="refAuthor">Jones, M. B.</span>, <span class="refAuthor">Ali, N.</span>, and <span class="refAuthor">Srinivasa</span>, <span class="refTitle">"Additional Authentication Method Reference Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-amr-values-01</span>, <time datetime="2026-07-19" class="refDate">19 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-amr-values-01">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-amr-values-01</a>&gt;</span>. </dd>
+<span class="refAuthor">Agarwal, A.</span>, <span class="refAuthor">Jones, M. B.</span>, <span class="refAuthor">Ali, N.</span>, and <span class="refAuthor">Srinivasa</span>, <span class="refTitle">"Additional Authentication Method Reference Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-amr-values-02</span>, <time datetime="2026-10-01" class="refDate">1 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-amr-values-02">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-amr-values-02</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.skyfire-oauth-id-verification">[I-D.skyfire-oauth-id-verification]</dt>
         <dd>
-<span class="refAuthor">Agarwal, A.</span>, <span class="refAuthor">Jones, M. B.</span>, <span class="refAuthor">Ali, N.</span>, and <span class="refAuthor">Srinivasa</span>, <span class="refTitle">"Identity Verification Methods Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-id-verification-01</span>, <time datetime="2026-07-19" class="refDate">19 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-id-verification-01">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-id-verification-01</a>&gt;</span>. </dd>
+<span class="refAuthor">Agarwal, A.</span>, <span class="refAuthor">Jones, M. B.</span>, <span class="refAuthor">Ali, N.</span>, and <span class="refAuthor">Srinivasa</span>, <span class="refTitle">"Identity Verification Methods Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-id-verification-02</span>, <time datetime="2026-10-01" class="refDate">1 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-id-verification-02">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-id-verification-02</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="KYAPAY-ORG">[KYAPAY-ORG]</dt>
         <dd>
@@ -2479,10 +2449,6 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
 <dt id="RFC8725">[RFC8725]</dt>
         <dd>
 <span class="refAuthor">Sheffer, Y.</span>, <span class="refAuthor">Hardt, D.</span>, and <span class="refAuthor">M. Jones</span>, <span class="refTitle">"JSON Web Token Best Current Practices"</span>, <span class="seriesInfo">BCP 225</span>, <span class="seriesInfo">RFC 8725</span>, <span class="seriesInfo">DOI 10.17487/RFC8725</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8725">https://www.rfc-editor.org/rfc/rfc8725</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC9112">[RFC9112]</dt>
-        <dd>
-<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP/1.1"</span>, <span class="seriesInfo">STD 99</span>, <span class="seriesInfo">RFC 9112</span>, <span class="seriesInfo">DOI 10.17487/RFC9112</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9112">https://www.rfc-editor.org/rfc/rfc9112</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9449">[RFC9449]</dt>
         <dd>
