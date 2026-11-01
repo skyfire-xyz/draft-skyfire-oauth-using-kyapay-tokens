@@ -5,10 +5,10 @@
 Web Authorization Protocol                                    A. Agarwal
 Internet-Draft                                      Skyfire Systems Inc.
 Intended status: Standards Track                             M. B. Jones
-Expires: 4 May 2027                               Self-Issued Consulting
+Expires: 5 May 2027                               Self-Issued Consulting
                                                                S. Thumma
                                                                   Akamai
-                                                         31 October 2026
+                                                         1 November 2026
 
 
                           Using KYAPay Tokens
@@ -69,7 +69,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 May 2027.
+   This Internet-Draft will expire on 5 May 2027.
 
 Copyright Notice
 
@@ -584,9 +584,9 @@ Table of Contents
    value, and MUST NOT treat a field it rejects for its size as absent.
    When it rejects a field for its size, it SHOULD respond with 431
    (Request Header Fields Too Large) [RFC6585]. 6144 octets fits a token
-   carrying every claim registered in [I-D.skyfire-oauth-kyapay-token]
-   and stays within common origin-server limits for a single header
-   field.
+   whose claims total 4096 octets of JSON, the limit
+   [I-D.skyfire-oauth-kyapay-token] asks issuers to observe, and stays
+   within common origin-server limits for a single header field.
 
 5.3.  Conveying Tokens over Other Interfaces
 
