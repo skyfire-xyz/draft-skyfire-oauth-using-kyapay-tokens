@@ -303,7 +303,7 @@ It is useful to separate two questions a recipient may want answered:
 
 * *Who is behind this request?*
   This is answered by the KYA token: a trusted, neutral issuer that performs KYC/KYB attests to the identity of the human principal (`hid`), agent platform (`apd`), and agent (`aid`), acting as a client-side trust anchor analogous to a Certificate Authority.
-  KYA is a set of verifiable *nouns* -- identity, verification status, authorization, payment -- and, being a JWT, it is transport-agnostic: the same token rides HTTP, WebSockets, gRPC metadata, a message queue, or a stdio MCP channel, and can be logged and independently re-verified at rest.
+  KYA is a set of verifiable *nouns* -- identity, verification status, authorization, payment -- and, being a JWT, it is transport-agnostic: the same token rides HTTP, WebSockets, gRPC metadata, a message queue, or a stdio MCP channel, and a recipient that needs it for audit or dispute resolution can retain it and re-verify it later ({{Section 5.2 of I-D.skyfire-oauth-kyapay-token}}).
 
 * *Did the sender actually hold the credential's key?*
   This is proof of possession, which a bearer token does not provide.
@@ -386,7 +386,7 @@ within common origin-server limits for a single header field.
 
 Beyond HTTP requests to websites and APIs, agents interact through a growing set of interfaces and protocols, including agent-to-tool interactions such as MCP {{MCP}}, agent-to-agent interactions such as A2A {{A2A}}, agent-to-API interactions (for example, OpenAPI descriptions converted into locally callable tools), and emerging protocols such as Universal Commerce Protocol {{UCP}} and Verifiable Intent {{VINTENT}}.
 KYAPay is designed so that the same self-contained token can be conveyed across any of these interfaces -- as an HTTP header field, a message field, or a tool argument -- to deliver verified identity and payment credentials to the receiving service, API, or agent.
-Because a KYA token is a self-contained JWT, it is transport-agnostic in a way that a request-signing mechanism is not: HTTP Message Signatures {{RFC9421}} are meaningful only for HTTP exchanges, whereas the same token can ride HTTP, WebSockets, gRPC metadata, message queues, or a stdio MCP channel, and can also sit at rest in a store or audit log for later verification.
+Because a KYA token is a self-contained JWT, it is transport-agnostic in a way that a request-signing mechanism is not: HTTP Message Signatures {{RFC9421}} are meaningful only for HTTP exchanges, whereas the same token can ride HTTP, WebSockets, gRPC metadata, message queues, or a stdio MCP channel, and can be retained by a recipient that needs it for audit or dispute resolution and verified again later ({{Section 5.2 of I-D.skyfire-oauth-kyapay-token}}).
 This document specifies only the HTTP header binding in {{HeaderField}};
 bindings for other protocols are expected to be defined by those protocols or by companion specifications.
 In all cases, the validation and usage rules of {{SecInt}} apply to the token, once received.
@@ -804,6 +804,7 @@ for their contributions to the specification.
 
 * Updated the traditional bot detection methods in the introduction
 * Updated the Bot Managers section and introduce the concept of feedback loop to the agent through 401 status code in case of token assessment failure
+* Described retaining a token for audit or dispute resolution.
 
 -01
 
