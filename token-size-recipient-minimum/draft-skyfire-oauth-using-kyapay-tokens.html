@@ -1748,9 +1748,10 @@ minimum applies to the field value as a whole, however many tokens it carries, a
 a recipient's parser <span class="bcp14">MUST</span> accept List members of that length. A recipient <span class="bcp14">MUST NOT</span>
 truncate the field value, and <span class="bcp14">MUST NOT</span> treat a field it rejects for its size as
 absent. When it rejects a field for its size, it <span class="bcp14">SHOULD</span> respond with 431 (Request
-Header Fields Too Large) <span>[<a href="#RFC6585" class="cite xref">RFC6585</a>]</span>. 6144 octets fits a token whose claims total
-4096 octets of JSON, the limit <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span> asks issuers to
-observe, and stays within common origin-server limits for a single header field.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+Header Fields Too Large) <span>[<a href="#RFC6585" class="cite xref">RFC6585</a>]</span>. With a typical JOSE header and an ES256
+signature, 6144 octets fits a token whose claims total 4096 octets of JSON, the
+limit <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span> asks issuers to observe. It also stays
+within common origin-server limits for a single header field.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conveying-tokens-over-other-interfaces">
