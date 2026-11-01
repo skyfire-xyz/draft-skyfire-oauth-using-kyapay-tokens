@@ -53,6 +53,7 @@ normative:
   RFC8174:
   RFC7515: # JWS
   RFC7519: # JWT
+  RFC8725: # JWT BCP (BCP 225)
   RFC8693: # OAuth 2.0 Token Exchange
   RFC9110: # HTTP Semantics
   RFC9421: # HTTP Message Signatures
@@ -63,7 +64,6 @@ normative:
 
 informative:
   RFC6749: # OAuth 2.0
-  RFC8725: # JWT BCP
   RFC8176: # AMR values
   RFC8705: # OAuth 2.0 Mutual-TLS
   RFC9449: # DPoP
@@ -359,7 +359,8 @@ A sender:
 
 A recipient:
 
-* MUST determine the type of each token from its `typ` header parameter ({{I-D.skyfire-oauth-kyapay-token}}), not from its position; and
+* MUST determine the type of each token from its `typ` header parameter ({{I-D.skyfire-oauth-kyapay-token}}), not from its position;
+* MAY reject a request that carries more than one token of the same `typ`; and
 * MUST ignore a `KYAPay-Token` member it cannot parse as a JWT, while continuing to process the remaining members, unless local policy requires rejecting the whole request.
 
 Intermediaries and caches MUST treat `KYAPay-Token` as containing sensitive, request-specific credentials;
@@ -679,7 +680,7 @@ The objective of all of the above is a single outcome: a valid KYAPay JWT that i
 
 # Security Considerations {#SecCon}
 
-When validating the JWTs described here and in {{I-D.skyfire-oauth-kyapay-token}}, implementers MUST follow the JSON Web Token Best Current Practices {{RFC8725}}, in addition to the validation steps of {{I-D.skyfire-oauth-kyapay-token}}, Section 4.
+When validating the JWTs described here and in {{I-D.skyfire-oauth-kyapay-token}}, implementers MUST follow the JSON Web Token Best Current Practices, BCP 225 {{RFC8725}}, in addition to the validation steps of {{I-D.skyfire-oauth-kyapay-token}}, Section 4.
 
 ## Transport Confidentiality
 
@@ -789,9 +790,10 @@ The `amr` extensions and the `ivm` and `aml` claims and values are registered by
 The authors thank the contributors to the KYAPay Token {{I-D.skyfire-oauth-kyapay-token}} specification and the partners in the KYAPay consortium (see {{KYAPAY-ORG}}) -- including bot-management, fraud, CIAM, and ATO vendors and merchants -- whose deployment and review experience informed the usage patterns and open issues described here.
 
 We would like to thank
-David Senecal
+Bhasker Allam,
+Jean Diaconu,
 and
-Jean Diaconu
+David Senecal
 for their contributions to the specification.
 
 
@@ -804,6 +806,7 @@ for their contributions to the specification.
 
 * Updated the traditional bot detection methods in the introduction
 * Updated the Bot Managers section and introduce the concept of feedback loop to the agent through 401 status code in case of token assessment failure
+* Made BCP 225 a normative reference, and let a recipient reject a request carrying more than one token of the same `typ`.
 
 -01
 
