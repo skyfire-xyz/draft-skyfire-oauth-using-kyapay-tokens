@@ -252,7 +252,7 @@ KYAPay tokens are structured to convey these identities so that this auditable, 
 Agents are useful in proportion to the breadth of the web they can act across.
 If a human must pre-configure access for an agent at each site before the agent can act, the result is indistinguishable from the workflow automation that already exists, and the principal loses the probabilistic discovery -- of new merchants, products, services, and alternatives -- that is one of the main reasons to use an agent at all.
 The goal is therefore agentic access to the existing web, not a parallel, agent-only surface that must be set up in advance.
-This goal can only be met if security intermediaries admit legitimate human-via-agent requests by default when a valid token is present.
+This goal can only be met if security intermediaries admit legitimate human-via-agent requests without per-site setup when a valid token is present and the verified identity it carries meets the site's policy for the requested action ({{BotMgr}}).
 
 ## Works with Today's Web at Zero Merchant Tech Lift
 
@@ -466,6 +466,8 @@ KYAPay tokens transform this detection model into a self-identification model. B
 For token-bearing traffic, the identification question is settled: the bot manager does not need to execute its behavioral or fingerprinting detection heuristics to prove the request is automated. Untokened or unverifiable requests fall back to the standard detection pipeline.
 
 Settling identification, however, does not grant automatic access. Identification is distinct from admission: classifying a request as a verified agent simply provides authenticated context. The bot manager uses the token's verified identity layer -- the human principal (`hid`), the agent platform (`apd`), and the agent instance (`aid`) -- to select and evaluate the site's configured access policy to determine the final disposition (admit, rate-limit, require step-up, or deny) rather than applying bot-blocking challenges designed for unattended, unattributed automation.
+
+Per-entity rate and abuse limits ({{BadActor}}) continue to apply to admitted requests, and a site MAY still challenge, or require step-up ({{StepUp}}) for, sensitive actions.
 
 KYAPay tokens are well-suited to inline bot management for several reasons:
 
@@ -789,9 +791,10 @@ The `amr` extensions and the `ivm` and `aml` claims and values are registered by
 The authors thank the contributors to the KYAPay Token {{I-D.skyfire-oauth-kyapay-token}} specification and the partners in the KYAPay consortium (see {{KYAPAY-ORG}}) -- including bot-management, fraud, CIAM, and ATO vendors and merchants -- whose deployment and review experience informed the usage patterns and open issues described here.
 
 We would like to thank
-David Senecal
+Bhasker Allam,
+Jean Diaconu,
 and
-Jean Diaconu
+David Senecal
 for their contributions to the specification.
 
 
@@ -804,6 +807,7 @@ for their contributions to the specification.
 
 * Updated the traditional bot detection methods in the introduction
 * Updated the Bot Managers section and introduce the concept of feedback loop to the agent through 401 status code in case of token assessment failure
+* Made admission depend on the site's policy for the requested action, and stated that rate and abuse limits and step-up still apply to admitted requests.
 
 -01
 
