@@ -5,10 +5,10 @@
 Web Authorization Protocol                                    A. Agarwal
 Internet-Draft                                      Skyfire Systems Inc.
 Intended status: Standards Track                             M. B. Jones
-Expires: 4 April 2027                             Self-Issued Consulting
+Expires: 5 May 2027                               Self-Issued Consulting
                                                                S. Thumma
                                                                   Akamai
-                                                          1 October 2026
+                                                         1 November 2026
 
 
                           Using KYAPay Tokens
@@ -69,7 +69,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 April 2027.
+   This Internet-Draft will expire on 5 May 2027.
 
 Copyright Notice
 
@@ -104,8 +104,9 @@ Table of Contents
      4.3.  The Proof-of-Possession Path (Planned Evolution)
    5.  Conveying KYAPay Tokens in Requests
      5.1.  The KYAPay-Token HTTP Header Field
-     5.2.  Conveying Tokens over Other Interfaces
-     5.3.  Authenticating the Counterparty
+     5.2.  Token Size
+     5.3.  Conveying Tokens over Other Interfaces
+     5.4.  Authenticating the Counterparty
    6.  Using KYAPay Tokens at Security Intermediaries
      6.1.  Common Processing Model
      6.2.  Determining Human Presence and Assurance
@@ -577,7 +578,21 @@ Table of Contents
    otherwise it is a bearer token, subject to the controls and accepted
    risks in Section 8.
 
-5.2.  Conveying Tokens over Other Interfaces
+5.2.  Token Size
+
+   A recipient MUST accept a KYAPay-Token field value of at least 6144
+   octets.  The minimum applies to the field value as a whole, however
+   many tokens it carries, and a recipient's parser MUST accept List
+   members of that length.  A recipient MUST NOT truncate the field
+   value, and MUST NOT treat a field it rejects for its size as absent.
+   When it rejects a field for its size, it SHOULD respond with 431
+   (Request Header Fields Too Large) [RFC6585].  With a typical JOSE
+   header and an ES256 signature, 6144 octets fits a token whose claims
+   total 4096 octets of JSON, the limit [I-D.skyfire-oauth-kyapay-token]
+   asks issuers to observe.  It also stays within common origin-server
+   limits for a single header field.
+
+5.3.  Conveying Tokens over Other Interfaces
 
    Beyond HTTP requests to websites and APIs, agents interact through a
    growing set of interfaces and protocols, including agent-to-tool
@@ -600,7 +615,7 @@ Table of Contents
    companion specifications.  In all cases, the validation and usage
    rules of Section 6 apply to the token, once received.
 
-5.3.  Authenticating the Counterparty
+5.4.  Authenticating the Counterparty
 
    Conveying a token securely also requires that the sending agent
    deliver it to the intended recipient and that the recipient be able
@@ -1277,9 +1292,9 @@ Table of Contents
    [I-D.skyfire-oauth-kyapay-token]
               Agarwal, A. and M. B. Jones, "KYAPay Token", Work in
               Progress, Internet-Draft, draft-skyfire-oauth-kyapay-
-              token-01, 19 July 2026,
+              token-02, 1 October 2026,
               <https://datatracker.ietf.org/doc/html/draft-skyfire-
-              oauth-kyapay-token-01>.
+              oauth-kyapay-token-02>.
 
    [I-D.skyfire-oauth-kyapay-token-exchange]
               Agarwal, A., Jones, M. B., Hingnikar, A., and J. Hickman,
@@ -1292,6 +1307,10 @@ Table of Contents
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC6585]  Nottingham, M. and R. Fielding, "Additional HTTP Status
+              Codes", RFC 6585, DOI 10.17487/RFC6585, April 2012,
+              <https://www.rfc-editor.org/rfc/rfc6585>.
 
    [RFC7515]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web
               Signature (JWS)", RFC 7515, DOI 10.17487/RFC7515, May
@@ -1339,24 +1358,24 @@ Table of Contents
    [I-D.skyfire-oauth-aml-methods]
               Agarwal, A., Jones, M. B., and N. Ali, "Anti-Money
               Laundering Methods Values", Work in Progress, Internet-
-              Draft, draft-skyfire-oauth-aml-methods-00, 18 July 2026,
+              Draft, draft-skyfire-oauth-aml-methods-01, 1 October 2026,
               <https://datatracker.ietf.org/doc/html/draft-skyfire-
-              oauth-aml-methods-00>.
+              oauth-aml-methods-01>.
 
    [I-D.skyfire-oauth-amr-values]
               Agarwal, A., Jones, M. B., Ali, N., and Srinivasa,
               "Additional Authentication Method Reference Values", Work
               in Progress, Internet-Draft, draft-skyfire-oauth-amr-
-              values-01, 19 July 2026,
+              values-02, 1 October 2026,
               <https://datatracker.ietf.org/doc/html/draft-skyfire-
-              oauth-amr-values-01>.
+              oauth-amr-values-02>.
 
    [I-D.skyfire-oauth-id-verification]
               Agarwal, A., Jones, M. B., Ali, N., and Srinivasa,
               "Identity Verification Methods Values", Work in Progress,
-              Internet-Draft, draft-skyfire-oauth-id-verification-01, 19
-              July 2026, <https://datatracker.ietf.org/doc/html/draft-
-              skyfire-oauth-id-verification-01>.
+              Internet-Draft, draft-skyfire-oauth-id-verification-02, 1
+              October 2026, <https://datatracker.ietf.org/doc/html/
+              draft-skyfire-oauth-id-verification-02>.
 
    [KYAPAY-ORG]
               Skyfire Systems Inc., "KYAPay: Verified Agent Identity and

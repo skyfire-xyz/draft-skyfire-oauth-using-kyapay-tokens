@@ -30,18 +30,18 @@ the token itself is the interoperability contract.
 <meta content="draft-skyfire-oauth-using-kyapay-tokens-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.34.1
-    Python 3.14.7
-    ConfigArgParse 1.7.7
+    Python 3.14.8
+    ConfigArgParse 1.8.0
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.11.10
+    platformdirs 4.13.4
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.8.4
+    wcwidth 0.9.2
 -->
 <link href="draft-skyfire-oauth-using-kyapay-tokens.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1057,11 +1057,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Using KYAPay Tokens</td>
-<td class="right">October 2026</td>
+<td class="right">November 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Agarwal, et al.</td>
-<td class="center">Expires 4 April 2027</td>
+<td class="center">Expires 5 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1074,12 +1074,12 @@ svg {
 <dd class="internet-draft">draft-skyfire-oauth-using-kyapay-tokens-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-10-01" class="published">1 October 2026</time>
+<time datetime="2026-11-01" class="published">1 November 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-04-04">4 April 2027</time></dd>
+<dd class="expires"><time datetime="2027-05-05">5 May 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1142,7 +1142,7 @@ the token itself is the interoperability contract.<a href="#section-abstract-1" 
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 5 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1231,10 +1231,13 @@ the token itself is the interoperability contract.<a href="#section-abstract-1" 
                 <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-the-kyapay-token-http-heade" class="internal xref">The KYAPay-Token HTTP Header Field</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
-                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-conveying-tokens-over-other" class="internal xref">Conveying Tokens over Other Interfaces</a></p>
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-token-size" class="internal xref">Token Size</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
-                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-authenticating-the-counterp" class="internal xref">Authenticating the Counterparty</a></p>
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-conveying-tokens-over-other" class="internal xref">Conveying Tokens over Other Interfaces</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
+                <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-authenticating-the-counterp" class="internal xref">Authenticating the Counterparty</a></p>
 </li>
             </ul>
 </li>
@@ -1719,27 +1722,43 @@ When the token carries a proof-of-possession key (<a href="#TrustStack" class="a
 otherwise it is a bearer token, subject to the controls and accepted risks in <a href="#SecCon" class="auto internal xref">Section 8</a>.<a href="#section-5.1-10" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="conveying-tokens-over-other-interfaces">
+<div id="TokenSize">
 <section id="section-5.2">
-        <h3 id="name-conveying-tokens-over-other">
-<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-conveying-tokens-over-other" class="section-name selfRef">Conveying Tokens over Other Interfaces</a>
+        <h3 id="name-token-size">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-token-size" class="section-name selfRef">Token Size</a>
         </h3>
-<p id="section-5.2-1">Beyond HTTP requests to websites and APIs, agents interact through a growing set of interfaces and protocols, including agent-to-tool interactions such as MCP <span>[<a href="#MCP" class="cite xref">MCP</a>]</span>, agent-to-agent interactions such as A2A <span>[<a href="#A2A" class="cite xref">A2A</a>]</span>, agent-to-API interactions (for example, OpenAPI descriptions converted into locally callable tools), and emerging protocols such as Universal Commerce Protocol <span>[<a href="#UCP" class="cite xref">UCP</a>]</span> and Verifiable Intent <span>[<a href="#VINTENT" class="cite xref">VINTENT</a>]</span>.
+<p id="section-5.2-1">A recipient <span class="bcp14">MUST</span> accept a <code>KYAPay-Token</code> field value of at least 6144 octets. The
+minimum applies to the field value as a whole, however many tokens it carries, and
+a recipient's parser <span class="bcp14">MUST</span> accept List members of that length. A recipient <span class="bcp14">MUST NOT</span>
+truncate the field value, and <span class="bcp14">MUST NOT</span> treat a field it rejects for its size as
+absent. When it rejects a field for its size, it <span class="bcp14">SHOULD</span> respond with 431 (Request
+Header Fields Too Large) <span>[<a href="#RFC6585" class="cite xref">RFC6585</a>]</span>. With a typical JOSE header and an ES256
+signature, 6144 octets fits a token whose claims total 4096 octets of JSON, the
+limit <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span> asks issuers to observe. It also stays
+within common origin-server limits for a single header field.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="conveying-tokens-over-other-interfaces">
+<section id="section-5.3">
+        <h3 id="name-conveying-tokens-over-other">
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-conveying-tokens-over-other" class="section-name selfRef">Conveying Tokens over Other Interfaces</a>
+        </h3>
+<p id="section-5.3-1">Beyond HTTP requests to websites and APIs, agents interact through a growing set of interfaces and protocols, including agent-to-tool interactions such as MCP <span>[<a href="#MCP" class="cite xref">MCP</a>]</span>, agent-to-agent interactions such as A2A <span>[<a href="#A2A" class="cite xref">A2A</a>]</span>, agent-to-API interactions (for example, OpenAPI descriptions converted into locally callable tools), and emerging protocols such as Universal Commerce Protocol <span>[<a href="#UCP" class="cite xref">UCP</a>]</span> and Verifiable Intent <span>[<a href="#VINTENT" class="cite xref">VINTENT</a>]</span>.
 KYAPay is designed so that the same self-contained token can be conveyed across any of these interfaces -- as an HTTP header field, a message field, or a tool argument -- to deliver verified identity and payment credentials to the receiving service, API, or agent.
 Because a KYA token is a self-contained JWT, it is transport-agnostic in a way that a request-signing mechanism is not: HTTP Message Signatures <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> are meaningful only for HTTP exchanges, whereas the same token can ride HTTP, WebSockets, gRPC metadata, message queues, or a stdio MCP channel, and can also sit at rest in a store or audit log for later verification.
 This document specifies only the HTTP header binding in <a href="#HeaderField" class="auto internal xref">Section 5.1</a>;
 bindings for other protocols are expected to be defined by those protocols or by companion specifications.
-In all cases, the validation and usage rules of <a href="#SecInt" class="auto internal xref">Section 6</a> apply to the token, once received.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+In all cases, the validation and usage rules of <a href="#SecInt" class="auto internal xref">Section 6</a> apply to the token, once received.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authenticating-the-counterparty">
-<section id="section-5.3">
+<section id="section-5.4">
         <h3 id="name-authenticating-the-counterp">
-<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-authenticating-the-counterp" class="section-name selfRef">Authenticating the Counterparty</a>
+<a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-authenticating-the-counterp" class="section-name selfRef">Authenticating the Counterparty</a>
         </h3>
-<p id="section-5.3-1">Conveying a token securely also requires that the sending agent deliver it to the intended recipient and that the recipient be able to bind the token to itself.
+<p id="section-5.4-1">Conveying a token securely also requires that the sending agent deliver it to the intended recipient and that the recipient be able to bind the token to itself.
 The <code>aud</code> claim, together with the optional <code>tdm</code> (target domain) and <code>tsi</code> (target service identifier) claims defined in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, allows a recipient to confirm that a token was minted for it and to mitigate replay to a different party (<a href="#SecCon" class="auto internal xref">Section 8</a>).
-At the transport and discovery layers, mechanisms such as DNS domain names (with TLS server authentication), A2A agent cards <span>[<a href="#A2A" class="cite xref">A2A</a>]</span>, and MCP server identification <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> help an agent confirm that it is communicating with the correct counterparty before presenting a token.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+At the transport and discovery layers, mechanisms such as DNS domain names (with TLS server authentication), A2A agent cards <span>[<a href="#A2A" class="cite xref">A2A</a>]</span>, and MCP server identification <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> help an agent confirm that it is communicating with the correct counterparty before presenting a token.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2305,7 +2324,7 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
 <dl class="references">
 <dt id="I-D.skyfire-oauth-kyapay-token">[I-D.skyfire-oauth-kyapay-token]</dt>
         <dd>
-<span class="refAuthor">Agarwal, A.</span> and <span class="refAuthor">M. B. Jones</span>, <span class="refTitle">"KYAPay Token"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-kyapay-token-01</span>, <time datetime="2026-07-19" class="refDate">19 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-01">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-01</a>&gt;</span>. </dd>
+<span class="refAuthor">Agarwal, A.</span> and <span class="refAuthor">M. B. Jones</span>, <span class="refTitle">"KYAPay Token"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-kyapay-token-02</span>, <time datetime="2026-10-01" class="refDate">1 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-02">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-02</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.skyfire-oauth-kyapay-token-exchange">[I-D.skyfire-oauth-kyapay-token-exchange]</dt>
         <dd>
@@ -2314,6 +2333,10 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6585">[RFC6585]</dt>
+        <dd>
+<span class="refAuthor">Nottingham, M.</span> and <span class="refAuthor">R. Fielding</span>, <span class="refTitle">"Additional HTTP Status Codes"</span>, <span class="seriesInfo">RFC 6585</span>, <span class="seriesInfo">DOI 10.17487/RFC6585</span>, <time datetime="2012-04" class="refDate">April 2012</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6585">https://www.rfc-editor.org/rfc/rfc6585</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC7515">[RFC7515]</dt>
         <dd>
@@ -2362,15 +2385,15 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
 <dd class="break"></dd>
 <dt id="I-D.skyfire-oauth-aml-methods">[I-D.skyfire-oauth-aml-methods]</dt>
         <dd>
-<span class="refAuthor">Agarwal, A.</span>, <span class="refAuthor">Jones, M. B.</span>, and <span class="refAuthor">N. Ali</span>, <span class="refTitle">"Anti-Money Laundering Methods Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-aml-methods-00</span>, <time datetime="2026-07-18" class="refDate">18 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-aml-methods-00">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-aml-methods-00</a>&gt;</span>. </dd>
+<span class="refAuthor">Agarwal, A.</span>, <span class="refAuthor">Jones, M. B.</span>, and <span class="refAuthor">N. Ali</span>, <span class="refTitle">"Anti-Money Laundering Methods Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-aml-methods-01</span>, <time datetime="2026-10-01" class="refDate">1 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-aml-methods-01">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-aml-methods-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.skyfire-oauth-amr-values">[I-D.skyfire-oauth-amr-values]</dt>
         <dd>
-<span class="refAuthor">Agarwal, A.</span>, <span class="refAuthor">Jones, M. B.</span>, <span class="refAuthor">Ali, N.</span>, and <span class="refAuthor">Srinivasa</span>, <span class="refTitle">"Additional Authentication Method Reference Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-amr-values-01</span>, <time datetime="2026-07-19" class="refDate">19 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-amr-values-01">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-amr-values-01</a>&gt;</span>. </dd>
+<span class="refAuthor">Agarwal, A.</span>, <span class="refAuthor">Jones, M. B.</span>, <span class="refAuthor">Ali, N.</span>, and <span class="refAuthor">Srinivasa</span>, <span class="refTitle">"Additional Authentication Method Reference Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-amr-values-02</span>, <time datetime="2026-10-01" class="refDate">1 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-amr-values-02">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-amr-values-02</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.skyfire-oauth-id-verification">[I-D.skyfire-oauth-id-verification]</dt>
         <dd>
-<span class="refAuthor">Agarwal, A.</span>, <span class="refAuthor">Jones, M. B.</span>, <span class="refAuthor">Ali, N.</span>, and <span class="refAuthor">Srinivasa</span>, <span class="refTitle">"Identity Verification Methods Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-id-verification-01</span>, <time datetime="2026-07-19" class="refDate">19 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-id-verification-01">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-id-verification-01</a>&gt;</span>. </dd>
+<span class="refAuthor">Agarwal, A.</span>, <span class="refAuthor">Jones, M. B.</span>, <span class="refAuthor">Ali, N.</span>, and <span class="refAuthor">Srinivasa</span>, <span class="refTitle">"Identity Verification Methods Values"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-skyfire-oauth-id-verification-02</span>, <time datetime="2026-10-01" class="refDate">1 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-id-verification-02">https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-id-verification-02</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="KYAPAY-ORG">[KYAPAY-ORG]</dt>
         <dd>
