@@ -728,11 +728,13 @@ Table of Contents
        signal, and the intermediary MUST decline what it governs for
        that request, rather than applying its policy for requests that
        carry no token: a bot manager blocks the request, a fraud manager
-       declines the transaction, an ATO protector blocks the sign-in, a
-       CIAM system refuses the account action or token exchange, and a
-       payment service does not proceed with the payment.  Where the
-       decline is returned to the agent in an HTTP response, that
-       response is as described in Section 6.5.
+       declines the transaction, or, where it inspects the token only
+       after the action, handles the failure as it handles any other
+       fraud finding on a completed transaction, an ATO protector blocks
+       the sign-in, a CIAM system refuses the account action or token
+       exchange, and a payment service does not proceed with the
+       payment.  Where the decline is returned to the agent in an HTTP
+       response, that response is as described in Section 6.5.
 
    4.  MUST verify the token signature against a key obtained from the
        issuer's JWK Set, discovered via the iss claim using the /.well-

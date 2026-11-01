@@ -1849,7 +1849,7 @@ The trusted-issuer set is configured out of band and is not derived from the tok
 </li>
           <li id="section-6.1-2.3">
             <p id="section-6.1-2.3.1"><span class="bcp14">MUST</span> validate each token as specified in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, Section 4.
-A token that fails validation <span class="bcp14">MUST NOT</span> be treated as conveying a human presence signal, and the intermediary <span class="bcp14">MUST</span> decline what it governs for that request, rather than applying its policy for requests that carry no token: a bot manager blocks the request, a fraud manager declines the transaction, an ATO protector blocks the sign-in, a CIAM system refuses the account action or token exchange, and a payment service does not proceed with the payment.
+A token that fails validation <span class="bcp14">MUST NOT</span> be treated as conveying a human presence signal, and the intermediary <span class="bcp14">MUST</span> decline what it governs for that request, rather than applying its policy for requests that carry no token: a bot manager blocks the request, a fraud manager declines the transaction, or, where it inspects the token only after the action, handles the failure as it handles any other fraud finding on a completed transaction, an ATO protector blocks the sign-in, a CIAM system refuses the account action or token exchange, and a payment service does not proceed with the payment.
 Where the decline is returned to the agent in an HTTP response, that response is as described in <a href="#StepUp" class="auto internal xref">Section 6.5</a>.<a href="#section-6.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.4">
