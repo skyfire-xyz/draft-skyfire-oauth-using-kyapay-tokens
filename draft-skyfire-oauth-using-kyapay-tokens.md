@@ -57,6 +57,7 @@ normative:
   RFC9110: # HTTP Semantics
   RFC9421: # HTTP Message Signatures
   RFC7800: # JWT proof-of-possession (cnf)
+  RFC6585: # 431 Request Header Fields Too Large
   I-D.skyfire-oauth-kyapay-token:
   I-D.skyfire-oauth-kyapay-token-exchange:
 
@@ -368,6 +369,18 @@ The `KYAPay-Token` header field is intended for use over TLS.
 A token MUST NOT be sent over a non-TLS-protected connection.
 When the token carries a proof-of-possession key ({{TrustStack}}), it SHOULD be accompanied by a request Message Signature {{RFC9421}} over that key;
 otherwise it is a bearer token, subject to the controls and accepted risks in {{SecCon}}.
+
+## Token Size {#TokenSize}
+
+A recipient MUST accept a `KYAPay-Token` field value of at least 6144 octets. The
+minimum applies to the field value as a whole, however many tokens it carries, and
+a recipient's parser MUST accept List members of that length. A recipient MUST NOT
+truncate the field value, and MUST NOT treat a field it rejects for its size as
+absent. When it rejects a field for its size, it SHOULD respond with 431 (Request
+Header Fields Too Large) {{RFC6585}}. With a typical JOSE header and an ES256
+signature, 6144 octets fits a token whose claims total 4096 octets of JSON, the
+limit {{I-D.skyfire-oauth-kyapay-token}} asks issuers to observe. It also stays
+within common origin-server limits for a single header field.
 
 ## Conveying Tokens over Other Interfaces
 
