@@ -55,6 +55,7 @@ normative:
   RFC7519: # JWT
   RFC8693: # OAuth 2.0 Token Exchange
   RFC9110: # HTTP Semantics
+  RFC9651: # Structured Field Values
   RFC9421: # HTTP Message Signatures
   RFC7800: # JWT proof-of-possession (cnf)
   RFC6585: # 431 Request Header Fields Too Large
@@ -344,12 +345,14 @@ for a human-via-agent request, they are carried in the `KYAPay-Token` header fie
 The `KYAPay-Token` header field is an HTTP request header field whose value is a KYA, PAY, or KYA-PAY token, as defined in {{I-D.skyfire-oauth-kyapay-token}}.
 HTTP field names are case-insensitive {{RFC9110}}.
 
-    KYAPay-Token = token-jwt *( OWS "," OWS token-jwt )
-    token-jwt    = 1*( ALPHA / DIGIT / "-" / "_" / "." )
+`KYAPay-Token` is a List Structured Field ({{Section 3.1 of RFC9651}}).
+Each member is a Token ({{Section 3.3.4 of RFC9651}}) whose value is a JWT in compact serialization, with no parameters.
+A compact JWT consists only of base64url characters and periods, and it begins with the encoding of a JSON object, so its first character is a letter; it is therefore a valid Token as it stands.
+For example:
 
-A request MAY convey more than one token (for example, separate KYA and PAY tokens) either as a comma-separated list in a single `KYAPay-Token` header field or as multiple `KYAPay-Token` header fields;
-per {{Section 5.2 of RFC9110}}, multiple field lines with the same name are equivalent to a single comma-separated field line.
-Because a JWT uses only the base64url alphabet plus the period (".") separator, it never contains a comma, so list parsing is unambiguous.
+    KYAPay-Token: eyJhbGciOiJFUzI1NiIsInR5cCI6Imt5YStqd3QifQ.eyJpc3Mi...
+
+A request MAY convey more than one token (for example, separate KYA and PAY tokens), either as members of one field line or in several `KYAPay-Token` field lines, which are combined before parsing as described in {{Section 4.2 of RFC9651}}.
 
 A sender:
 
@@ -359,8 +362,10 @@ A sender:
 
 A recipient:
 
-* MUST determine the type of each token from its `typ` header parameter ({{I-D.skyfire-oauth-kyapay-token}}), not from its position; and
-* MUST ignore a `KYAPay-Token` member it cannot parse as a JWT, while continuing to process the remaining members, unless local policy requires rejecting the whole request.
+* MUST determine the type of each token from its `typ` header parameter ({{I-D.skyfire-oauth-kyapay-token}}), not from its position;
+* MUST parse the field as a List {{RFC9651}}. A field that fails to parse fails as a whole, and a recipient MUST NOT attempt to recover individual members from it;
+* MUST reject the request if the field fails to parse, or if any member is not a Token whose value is a well-formed JWT. {{Section 4.2 of RFC9651}} permits either ignoring a field that fails to parse or treating the message as malformed; this document requires the latter; and
+* MUST accept List members as long as the field value it is required to accept ({{TokenSize}}).
 
 Intermediaries and caches MUST treat `KYAPay-Token` as containing sensitive, request-specific credentials;
 it MUST NOT be cached in a way that would allow it to be replayed on a different request, and it MUST NOT be logged or forwarded to parties other than legitimate participants (see {{PrivCon}}).
@@ -789,9 +794,10 @@ The `amr` extensions and the `ivm` and `aml` claims and values are registered by
 The authors thank the contributors to the KYAPay Token {{I-D.skyfire-oauth-kyapay-token}} specification and the partners in the KYAPay consortium (see {{KYAPAY-ORG}}) -- including bot-management, fraud, CIAM, and ATO vendors and merchants -- whose deployment and review experience informed the usage patterns and open issues described here.
 
 We would like to thank
-David Senecal
+Bhasker Allam,
+Jean Diaconu,
 and
-Jean Diaconu
+David Senecal
 for their contributions to the specification.
 
 
@@ -804,6 +810,7 @@ for their contributions to the specification.
 
 * Updated the traditional bot detection methods in the introduction
 * Updated the Bot Managers section and introduce the concept of feedback loop to the agent through 401 status code in case of token assessment failure
+* Defined `KYAPay-Token` as a List of Tokens, replacing the ABNF, and required a recipient to reject a field that fails to parse.
 
 -01
 
