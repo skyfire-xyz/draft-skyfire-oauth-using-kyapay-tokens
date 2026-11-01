@@ -359,7 +359,7 @@ A token that carries no proof-of-possession key is a bearer token ({{Bearer}}), 
 
 A covered component has to hold the same value when the signature is verified as when it was created, and a hop that rewrites a request changes the components that say where it is going.
 The signature is therefore verified by the first recipient to receive the request as the agent sent it, before any rewriting, which is usually the CDN, bot manager, or edge worker in front of the Target.
-A recipient that rewrites a request MUST verify the signature before rewriting it.
+The first recipient that rewrites a request MUST verify the signature before rewriting it.
 The recipient that verifies the signature MUST NOT forward a request whose signature is absent or invalid; it rejects the request ({{ProcModel}}).
 Where the signature covers `Content-Digest`, the field MUST be checked against the content {{RFC9530}} before the request is acted on, by the recipient that verifies the signature or by a recipient behind it that receives the content unchanged; a mismatch, or a digest that cannot be checked, MUST be treated as an invalid signature.
 A recipient behind that hop MAY rely on it instead of verifying the signature itself, but only where the deployment ensures that requests cannot reach it without passing through that hop.
