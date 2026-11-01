@@ -1801,8 +1801,9 @@ Where the claims for the host match those of the Target's token, the agent <span
             <p id="section-5.5-2.3.1">A request to any other host <span class="bcp14">SHOULD NOT</span> carry a token.<a href="#section-5.5-2.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.5-3">The Target determines which hosts act on its behalf and which claims each receives.
-Until a mechanism exists for the Target to declare this, an agent learns it by configuration or from an arrangement with the Target.<a href="#section-5.5-3" class="pilcrow">¶</a></p>
+<p id="section-5.5-3">This applies however the token is attached. An agent that adds the field below the page, for example by browser-level header injection, applies these rules to each request according to its destination, because a page also sends requests to hosts that are neither the Target nor acting on its behalf.<a href="#section-5.5-3" class="pilcrow">¶</a></p>
+<p id="section-5.5-4">The Target determines which hosts act on its behalf and which claims each receives.
+Until a mechanism exists for the Target to declare this, an agent learns it by configuration or from an arrangement with the Target.<a href="#section-5.5-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
