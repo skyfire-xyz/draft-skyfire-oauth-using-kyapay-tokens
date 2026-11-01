@@ -412,6 +412,7 @@ On receiving a request that carries one or more KYAPay tokens, a security interm
    This check MUST precede any processing that resolves a value taken from the token, and in particular any network retrieval driven by the `iss` claim.
    Until the token has been verified, `iss` is supplied by the sender: resolving it before the issuer is known to be trusted would allow an unauthenticated request to cause an outbound fetch to an arbitrary URL of the sender's choosing.
    The trusted-issuer set is configured out of band and is not derived from the token.
+   A recipient MUST NOT retrieve key material for an issuer that is not in its configured set of trusted issuers.
 1. MUST validate each token as specified in {{I-D.skyfire-oauth-kyapay-token}}, Section 4.
    A token that fails validation MUST NOT be treated as conveying a human presence signal, and the intermediary MUST fall back to its default (token-absent) policy for that request.
 1. MUST verify the token signature against a key obtained from the issuer's JWK Set, discovered via the `iss` claim using the `/.well-known/jwks.json` mechanism ({{I-D.skyfire-oauth-kyapay-token}}).
@@ -789,9 +790,10 @@ The `amr` extensions and the `ivm` and `aml` claims and values are registered by
 The authors thank the contributors to the KYAPay Token {{I-D.skyfire-oauth-kyapay-token}} specification and the partners in the KYAPay consortium (see {{KYAPAY-ORG}}) -- including bot-management, fraud, CIAM, and ATO vendors and merchants -- whose deployment and review experience informed the usage patterns and open issues described here.
 
 We would like to thank
-David Senecal
+Bhasker Allam,
+Jean Diaconu,
 and
-Jean Diaconu
+David Senecal
 for their contributions to the specification.
 
 
@@ -804,6 +806,7 @@ for their contributions to the specification.
 
 * Updated the traditional bot detection methods in the introduction
 * Updated the Bot Managers section and introduce the concept of feedback loop to the agent through 401 status code in case of token assessment failure
+* Prohibited retrieving key material for an issuer that is not trusted.
 
 -01
 
