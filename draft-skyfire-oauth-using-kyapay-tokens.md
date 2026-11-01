@@ -57,6 +57,7 @@ normative:
   RFC9110: # HTTP Semantics
   RFC9421: # HTTP Message Signatures
   RFC7800: # JWT proof-of-possession (cnf)
+  RFC9530: # Digest Fields
   RFC6585: # 431 Request Header Fields Too Large
   I-D.skyfire-oauth-kyapay-token:
   I-D.skyfire-oauth-kyapay-token-exchange:
@@ -279,7 +280,7 @@ As one illustration, a merchant that recognizes a KYAPay-bearing request MAY ada
 This section is informative.
 It situates KYAPay tokens among the other mechanisms a recipient encounters and, importantly, distinguishes what is deployed today from the planned evolution, so that the consumption requirements in {{SecInt}} are read against the correct baseline.
 
-## KYA is an Issuer-Signed Bearer Token Today
+## KYA is an Issuer-Signed Bearer Token Today {#Bearer}
 
 As currently deployed, a KYA (or KYA-PAY) token is an issuer-signed, short-lived bearer token.
 Its single most valuable operational property is that a Target has to do almost nothing to consume it: verify a JWT against the issuer's public key via JWKS, exactly as it would verify any OpenID Connect {{OpenID.Core}} or OAuth {{RFC6749}} token.
@@ -315,14 +316,21 @@ Because these are different layers, HTTP Message Signatures {{RFC9421}} and simi
 request signing supplies authenticity and possession, while KYA supplies identity, authorization, and payment.
 A complete proof-of-possession design uses both, bound together, as described next.
 
-## The Proof-of-Possession Path (Planned Evolution)
+A KYA token is verified the same way however a request is routed, because it is a self-contained JWT and not a signature over the request.
+A signature over the request is different: it can be verified only where the request still has the form the agent signed.
+Requests are routinely rewritten on the way to an origin.
+CDNs, load balancers, API gateways and edge workers add or strip path prefixes, route to internal host names and normalize URIs, and sites deliberately keep their external and internal URLs separate so as not to expose their internal architecture.
+A design in which every recipient verified a signature over the request would fail at each such hop, or need special handling there.
+This is why KYA is a bearer token by default ({{Bearer}}), and why, where proof of possession is used, the request signature is verified at the first hop ({{PoPSignatures}}).
+
+## The Proof-of-Possession Path (Planned Evolution) {#PoPPath}
 
 When per-request signing becomes practical at scale, the planned evolution of KYA is a Certificate-Authority-like model that adds proof of possession without changing the trust anchor:
 
 1. the issuer onboards the agent as a CA would;
 1. the agent generates a key pair and provides its public key to the issuer;
 1. the issuer binds that public key into the KYA token using the JWT confirmation claim `cnf` {{RFC7800}}. The token MUST carry `cnf.jwk` -- the key itself. A key identifier would satisfy {{RFC7800}} only on its own terms, which hold "provided the recipient is able to obtain the identified key": a recipient meeting the agent for the first time holds no such key, and a thumbprint is a one-way hash from which none can be recovered. The issuer cannot determine when that proviso is met -- it knows neither which recipients a token will reach, nor the initiator's intent, nor the state of any interaction between initiator and target. Nor can it rely on continuity between tokens: where a target de-duplicates on `jti` to prevent replay, each token is fresh and must stand on its own. Carrying the key is therefore the only form that works in the general case. Other confirmation members MAY additionally be present; a recipient MUST NOT be required to obtain the key by any means other than reading `cnf.jwk`; and
-1. the agent signs each request in place -- a signature over the request (method, path, body digest, timestamp/nonce) using {{RFC9421}} -- verified against the key in `cnf`, with no separate proof-of-possession token.
+1. the agent signs each request in place using {{RFC9421}}, covering the components listed in {{PoPSignatures}}, and the signature is verified against the key in `cnf`, with no separate proof-of-possession token.
 
 This yields an unbroken chain from request to key to identity: the request is signed by a key, and that key is vouched for as the initiator's by the issuer.
 Preferring a request signed against the `cnf` key over a detached, DPoP-style proof {{RFC9449}} keeps a single token -- the recipient validates the KYA token once (per session), caches the `cnf` key, then performs only a fast per-request signature check, instead of validating two artifacts and confirming they are bound to each other.
@@ -330,8 +338,33 @@ When present, this binding is consumed as specified in {{ProcModel}} and closes 
 
 Adoption remains the constraint on when this becomes mandatory.
 Per-request signing is costly: hardware-protected keys are secure but slow, software keys are fast but exfiltratable, and post-quantum algorithms do not make signing faster.
-Defeating replay of the proof itself further requires either per-Target nonce caches or binding the signature to the request content, and other request-bound designs considered (mutual TLS {{RFC8705}}, TLS channel binding, session-based schemes) each raise the participation bar or add Target-side state.
+Binding the signature to the request ({{PoPSignatures}}) stops a captured signature from being altered or presented with a different request; an identical request can still be resent until the signature expires, and this document does not rely on per-Target nonce caches to prevent that ({{Replay}}).
+Other request-bound designs considered (mutual TLS {{RFC8705}}, TLS channel binding, session-based schemes) each raise the participation bar or add Target-side state.
 Until fast, secure signing and a workable anti-replay approach exist that keep the Target's job about as simple as verifying a JWT, KYA remains a bearer token by default and proof of possession is an optional, forward-compatible upgrade rather than a precondition for participation.
+
+## Request Signatures for Proof of Possession {#PoPSignatures}
+
+Where a token carries a proof-of-possession key ({{PoPPath}}), the agent signs each request with that key using HTTP Message Signatures {{RFC9421}}.
+The signature MUST cover:
+
+* the `@method` derived component;
+* the `@target-uri` derived component;
+* the `KYAPay-Token` header field, so that a signature cannot be presented with a different token; and
+* the `Content-Digest` header field {{RFC9530}}, whenever the request has content.
+
+The signature MUST carry the `created` and `expires` parameters.
+
+Proof of possession is optional.
+A token that carries no proof-of-possession key is a bearer token ({{Bearer}}), and nothing in this section applies to it.
+
+A covered component has to hold the same value when the signature is verified as when it was created, and a hop that rewrites a request changes the components that say where it is going.
+The signature is therefore verified by the first recipient to receive the request as the agent sent it, before any rewriting, which is usually the CDN, bot manager, or edge worker in front of the Target.
+A recipient that rewrites a request MUST verify the signature before rewriting it.
+The recipient that verifies the signature MUST NOT forward a request whose signature is absent or invalid; it rejects the request ({{ProcModel}}).
+A recipient behind that hop MAY rely on it instead of verifying the signature itself, but only where the deployment ensures that requests cannot reach it without passing through that hop.
+It still validates the token as described in {{ProcModel}}.
+
+The other elements that {{Section 1.4 of RFC9421}} requires a profile to specify, including the source of the verification key, the `keyid` and `tag` parameters, and error responses, are expected to be specified in a future revision of this document.
 
 # Conveying KYAPay Tokens in Requests {#ConveyingRequests}
 
@@ -419,7 +452,9 @@ On receiving a request that carries one or more KYAPay tokens, a security interm
    issuer keys SHOULD be cached and refreshed according to standard JWK Set practice.
 1. MUST confirm that the token is intended for this recipient by checking the `aud` claim (and, if used, the `tdm` and `tsi` claims) as described in {{SecCon}}.
 1. MUST confirm that the `env` claim (for example, `production`) matches the environment the intermediary is operating in.
-   When the token carries a proof-of-possession key (the `cnf` claim {{RFC7800}}, Section 4), MUST verify that the request is signed by that key -- over HTTP, using HTTP Message Signatures {{RFC9421}} -- and reject the request if the signature is absent or invalid.
+1. When the token carries a proof-of-possession key (the `cnf` claim {{RFC7800}}, {{PoPPath}}), MUST verify that the request is signed by that key as described in {{PoPSignatures}}, and MUST reject the request, and not forward it, if the signature is absent or invalid.
+   An intermediary behind a hop that has already done so MAY rely on that hop instead, as {{PoPSignatures}} describes.
+   When the token carries no such key, this step does not apply.
 1. When the token carries no such key, it is a bearer token: the intermediary MUST rely on the controls in {{SecCon}} (short lifetime, audience binding, TLS, issuer-gated onboarding) and MUST NOT assume that mere presentation of the token proves the sender holds a key bound to it.
 1. SHOULD use the token's claims to inform its decision, as described in the following subsections, only after successful validation.
 
@@ -476,7 +511,7 @@ Because the token is a self-contained, signed JWT, the bot manager performs stan
 A validated token provides verified initiator identity (and, when targeting an agent, target identity), which the bot manager uses to select and evaluate the appropriate site policy rather than treating the traffic as suspected automation. By contrast, network-origin claims (such as declared source IP ranges) are unreliable as proof of origin -- addresses change and can be masked by VPNs, CGNAT, or shared pools -- so a recipient MAY use them as a weak corroborating signal only, but MUST NOT treat an IP match alone as sufficient to bypass controls nor an IP mismatch as conclusive. Short lifetimes, audience binding, and proof-of-possession ({{TrustStack}}), not IP correlation, are the recommended controls against token misuse.
 
 * **Replay Resistance.**
-A bearer token captured within its validity window can be replayed; a bot manager bounds this with short lifetimes, audience binding, and TLS ({{SecCon}}). Where a token carries a proof-of-possession key ({{TrustStack}}), the bot manager (or the edge/CDN provider acting for the Target) SHOULD additionally verify the per-request signature {{RFC9421}} against that key, which removes in-window replay exposure.
+A bearer token captured within its validity window can be replayed; a bot manager bounds this with short lifetimes, audience binding, and TLS ({{SecCon}}). Where a token carries a proof-of-possession key ({{PoPPath}}), the per-request signature is verified at the first hop, before any rewriting, which is usually the bot manager or the edge/CDN provider acting for the Target ({{PoPSignatures}}); this stops a stolen token being used on its own ({{Replay}}).
 
 ### Token present but invalid
 
@@ -693,11 +728,12 @@ The `exp` claim MUST be present;
 recipients SHOULD require short lifetimes (for high-assurance actions, on the order of a few minutes) and MUST reject tokens whose lifetime exceeds their local policy maximum.
 Recipients SHOULD reject tokens whose `iat` is outside an acceptable window.
 
-## Replay and Proof of Possession
+## Replay and Proof of Possession {#Replay}
 
 A bare bearer token can be replayed by anyone who captures it within its validity window.
 As deployed today ({{TrustStack}}), KYAPay accepts this bounded in-window risk and mitigates rather than eliminates it: recipients MUST validate the `aud` claim (and `tdm`/`tsi` where used) so that a token minted for one Target cannot be presented to another, MUST keep accepted lifetimes short, and SHOULD use the `jti` claim to detect replay to the same recipient.
-Where a token carries a proof-of-possession key (`cnf` {{RFC7800}}), recipients MUST additionally verify a per-request signature {{RFC9421}} over that key ({{ProcModel}}), which removes the in-window replay exposure.
+Where a token carries a proof-of-possession key (`cnf` {{RFC7800}}), recipients MUST additionally verify a per-request signature {{RFC9421}} over that key ({{PoPSignatures}}).
+This stops a stolen token from being used on its own, turning an open-ended token-theft exposure into a bounded window in which a captured signed request could be replayed verbatim; it does not prevent that verbatim replay.
 Access tokens produced by token exchange ({{ATOProt}}) SHOULD be sender-constrained ({{RFC9449}}, {{RFC8705}}).
 
 ## Malicious or Compromised Target Reuse
@@ -789,9 +825,10 @@ The `amr` extensions and the `ivm` and `aml` claims and values are registered by
 The authors thank the contributors to the KYAPay Token {{I-D.skyfire-oauth-kyapay-token}} specification and the partners in the KYAPay consortium (see {{KYAPAY-ORG}}) -- including bot-management, fraud, CIAM, and ATO vendors and merchants -- whose deployment and review experience informed the usage patterns and open issues described here.
 
 We would like to thank
-David Senecal
+Bhasker Allam,
+Jean Diaconu,
 and
-Jean Diaconu
+David Senecal
 for their contributions to the specification.
 
 
@@ -804,6 +841,7 @@ for their contributions to the specification.
 
 * Updated the traditional bot detection methods in the introduction
 * Updated the Bot Managers section and introduce the concept of feedback loop to the agent through 401 status code in case of token assessment failure
+* Added Request Signatures for Proof of Possession: the covered components, and verification at the first hop.
 
 -01
 
