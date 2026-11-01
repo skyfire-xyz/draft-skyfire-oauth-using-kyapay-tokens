@@ -444,7 +444,7 @@ Throughout, "validate the token" means to perform the validation procedure defin
 
 A recipient first decides, from its own policy for the resource and action requested, whether it uses KYAPay tokens for that request.
 A recipient that does not MAY ignore the `KYAPay-Token` field.
-A recipient that does, on receiving a request that carries one or more KYAPay tokens, processes the tokens of the types it accepts ({{I-D.skyfire-oauth-kyapay-token}}) as follows, and MAY ignore tokens of other types.
+A recipient that does, on receiving a request that carries one or more KYAPay tokens, processes the tokens of the types it accepts ({{I-D.skyfire-oauth-kyapay-token}}) as follows, and sets aside tokens of other types ({{I-D.skyfire-oauth-kyapay-token}}, Section 4).
 A security intermediary:
 
 1. MUST extract each token as described in {{ConveyingRequests}}.
