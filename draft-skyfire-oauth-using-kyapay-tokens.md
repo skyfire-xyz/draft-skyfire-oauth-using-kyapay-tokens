@@ -279,7 +279,7 @@ As one illustration, a merchant that recognizes a KYAPay-bearing request MAY ada
 This section is informative.
 It situates KYAPay tokens among the other mechanisms a recipient encounters and, importantly, distinguishes what is deployed today from the planned evolution, so that the consumption requirements in {{SecInt}} are read against the correct baseline.
 
-## KYA is an Issuer-Signed Bearer Token Today
+## KYA is an Issuer-Signed Bearer Token Today {#Bearer}
 
 As currently deployed, a KYA (or KYA-PAY) token is an issuer-signed, short-lived bearer token.
 Its single most valuable operational property is that a Target has to do almost nothing to consume it: verify a JWT against the issuer's public key via JWKS, exactly as it would verify any OpenID Connect {{OpenID.Core}} or OAuth {{RFC6749}} token.
@@ -315,7 +315,7 @@ Because these are different layers, HTTP Message Signatures {{RFC9421}} and simi
 request signing supplies authenticity and possession, while KYA supplies identity, authorization, and payment.
 A complete proof-of-possession design uses both, bound together, as described next.
 
-## The Proof-of-Possession Path (Planned Evolution)
+## The Proof-of-Possession Path (Planned Evolution) {#PoPPath}
 
 When per-request signing becomes practical at scale, the planned evolution of KYA is a Certificate-Authority-like model that adds proof of possession without changing the trust anchor:
 
@@ -391,7 +391,7 @@ This document specifies only the HTTP header binding in {{HeaderField}};
 bindings for other protocols are expected to be defined by those protocols or by companion specifications.
 In all cases, the validation and usage rules of {{SecInt}} apply to the token, once received.
 
-## Authenticating the Counterparty
+## Authenticating the Counterparty {#Counterparty}
 
 Conveying a token securely also requires that the sending agent deliver it to the intended recipient and that the recipient be able to bind the token to itself.
 The `aud` claim, together with the optional `tdm` (target domain) and `tsi` (target service identifier) claims defined in {{I-D.skyfire-oauth-kyapay-token}}, allows a recipient to confirm that a token was minted for it and to mitigate replay to a different party ({{SecCon}}).
@@ -713,6 +713,35 @@ Malware resident on the agent's host can drive the agent's legitimate key as a s
 Proof of possession does not prevent this: the malware's requests convey valid bindings and are indistinguishable from the real agent's.
 This risk is bounded not by the token bindings but by short token lifetimes -- so anything signed during a compromise expires quickly once the malware is evicted -- together with host-level controls such as attestation, anomaly detection, and hygiene.
 
+## Token Exposure in the Agent Runtime {#RuntimeExposure}
+
+Agents driven by language models process untrusted content and record their activity in ways that conventional HTTP clients do not.
+A KYAPay token can therefore leave the agent through normal operation, without the agent host being compromised.
+Examples include:
+
+* the token appearing in model context, conversation transcripts, or tool-call inputs and outputs that are logged, retained, or sent to a model provider;
+
+* agent tracing, observability, or debugging systems that record outbound request headers;
+
+* prompt injection, where content retrieved from a website or tool instructs the agent to reveal the token or to include it in a request to a party other than the intended Target.
+
+For a bearer token ({{Bearer}}), anyone who obtains a leaked token can present it at the Target it was minted for until it expires.
+Audience binding ({{Counterparty}}) does not help if the attacker presents the token at that Target.
+
+Agent developers and KYAPay Token Issuers SHOULD mint and attach tokens in deterministic components ({{NonPrescCreat}}) whose outputs are not placed in model context.
+Agents SHOULD attach a token only to requests sent to the Target for which the token was requested; where the token carries `tdm`, that means a destination within the domain that `tdm` names.
+The component that attaches a token MUST make that decision without relying on model output.
+
+Agent runtimes MUST NOT write KYAPay token values to logs, traces, or observability exports.
+
+Agents SHOULD request a new token for each Target and task rather than reusing one broadly, and SHOULD request the shortest lifetime that fits the task.
+Proof of possession ({{PoPPath}}) reduces this exposure only if the private key is also kept out of model context.
+
+Some architectures place a token in model context unavoidably.
+Where an agent obtains a token by invoking a tool, the tool result is returned to the model, and any retained transcript of that session therefore contains the token.
+A deployment in that position SHOULD treat the token as disclosed to every party with access to that context, including the model provider.
+For such a deployment, per-Target, short-lived tokens are the main mitigation, together with proof of possession where the private key is held outside model context.
+
 ## Issuer Trust
 
 A token is only as trustworthy as its issuer and the verifiers it cites.
@@ -789,10 +818,12 @@ The `amr` extensions and the `ivm` and `aml` claims and values are registered by
 The authors thank the contributors to the KYAPay Token {{I-D.skyfire-oauth-kyapay-token}} specification and the partners in the KYAPay consortium (see {{KYAPAY-ORG}}) -- including bot-management, fraud, CIAM, and ATO vendors and merchants -- whose deployment and review experience informed the usage patterns and open issues described here.
 
 We would like to thank
-David Senecal
+Bhasker Allam,
+Jean Diaconu,
 and
-Jean Diaconu
+David Senecal
 for their contributions to the specification.
+Bhasker Allam also wrote the text on which {{RuntimeExposure}} is based.
 
 
 # Document History
@@ -804,6 +835,7 @@ for their contributions to the specification.
 
 * Updated the traditional bot detection methods in the introduction
 * Updated the Bot Managers section and introduce the concept of feedback loop to the agent through 401 status code in case of token assessment failure
+* Added Token Exposure in the Agent Runtime to the Security Considerations.
 
 -01
 
