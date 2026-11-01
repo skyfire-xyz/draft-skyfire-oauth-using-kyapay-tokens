@@ -592,7 +592,7 @@ It does not convey authority over any account at the Target.
 An ATO protector MUST NOT treat a validated token, on its own, as evidence that the session is authorized for the account it is acting on.
 
 Where a KYAPay token is presented to gain access to an account (at sign-in, at account creation, or when the token is exchanged for an access token as described above), a recipient SHOULD check that the token's principal is linked to that account.
-The principal is linked when the account already records the token's `hid.id`, or when a verified identifier in `hid` matches the corresponding identifier registered on the account.
+The principal is linked when the account already records the token's `iss` and `hid.id`, or when a verified identifier in `hid` matches one the account records as verified.
 A match is a strong positive signal that the agent is acting within its own principal's account, and a recipient MAY weight it accordingly.
 A mismatch SHOULD be treated as grounds for step-up ({{StepUp}}) rather than as conclusive.
 Because an issuer asserts an identifier only where it has verified that the principal controls it, a match is evidence of control rather than of mere knowledge.
@@ -609,9 +609,9 @@ With KYAPay tokens it can manage agents consistently with humans:
 * It SHOULD maintain the linkage between a human principal and the agents authorized to act for them, so that a principal can be given visibility into, and control over, agent activity and vice versa.
 
 * A validated token identifies the principal who authorized the agent; it does not by itself convey authority over an existing account.
-  A CIAM system MAY create a new account from a validated token, in which case the token's principal is the account holder by construction, and it SHOULD record the token's `hid.id` against the account.
+  A CIAM system MAY create a new account from a validated token, in which case the token's principal is the account holder by construction, and it SHOULD record the token's `iss` and `hid.id` against the account.
   To admit an agent to an existing account, a CIAM system MUST additionally establish that the token's principal is linked to that account.
-  Any of the following is sufficient: the account already records the token's `hid.id`; a verified identifier in `hid` matches the corresponding attribute registered on the account; or an existing session for that account authenticated by other means.
+  Any of the following is sufficient: the account already records the token's `iss` and `hid.id`; a verified identifier in `hid` matches one the account records as verified; or an existing session for that account authenticated by other means.
   A mismatch, or the absence of any link, SHOULD be treated as grounds for step-up ({{StepUp}}) rather than as conclusive.
   A validated token alone MUST NOT be treated as sufficient.
 
