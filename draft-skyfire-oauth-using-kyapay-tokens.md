@@ -452,7 +452,8 @@ A security intermediary:
    Until the token has been verified, `iss` is supplied by the sender: resolving it before the issuer is known to be trusted would allow an unauthenticated request to cause an outbound fetch to an arbitrary URL of the sender's choosing.
    The trusted-issuer set is configured out of band and is not derived from the token.
 1. MUST validate each token as specified in {{I-D.skyfire-oauth-kyapay-token}}, Section 4.
-   A token that fails validation MUST NOT be treated as conveying a human presence signal, and the intermediary MUST decline the request as described in {{StepUp}}, rather than applying its policy for requests that carry no token.
+   A token that fails validation MUST NOT be treated as conveying a human presence signal, and the intermediary MUST decline what it governs for that request, rather than applying its policy for requests that carry no token: a bot manager blocks the request, a fraud manager declines the transaction, an ATO protector blocks the sign-in, a CIAM system refuses the account action or token exchange, and a payment service does not proceed with the payment.
+   Where the decline is returned to the agent in an HTTP response, that response is as described in {{StepUp}}.
 1. MUST verify the token signature against a key obtained from the issuer's JWK Set, discovered via the `iss` claim using the `/.well-known/jwks.json` mechanism ({{I-D.skyfire-oauth-kyapay-token}}).
    Because KYAPay tokens are self-contained, this verification SHOULD be performed locally, without a synchronous callout to the issuer per request;
    issuer keys SHOULD be cached and refreshed according to standard JWK Set practice.
@@ -581,7 +582,8 @@ the token supplements, and does not replace, those signals.
 A recipient can decline a request because it carries no KYAPay token, because the token fails validation ({{ProcModel}}), or because the token is valid but does not carry what the action requires: for example identity claims, a higher assurance level for a sensitive action, or a payment token.
 Not all actions carry the same risk; viewing a loyalty balance is far less sensitive than making a large payment, and a token attests only the assurance established when it was issued.
 
-In each case the recipient responds with 403 (Forbidden), or with 402 (Payment Required) where what is missing or insufficient is payment, and SHOULD include the `Accept-KYAPay-Token` field ({{AcceptField}}) stating what a request needs in order to succeed.
+Where the decline is returned to the agent in an HTTP response, that response is 403 (Forbidden), or 402 (Payment Required) where what is missing or insufficient is payment, and SHOULD include the `Accept-KYAPay-Token` field ({{AcceptField}}) stating what a request needs in order to succeed.
+Over other interfaces ({{OtherInterfaces}}), how a decline is signalled is left to the binding for that interface.
 A recipient SHOULD NOT use 401 (Unauthorized) for these cases: that status requires a `WWW-Authenticate` challenge ({{Section 15.5.2 of RFC9110}}), and a KYAPay token is not an `Authorization` credential.
 A recipient MAY describe the reason in a problem details body {{RFC9457}}.
 
@@ -862,7 +864,7 @@ for their contributions to the specification.
 
 * Updated the traditional bot detection methods in the introduction
 * Updated the Bot Managers section and introduce the concept of feedback loop to the agent through an error response in case of token assessment failure
-* Added the `Accept-KYAPay-Token` response field, replaced Step-Up Authentication with Responding When a Token Falls Short (403, or 402 for payment; not 401), changed the Bot Managers error examples to match, and made a recipient decide from its own policy whether it uses tokens for a request and decline the request when a token it uses fails validation, rather than treat it as carrying no token.
+* Added the `Accept-KYAPay-Token` response field, replaced Step-Up Authentication with Responding When a Token Falls Short (over HTTP, 403, or 402 for payment; not 401), changed the Bot Managers error examples to match, and made a recipient decide from its own policy whether it uses tokens for a request and decline, within its role, a request whose token fails validation, rather than treat it as carrying no token.
 
 -01
 
