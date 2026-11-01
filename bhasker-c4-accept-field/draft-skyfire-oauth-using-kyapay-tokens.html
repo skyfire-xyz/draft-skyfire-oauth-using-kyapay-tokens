@@ -1334,6 +1334,9 @@ the token itself is the interoperability contract.<a href="#section-abstract-1" 
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.9">
                 <p id="section-toc.1-1.8.2.9.1"><a href="#section-8.9" class="auto internal xref">8.9</a>.  <a href="#name-key-management" class="internal xref">Key Management</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.10">
+                <p id="section-toc.1-1.8.2.10.1"><a href="#section-8.10" class="auto internal xref">8.10</a>. <a href="#name-disclosing-requirements" class="internal xref">Disclosing Requirements</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
@@ -1948,7 +1951,7 @@ A bearer token captured within its validity window can be replayed; a bot manage
 <a href="#section-6.3.2" class="section-number selfRef">6.3.2. </a><a href="#name-token-present-but-invalid" class="section-name selfRef">Token present but invalid</a>
           </h4>
 <p id="section-6.3.2-1">In some cases, a KYA token may be present in the request but the validation process may reveal some anomalies.
-The bot manager then responds as described in <a href="#StepUp" class="auto internal xref">Section 6.5</a>, with 403 (Forbidden) and the <code>Accept-KYAPay-Token</code> field stating what a request needs in order to succeed.<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
+The bot manager then responds as described in <a href="#StepUp" class="auto internal xref">Section 6.5</a>, with 403 (Forbidden), and can include the <code>Accept-KYAPay-Token</code> field stating what a request needs in order to succeed.<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
 <p id="section-6.3.2-2">In the examples in this section and the next, the <code>issuers</code> parameter (<a href="#AcceptField" class="auto internal xref">Section 5.5</a>) lists the issuers from which the bot manager accepts tokens, and a problem details body <span>[<a href="#RFC9457" class="cite xref">RFC9457</a>]</span> gives the reason.
 This document does not define those problem types; they are examples for discussion only.<a href="#section-6.3.2-2" class="pilcrow">¶</a></p>
 <p id="section-6.3.2-3"><strong>Token expired.</strong>
@@ -2028,10 +2031,11 @@ the token supplements, and does not replace, those signals.<a href="#section-6.4
         </h3>
 <p id="section-6.5-1">A recipient can decline a request because it carries no KYAPay token, because the token fails validation (<a href="#ProcModel" class="auto internal xref">Section 6.1</a>), or because the token is valid but does not carry what the action requires: for example identity claims, a higher assurance level for a sensitive action, or a payment token.
 Not all actions carry the same risk; viewing a loyalty balance is far less sensitive than making a large payment, and a token attests only the assurance established when it was issued.<a href="#section-6.5-1" class="pilcrow">¶</a></p>
-<p id="section-6.5-2">Where the decline is returned to the agent in an HTTP response, that response is 403 (Forbidden), or 402 (Payment Required) where what is missing or insufficient is payment, and <span class="bcp14">SHOULD</span> include the <code>Accept-KYAPay-Token</code> field (<a href="#AcceptField" class="auto internal xref">Section 5.5</a>) stating what a request needs in order to succeed.
-Over other interfaces (<a href="#OtherInterfaces" class="auto internal xref">Section 5.3</a>), how a decline is signalled is left to the binding for that interface.
+<p id="section-6.5-2">Where the decline is returned to the agent in an HTTP response, that response is 403 (Forbidden), or 402 (Payment Required) where what is missing or insufficient is payment, and <span class="bcp14">MAY</span> include the <code>Accept-KYAPay-Token</code> field (<a href="#AcceptField" class="auto internal xref">Section 5.5</a>) stating what a request needs in order to succeed (<a href="#DisclosingRequirements" class="auto internal xref">Section 8.10</a>).
+Where the request is to an endpoint whose protocol specifies its own error responses, the recipient instead responds as that protocol specifies, and <span class="bcp14">MAY</span> include the <code>Accept-KYAPay-Token</code> field; for example, an OAuth 2.0 authorization server that declines a token exchange responds as specified in <span><a href="https://rfc-editor.org/rfc/rfc8693#section-2.2.2" class="relref">Section 2.2.2</a> of [<a href="#RFC8693" class="cite xref">RFC8693</a>]</span>.
+Over other interfaces (<a href="#OtherInterfaces" class="auto internal xref">Section 5.3</a>), how a decline is signaled is left to the binding for that interface.
 A recipient <span class="bcp14">SHOULD NOT</span> use 401 (Unauthorized) for these cases: that status requires a <code>WWW-Authenticate</code> challenge (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-15.5.2" class="relref">Section 15.5.2</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>), and a KYAPay token is not an <code>Authorization</code> credential.
-A recipient <span class="bcp14">MAY</span> describe the reason in a problem details body <span>[<a href="#RFC9457" class="cite xref">RFC9457</a>]</span>.<a href="#section-6.5-2" class="pilcrow">¶</a></p>
+A recipient <span class="bcp14">MAY</span> describe the reason in a problem details body <span>[<a href="#RFC9457" class="cite xref">RFC9457</a>]</span> (<a href="#DisclosingRequirements" class="auto internal xref">Section 8.10</a>).<a href="#section-6.5-2" class="pilcrow">¶</a></p>
 <p id="section-6.5-3">An agent that receives such a response can compare it with what it sent.
 If it sent no token, or a token that was refused, it can obtain a new token and retry.
 If the token lacked something the recipient requires, obtaining it may involve the human principal, for example to agree to share an attribute or to complete further verification with the issuer, which can take minutes to days.<a href="#section-6.5-3" class="pilcrow">¶</a></p>
@@ -2340,6 +2344,31 @@ Recipients <span class="bcp14">SHOULD</span> treat high-value actions as warrant
 Issuers <span class="bcp14">SHOULD</span> retain superseded verification keys in their JWK Set for at least the maximum token lifetime after rotation.<a href="#section-8.9-1" class="pilcrow">¶</a></p>
 </section>
 </div>
+<div id="DisclosingRequirements">
+<section id="section-8.10">
+        <h3 id="name-disclosing-requirements">
+<a href="#section-8.10" class="section-number selfRef">8.10. </a><a href="#name-disclosing-requirements" class="section-name selfRef">Disclosing Requirements</a>
+        </h3>
+<p id="section-8.10-1">The <code>Accept-KYAPay-Token</code> field (<a href="#AcceptField" class="auto internal xref">Section 5.5</a>) and any problem details a recipient returns (<a href="#StepUp" class="auto internal xref">Section 6.5</a>) tell the sender what the recipient requires.
+That helps a legitimate agent obtain a suitable token, and it also reaches anyone else who sends a request.
+How much to state is a decision for the recipient, in light of its own risk:<a href="#section-8.10-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8.10-2.1">
+            <p id="section-8.10-2.1.1">It can omit the field, state only some of its requirements, or leave out the <code>issuers</code> parameter, which names the issuers it accepts.<a href="#section-8.10-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.10-2.2">
+            <p id="section-8.10-2.2.1">It can instead publish its requirements in advance, or agree them with initiators out of band.<a href="#section-8.10-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.10-2.3">
+            <p id="section-8.10-2.3.1">Requirements that differ by principal, by account, or by the outcome of a risk assessment can reveal those facts, for example which accounts are of high value or that a request has been flagged (<span><a href="https://rfc-editor.org/rfc/rfc9470#section-9" class="relref">Section 9</a> of [<a href="#RFC9470" class="cite xref">RFC9470</a>]</span> describes the same risk for authentication requirements).<a href="#section-8.10-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.10-2.4">
+            <p id="section-8.10-2.4.1">Saying which validation check a token failed can help an attacker probe the recipient; a generic reason avoids this (<span><a href="https://rfc-editor.org/rfc/rfc9457#section-5" class="relref">Section 5</a> of [<a href="#RFC9457" class="cite xref">RFC9457</a>]</span>).<a href="#section-8.10-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-8.10-3">Stating requirements does not weaken the token itself: a request still succeeds only with a token signed by an issuer the recipient trusts.<a href="#section-8.10-3" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="PrivCon">
@@ -2574,6 +2603,10 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
         <dd>
 <span class="refAuthor">Nottingham, M.</span>, <span class="refAuthor">Wilde, E.</span>, and <span class="refAuthor">S. Dalal</span>, <span class="refTitle">"Problem Details for HTTP APIs"</span>, <span class="seriesInfo">RFC 9457</span>, <span class="seriesInfo">DOI 10.17487/RFC9457</span>, <time datetime="2023-07" class="refDate">July 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9457">https://www.rfc-editor.org/rfc/rfc9457</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC9470">[RFC9470]</dt>
+        <dd>
+<span class="refAuthor">Bertocci, V.</span> and <span class="refAuthor">B. Campbell</span>, <span class="refTitle">"OAuth 2.0 Step Up Authentication Challenge Protocol"</span>, <span class="seriesInfo">RFC 9470</span>, <span class="seriesInfo">DOI 10.17487/RFC9470</span>, <time datetime="2023-09" class="refDate">September 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9470">https://www.rfc-editor.org/rfc/rfc9470</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC9901">[RFC9901]</dt>
         <dd>
 <span class="refAuthor">Fett, D.</span>, <span class="refAuthor">Yasuda, K.</span>, and <span class="refAuthor">B. Campbell</span>, <span class="refTitle">"Selective Disclosure for JSON Web Tokens"</span>, <span class="seriesInfo">RFC 9901</span>, <span class="seriesInfo">DOI 10.17487/RFC9901</span>, <time datetime="2025-11" class="refDate">November 2025</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9901">https://www.rfc-editor.org/rfc/rfc9901</a>&gt;</span>. </dd>
@@ -2624,7 +2657,7 @@ for their contributions to the specification.<a href="#appendix-A-2" class="pilc
           <p id="appendix-B-3.2.1">Updated the Bot Managers section and introduce the concept of feedback loop to the agent through an error response in case of token assessment failure<a href="#appendix-B-3.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-B-3.3">
-          <p id="appendix-B-3.3.1">Added the <code>Accept-KYAPay-Token</code> response field, replaced Step-Up Authentication with Responding When a Token Falls Short (over HTTP, 403, or 402 for payment; not 401), changed the Bot Managers error examples to match, and made a recipient decide from its own policy whether it uses tokens for a request and decline, within its role, a request whose token fails validation, rather than treat it as carrying no token.<a href="#appendix-B-3.3.1" class="pilcrow">¶</a></p>
+          <p id="appendix-B-3.3.1">Added the <code>Accept-KYAPay-Token</code> response field, which a recipient <span class="bcp14">MAY</span> send, replaced Step-Up Authentication with Responding When a Token Falls Short (over HTTP, 403, or 402 for payment, unless the protocol in use specifies its own errors; not 401), changed the Bot Managers error examples to match, made a recipient decide from its own policy whether it uses tokens for a request and decline, within its role, a request whose token fails validation, rather than treat it as carrying no token, and added Disclosing Requirements.<a href="#appendix-B-3.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="appendix-B-4">-01<a href="#appendix-B-4" class="pilcrow">¶</a></p>

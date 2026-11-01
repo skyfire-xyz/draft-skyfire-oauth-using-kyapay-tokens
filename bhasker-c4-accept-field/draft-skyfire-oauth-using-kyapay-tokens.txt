@@ -136,6 +136,7 @@ Table of Contents
      8.7.  Revocation
      8.8.  Continuity of Human Control
      8.9.  Key Management
+     8.10. Disclosing Requirements
    9.  Privacy Considerations
      9.1.  Minimal Disclosure
      9.2.  Consent
@@ -882,9 +883,9 @@ Table of Contents
 
    In some cases, a KYA token may be present in the request but the
    validation process may reveal some anomalies.  The bot manager then
-   responds as described in Section 6.5, with 403 (Forbidden) and the
-   Accept-KYAPay-Token field stating what a request needs in order to
-   succeed.
+   responds as described in Section 6.5, with 403 (Forbidden), and can
+   include the Accept-KYAPay-Token field stating what a request needs in
+   order to succeed.
 
    In the examples in this section and the next, the issuers parameter
    (Section 5.5) lists the issuers from which the bot manager accepts
@@ -987,14 +988,20 @@ Table of Contents
 
    Where the decline is returned to the agent in an HTTP response, that
    response is 403 (Forbidden), or 402 (Payment Required) where what is
-   missing or insufficient is payment, and SHOULD include the Accept-
+   missing or insufficient is payment, and MAY include the Accept-
    KYAPay-Token field (Section 5.5) stating what a request needs in
-   order to succeed.  Over other interfaces (Section 5.3), how a decline
-   is signalled is left to the binding for that interface.  A recipient
-   SHOULD NOT use 401 (Unauthorized) for these cases: that status
-   requires a WWW-Authenticate challenge (Section 15.5.2 of [RFC9110]),
-   and a KYAPay token is not an Authorization credential.  A recipient
-   MAY describe the reason in a problem details body [RFC9457].
+   order to succeed (Section 8.10).  Where the request is to an endpoint
+   whose protocol specifies its own error responses, the recipient
+   instead responds as that protocol specifies, and MAY include the
+   Accept-KYAPay-Token field; for example, an OAuth 2.0 authorization
+   server that declines a token exchange responds as specified in
+   Section 2.2.2 of [RFC8693].  Over other interfaces (Section 5.3), how
+   a decline is signaled is left to the binding for that interface.  A
+   recipient SHOULD NOT use 401 (Unauthorized) for these cases: that
+   status requires a WWW-Authenticate challenge (Section 15.5.2 of
+   [RFC9110]), and a KYAPay token is not an Authorization credential.  A
+   recipient MAY describe the reason in a problem details body [RFC9457]
+   (Section 8.10).
 
    An agent that receives such a response can compare it with what it
    sent.  If it sent no token, or a token that was refused, it can
@@ -1371,6 +1378,35 @@ Table of Contents
    superseded verification keys in their JWK Set for at least the
    maximum token lifetime after rotation.
 
+8.10.  Disclosing Requirements
+
+   The Accept-KYAPay-Token field (Section 5.5) and any problem details a
+   recipient returns (Section 6.5) tell the sender what the recipient
+   requires.  That helps a legitimate agent obtain a suitable token, and
+   it also reaches anyone else who sends a request.  How much to state
+   is a decision for the recipient, in light of its own risk:
+
+   *  It can omit the field, state only some of its requirements, or
+      leave out the issuers parameter, which names the issuers it
+      accepts.
+
+   *  It can instead publish its requirements in advance, or agree them
+      with initiators out of band.
+
+   *  Requirements that differ by principal, by account, or by the
+      outcome of a risk assessment can reveal those facts, for example
+      which accounts are of high value or that a request has been
+      flagged (Section 9 of [RFC9470] describes the same risk for
+      authentication requirements).
+
+   *  Saying which validation check a token failed can help an attacker
+      probe the recipient; a generic reason avoids this (Section 5 of
+      [RFC9457]).
+
+   Stating requirements does not weaken the token itself: a request
+   still succeeds only with a token signed by an issuer the recipient
+   trusts.
+
 9.  Privacy Considerations
 
    The privacy considerations of [I-D.skyfire-oauth-kyapay-token] apply.
@@ -1591,6 +1627,11 @@ Table of Contents
               for HTTP APIs", RFC 9457, DOI 10.17487/RFC9457, July 2023,
               <https://www.rfc-editor.org/rfc/rfc9457>.
 
+   [RFC9470]  Bertocci, V. and B. Campbell, "OAuth 2.0 Step Up
+              Authentication Challenge Protocol", RFC 9470,
+              DOI 10.17487/RFC9470, September 2023,
+              <https://www.rfc-editor.org/rfc/rfc9470>.
+
    [RFC9901]  Fett, D., Yasuda, K., and B. Campbell, "Selective
               Disclosure for JSON Web Tokens", RFC 9901,
               DOI 10.17487/RFC9901, November 2025,
@@ -1633,13 +1674,15 @@ Document History
       feedback loop to the agent through an error response in case of
       token assessment failure
 
-   *  Added the Accept-KYAPay-Token response field, replaced Step-Up
-      Authentication with Responding When a Token Falls Short (over
-      HTTP, 403, or 402 for payment; not 401), changed the Bot Managers
-      error examples to match, and made a recipient decide from its own
-      policy whether it uses tokens for a request and decline, within
-      its role, a request whose token fails validation, rather than
-      treat it as carrying no token.
+   *  Added the Accept-KYAPay-Token response field, which a recipient
+      MAY send, replaced Step-Up Authentication with Responding When a
+      Token Falls Short (over HTTP, 403, or 402 for payment, unless the
+      protocol in use specifies its own errors; not 401), changed the
+      Bot Managers error examples to match, made a recipient decide from
+      its own policy whether it uses tokens for a request and decline,
+      within its role, a request whose token fails validation, rather
+      than treat it as carrying no token, and added Disclosing
+      Requirements.
 
    -01
 
