@@ -1729,7 +1729,7 @@ KYAPay-Token: eyJhbGciOiJFUzI1NiIsInR5cCI6Imt5YStqd3QifQ.eyJpc3Mi...
             <p id="section-5.1-9.3.1"><span class="bcp14">MUST</span> reject the request if the field fails to parse, or if any member is not a Token whose value is a well-formed JWT. <span><a href="https://rfc-editor.org/rfc/rfc9651#section-4.2" class="relref">Section 4.2</a> of [<a href="#RFC9651" class="cite xref">RFC9651</a>]</span> permits either ignoring a field that fails to parse or treating the message as malformed; this document requires the latter; and<a href="#section-5.1-9.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.1-9.4">
-            <p id="section-5.1-9.4.1"><span class="bcp14">MUST</span> accept List members as long as the field value it is required to accept (<a href="#TokenSize" class="auto internal xref">Section 5.2</a>).<a href="#section-5.1-9.4.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-9.4.1"><span class="bcp14">MUST</span> accept List members of up to the length given in <a href="#TokenSize" class="auto internal xref">Section 5.2</a>.<a href="#section-5.1-9.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-5.1-10">Intermediaries and caches <span class="bcp14">MUST</span> treat <code>KYAPay-Token</code> as containing sensitive, request-specific credentials;

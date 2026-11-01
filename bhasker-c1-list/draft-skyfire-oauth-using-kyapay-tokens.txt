@@ -582,8 +582,7 @@ Table of Contents
       fails to parse or treating the message as malformed; this document
       requires the latter; and
 
-   *  MUST accept List members as long as the field value it is required
-      to accept (Section 5.2).
+   *  MUST accept List members of up to the length given in Section 5.2.
 
    Intermediaries and caches MUST treat KYAPay-Token as containing
    sensitive, request-specific credentials; it MUST NOT be cached in a
