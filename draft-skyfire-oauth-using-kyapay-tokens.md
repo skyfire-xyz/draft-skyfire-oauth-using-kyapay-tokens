@@ -573,6 +573,7 @@ claims where present, to weight how the principal was authenticated and verified
 A fraud manager need not sit inline in the request path.
 In practice the token is made available to it either inline (the Target forwards the received token to its fraud manager) or out of band (for example, script running on the Target's page captures the `KYAPay-Token` value and sends it to the fraud manager before the request reaches the Target's application).
 The same token MAY be inspected before the action, after it, or both.
+A recipient that inspects the token after the action evaluates its time-based claims, such as `exp`, against the time it received the request, as recorded by the recipient and not as supplied by the sender.
 In all of these arrangements, the token issuer is not in the transaction path;
 the fraud manager verifies the self-contained token locally by JWKS, as described in {{ProcModel}}.
 The fraud manager MAY continue to apply its existing behavioral and device models;
