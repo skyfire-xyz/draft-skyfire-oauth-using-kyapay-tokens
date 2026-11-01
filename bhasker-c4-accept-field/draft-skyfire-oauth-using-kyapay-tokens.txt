@@ -700,8 +700,13 @@ Table of Contents
 
 6.1.  Common Processing Model
 
-   On receiving a request that carries one or more KYAPay tokens, a
-   security intermediary:
+   A recipient first decides, from its own policy for the resource and
+   action requested, whether it uses KYAPay tokens for that request.  A
+   recipient that does not MAY ignore the KYAPay-Token field.  A
+   recipient that does, on receiving a request that carries one or more
+   KYAPay tokens, processes the tokens of the types it accepts
+   ([I-D.skyfire-oauth-kyapay-token]) as follows, and MAY ignore tokens
+   of other types.  A security intermediary:
 
    1.  MUST extract each token as described in Section 5.
 
@@ -718,8 +723,9 @@ Table of Contents
    3.  MUST validate each token as specified in
        [I-D.skyfire-oauth-kyapay-token], Section 4.  A token that fails
        validation MUST NOT be treated as conveying a human presence
-       signal, and the intermediary MUST fall back to its default
-       (token-absent) policy for that request.
+       signal, and the intermediary MUST decline the request as
+       described in Section 6.5, rather than applying its policy for
+       requests that carry no token.
 
    4.  MUST verify the token signature against a key obtained from the
        issuer's JWK Set, discovered via the iss claim using the /.well-
@@ -823,8 +829,9 @@ Table of Contents
    For token-bearing traffic, the identification question is settled:
    the bot manager does not need to execute its behavioral or
    fingerprinting detection heuristics to prove the request is
-   automated.  Untokened or unverifiable requests fall back to the
-   standard detection pipeline.
+   automated.  Requests that carry no token fall back to the standard
+   detection pipeline; a request whose token fails validation is
+   declined (Section 6.1).
 
    Settling identification, however, does not grant automatic access.
    Identification is distinct from admission: classifying a request as a
@@ -1621,8 +1628,11 @@ Document History
 
    *  Added the Accept-KYAPay-Token response field, replaced Step-Up
       Authentication with Responding When a Token Falls Short (403, or
-      402 for payment; not 401), and changed the Bot Managers error
-      examples to match.
+      402 for payment; not 401), changed the Bot Managers error examples
+      to match, and made a recipient decide from its own policy whether
+      it uses tokens for a request and decline the request when a token
+      it uses fails validation, rather than treat it as carrying no
+      token.
 
    -01
 

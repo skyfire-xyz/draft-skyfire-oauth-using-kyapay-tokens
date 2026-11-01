@@ -1830,7 +1830,10 @@ Throughout, "validate the token" means to perform the validation procedure defin
         <h3 id="name-common-processing-model">
 <a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-common-processing-model" class="section-name selfRef">Common Processing Model</a>
         </h3>
-<p id="section-6.1-1">On receiving a request that carries one or more KYAPay tokens, a security intermediary:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-1">A recipient first decides, from its own policy for the resource and action requested, whether it uses KYAPay tokens for that request.
+A recipient that does not <span class="bcp14">MAY</span> ignore the <code>KYAPay-Token</code> field.
+A recipient that does, on receiving a request that carries one or more KYAPay tokens, processes the tokens of the types it accepts (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>) as follows, and <span class="bcp14">MAY</span> ignore tokens of other types.
+A security intermediary:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.1-2">
 <li id="section-6.1-2.1">
             <p id="section-6.1-2.1.1"><span class="bcp14">MUST</span> extract each token as described in <a href="#ConveyingRequests" class="auto internal xref">Section 5</a>.<a href="#section-6.1-2.1.1" class="pilcrow">¶</a></p>
@@ -1843,7 +1846,7 @@ The trusted-issuer set is configured out of band and is not derived from the tok
 </li>
           <li id="section-6.1-2.3">
             <p id="section-6.1-2.3.1"><span class="bcp14">MUST</span> validate each token as specified in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, Section 4.
-A token that fails validation <span class="bcp14">MUST NOT</span> be treated as conveying a human presence signal, and the intermediary <span class="bcp14">MUST</span> fall back to its default (token-absent) policy for that request.<a href="#section-6.1-2.3.1" class="pilcrow">¶</a></p>
+A token that fails validation <span class="bcp14">MUST NOT</span> be treated as conveying a human presence signal, and the intermediary <span class="bcp14">MUST</span> decline the request as described in <a href="#StepUp" class="auto internal xref">Section 6.5</a>, rather than applying its policy for requests that carry no token.<a href="#section-6.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.4">
             <p id="section-6.1-2.4.1"><span class="bcp14">MUST</span> verify the token signature against a key obtained from the issuer's JWK Set, discovered via the <code>iss</code> claim using the <code>/.well-known/jwks.json</code> mechanism (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>).
@@ -1919,7 +1922,7 @@ A recipient <span class="bcp14">MAY</span> combine the token signal with its exi
 <a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-token-is-present-and-valid" class="section-name selfRef">Token is present and valid</a>
           </h4>
 <p id="section-6.3.1-1">KYAPay tokens transform this detection model into a self-identification model. By presenting a valid KYA token, an agent explicitly identifies itself as automated up front. The bot manager verifies the token -- checking the cryptographic signature against the issuer's published keys, issuer trust, validity window, and audience -- and classifies the request as a verified agent.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-2">For token-bearing traffic, the identification question is settled: the bot manager does not need to execute its behavioral or fingerprinting detection heuristics to prove the request is automated. Untokened or unverifiable requests fall back to the standard detection pipeline.<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-2">For token-bearing traffic, the identification question is settled: the bot manager does not need to execute its behavioral or fingerprinting detection heuristics to prove the request is automated. Requests that carry no token fall back to the standard detection pipeline; a request whose token fails validation is declined (<a href="#ProcModel" class="auto internal xref">Section 6.1</a>).<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
 <p id="section-6.3.1-3">Settling identification, however, does not grant automatic access. Identification is distinct from admission: classifying a request as a verified agent simply provides authenticated context. The bot manager uses the token's verified identity layer -- the human principal (<code>hid</code>), the agent platform (<code>apd</code>), and the agent instance (<code>aid</code>) -- to select and evaluate the site's configured access policy to determine the final disposition (admit, rate-limit, require step-up, or deny) rather than applying bot-blocking challenges designed for unattended, unattributed automation.<a href="#section-6.3.1-3" class="pilcrow">¶</a></p>
 <p id="section-6.3.1-4">KYAPay tokens are well-suited to inline bot management for several reasons:<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -2619,7 +2622,7 @@ for their contributions to the specification.<a href="#appendix-A-2" class="pilc
           <p id="appendix-B-3.2.1">Updated the Bot Managers section and introduce the concept of feedback loop to the agent through an error response in case of token assessment failure<a href="#appendix-B-3.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-B-3.3">
-          <p id="appendix-B-3.3.1">Added the <code>Accept-KYAPay-Token</code> response field, replaced Step-Up Authentication with Responding When a Token Falls Short (403, or 402 for payment; not 401), and changed the Bot Managers error examples to match.<a href="#appendix-B-3.3.1" class="pilcrow">¶</a></p>
+          <p id="appendix-B-3.3.1">Added the <code>Accept-KYAPay-Token</code> response field, replaced Step-Up Authentication with Responding When a Token Falls Short (403, or 402 for payment; not 401), changed the Bot Managers error examples to match, and made a recipient decide from its own policy whether it uses tokens for a request and decline the request when a token it uses fails validation, rather than treat it as carrying no token.<a href="#appendix-B-3.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="appendix-B-4">-01<a href="#appendix-B-4" class="pilcrow">¶</a></p>
