@@ -291,7 +291,7 @@ A bearer token establishes identity but not proof of possession: possession of t
 Today this residual, in-window risk is bounded rather than eliminated, by means that do not raise the consumption bar:
 
 * short token lifetimes (`exp`), so a captured token expires quickly;
-* audience binding (`aud`, and where used `tdm`/`tsi`), so a token minted for one Target cannot be presented to another;
+* audience binding ({{Counterparty}}), so a token minted for one Target cannot be presented to another;
 * TLS on every hop, which mitigates on-the-wire capture and man-in-the-middle; and
 * issuer-gated onboarding (KYC/KYB), which mitigates malicious agents and Targets being admitted to the network in the first place.
 
@@ -391,17 +391,20 @@ This document specifies only the HTTP header binding in {{HeaderField}};
 bindings for other protocols are expected to be defined by those protocols or by companion specifications.
 In all cases, the validation and usage rules of {{SecInt}} apply to the token, once received.
 
-## Authenticating the Counterparty
+## Authenticating the Counterparty {#Counterparty}
 
-Conveying a token securely also requires that the sending agent deliver it to the intended recipient and that the recipient be able to bind the token to itself.
-The `aud` claim, together with the optional `tdm` (target domain) and `tsi` (target service identifier) claims defined in {{I-D.skyfire-oauth-kyapay-token}}, allows a recipient to confirm that a token was minted for it and to mitigate replay to a different party ({{SecCon}}).
+The `aud` and `tsi` claims are identifiers assigned by the Token Issuer (the Identifying the Target section of {{I-D.skyfire-oauth-kyapay-token}}); their values are known to a Target that has onboarded to that issuer and are not otherwise discoverable.
+The `tdm` claim names the Target's domain, is not issuer-specific, and requires no relationship with the issuer to interpret.
+A Target that has onboarded to an issuer MAY check any of the three, and a security intermediary acting for such a Target MAY be configured with that Target's `aud` and `tsi` values and check them.
+A recipient that has not onboarded, including a security intermediary acting for many Targets, SHOULD check at least that `tdm` names the domain it is protecting for that request; where `tdm` also names a host or a path, the recipient MAY check those too.
+`tdm` MUST be present in tokens whose Target is identified by a domain name.
 At the transport and discovery layers, mechanisms such as DNS domain names (with TLS server authentication), A2A agent cards {{A2A}}, and MCP server identification {{MCP}} help an agent confirm that it is communicating with the correct counterparty before presenting a token.
 
 # Using KYAPay Tokens at Security Intermediaries {#SecInt}
 
 This section is normative.
 It defines a common processing model and then describes how each kind of security intermediary uses the validated token.
-Throughout, "validate the token" means to perform the validation procedure defined in {{I-D.skyfire-oauth-kyapay-token}}, Section 4 (JWT header validation, signature and issuer validation, and validation of `exp`, `iat`, `jti`, `aud`, and `env`), plus the PAY-specific validation for `pay+jwt` and `kya-pay+jwt` tokens.
+Throughout, "validate the token" means to perform the validation procedure defined in {{I-D.skyfire-oauth-kyapay-token}}, Section 4 (JWT header validation, signature and issuer validation, and validation of `exp`, `iat`, `jti`, the audience, and `env`), plus the PAY-specific validation for `pay+jwt` and `kya-pay+jwt` tokens.
 
 ## Common Processing Model {#ProcModel}
 
@@ -417,7 +420,7 @@ On receiving a request that carries one or more KYAPay tokens, a security interm
 1. MUST verify the token signature against a key obtained from the issuer's JWK Set, discovered via the `iss` claim using the `/.well-known/jwks.json` mechanism ({{I-D.skyfire-oauth-kyapay-token}}).
    Because KYAPay tokens are self-contained, this verification SHOULD be performed locally, without a synchronous callout to the issuer per request;
    issuer keys SHOULD be cached and refreshed according to standard JWK Set practice.
-1. MUST confirm that the token is intended for this recipient by checking the `aud` claim (and, if used, the `tdm` and `tsi` claims) as described in {{SecCon}}.
+1. MUST confirm that the token is intended for this recipient, as described in {{Counterparty}}.
 1. MUST confirm that the `env` claim (for example, `production`) matches the environment the intermediary is operating in.
    When the token carries a proof-of-possession key (the `cnf` claim {{RFC7800}}, Section 4), MUST verify that the request is signed by that key -- over HTTP, using HTTP Message Signatures {{RFC9421}} -- and reject the request if the signature is absent or invalid.
 1. When the token carries no such key, it is a bearer token: the intermediary MUST rely on the controls in {{SecCon}} (short lifetime, audience binding, TLS, issuer-gated onboarding) and MUST NOT assume that mere presentation of the token proves the sender holds a key bound to it.
@@ -789,9 +792,10 @@ The `amr` extensions and the `ivm` and `aml` claims and values are registered by
 The authors thank the contributors to the KYAPay Token {{I-D.skyfire-oauth-kyapay-token}} specification and the partners in the KYAPay consortium (see {{KYAPAY-ORG}}) -- including bot-management, fraud, CIAM, and ATO vendors and merchants -- whose deployment and review experience informed the usage patterns and open issues described here.
 
 We would like to thank
-David Senecal
+Bhasker Allam,
+Jean Diaconu,
 and
-Jean Diaconu
+David Senecal
 for their contributions to the specification.
 
 
@@ -804,6 +808,7 @@ for their contributions to the specification.
 
 * Updated the traditional bot detection methods in the introduction
 * Updated the Bot Managers section and introduce the concept of feedback loop to the agent through 401 status code in case of token assessment failure
+* Described how a recipient confirms the audience: `aud` and `tsi` where it has onboarded to the issuer, `tdm` otherwise; required `tdm` where the Target is identified by a domain name.
 
 -01
 
