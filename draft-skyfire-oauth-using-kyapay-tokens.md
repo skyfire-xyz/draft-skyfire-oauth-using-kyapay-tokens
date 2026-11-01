@@ -441,7 +441,10 @@ Throughout, "validate the token" means to perform the validation procedure defin
 
 ## Common Processing Model {#ProcModel}
 
-On receiving a request that carries one or more KYAPay tokens, a security intermediary:
+A recipient first decides, from its own policy for the resource and action requested, whether it uses KYAPay tokens for that request.
+A recipient that does not MAY ignore the `KYAPay-Token` field.
+A recipient that does, on receiving a request that carries one or more KYAPay tokens, processes the tokens of the types it accepts ({{I-D.skyfire-oauth-kyapay-token}}) as follows, and MAY ignore tokens of other types.
+A security intermediary:
 
 1. MUST extract each token as described in {{ConveyingRequests}}.
 1. MUST confirm that the token's issuer is one the recipient trusts for the claims being relied upon (see {{SecCon}}).
@@ -449,7 +452,7 @@ On receiving a request that carries one or more KYAPay tokens, a security interm
    Until the token has been verified, `iss` is supplied by the sender: resolving it before the issuer is known to be trusted would allow an unauthenticated request to cause an outbound fetch to an arbitrary URL of the sender's choosing.
    The trusted-issuer set is configured out of band and is not derived from the token.
 1. MUST validate each token as specified in {{I-D.skyfire-oauth-kyapay-token}}, Section 4.
-   A token that fails validation MUST NOT be treated as conveying a human presence signal, and the intermediary MUST fall back to its default (token-absent) policy for that request.
+   A token that fails validation MUST NOT be treated as conveying a human presence signal, and the intermediary MUST decline the request as described in {{StepUp}}, rather than applying its policy for requests that carry no token.
 1. MUST verify the token signature against a key obtained from the issuer's JWK Set, discovered via the `iss` claim using the `/.well-known/jwks.json` mechanism ({{I-D.skyfire-oauth-kyapay-token}}).
    Because KYAPay tokens are self-contained, this verification SHOULD be performed locally, without a synchronous callout to the issuer per request;
    issuer keys SHOULD be cached and refreshed according to standard JWK Set practice.
@@ -499,7 +502,7 @@ A bot manager sits inline in the request path to make per-request admission deci
 
 KYAPay tokens transform this detection model into a self-identification model. By presenting a valid KYA token, an agent explicitly identifies itself as automated up front. The bot manager verifies the token -- checking the cryptographic signature against the issuer's published keys, issuer trust, validity window, and audience -- and classifies the request as a verified agent.
 
-For token-bearing traffic, the identification question is settled: the bot manager does not need to execute its behavioral or fingerprinting detection heuristics to prove the request is automated. Untokened or unverifiable requests fall back to the standard detection pipeline.
+For token-bearing traffic, the identification question is settled: the bot manager does not need to execute its behavioral or fingerprinting detection heuristics to prove the request is automated. Requests that carry no token fall back to the standard detection pipeline; a request whose token fails validation is declined ({{ProcModel}}).
 
 Settling identification, however, does not grant automatic access. Identification is distinct from admission: classifying a request as a verified agent simply provides authenticated context. The bot manager uses the token's verified identity layer -- the human principal (`hid`), the agent platform (`apd`), and the agent instance (`aid`) -- to select and evaluate the site's configured access policy to determine the final disposition (admit, rate-limit, require step-up, or deny) rather than applying bot-blocking challenges designed for unattended, unattributed automation.
 
@@ -859,7 +862,7 @@ for their contributions to the specification.
 
 * Updated the traditional bot detection methods in the introduction
 * Updated the Bot Managers section and introduce the concept of feedback loop to the agent through an error response in case of token assessment failure
-* Added the `Accept-KYAPay-Token` response field, replaced Step-Up Authentication with Responding When a Token Falls Short (403, or 402 for payment; not 401), and changed the Bot Managers error examples to match.
+* Added the `Accept-KYAPay-Token` response field, replaced Step-Up Authentication with Responding When a Token Falls Short (403, or 402 for payment; not 401), changed the Bot Managers error examples to match, and made a recipient decide from its own policy whether it uses tokens for a request and decline the request when a token it uses fails validation, rather than treat it as carrying no token.
 
 -01
 
