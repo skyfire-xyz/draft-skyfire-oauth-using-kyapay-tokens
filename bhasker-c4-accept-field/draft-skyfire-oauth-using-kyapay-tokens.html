@@ -1846,7 +1846,8 @@ The trusted-issuer set is configured out of band and is not derived from the tok
 </li>
           <li id="section-6.1-2.3">
             <p id="section-6.1-2.3.1"><span class="bcp14">MUST</span> validate each token as specified in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, Section 4.
-A token that fails validation <span class="bcp14">MUST NOT</span> be treated as conveying a human presence signal, and the intermediary <span class="bcp14">MUST</span> decline the request as described in <a href="#StepUp" class="auto internal xref">Section 6.5</a>, rather than applying its policy for requests that carry no token.<a href="#section-6.1-2.3.1" class="pilcrow">¶</a></p>
+A token that fails validation <span class="bcp14">MUST NOT</span> be treated as conveying a human presence signal, and the intermediary <span class="bcp14">MUST</span> decline what it governs for that request, rather than applying its policy for requests that carry no token: a bot manager blocks the request, a fraud manager declines the transaction, an ATO protector blocks the sign-in, a CIAM system refuses the account action or token exchange, and a payment service does not proceed with the payment.
+Where the decline is returned to the agent in an HTTP response, that response is as described in <a href="#StepUp" class="auto internal xref">Section 6.5</a>.<a href="#section-6.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.4">
             <p id="section-6.1-2.4.1"><span class="bcp14">MUST</span> verify the token signature against a key obtained from the issuer's JWK Set, discovered via the <code>iss</code> claim using the <code>/.well-known/jwks.json</code> mechanism (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>).
@@ -2027,7 +2028,8 @@ the token supplements, and does not replace, those signals.<a href="#section-6.4
         </h3>
 <p id="section-6.5-1">A recipient can decline a request because it carries no KYAPay token, because the token fails validation (<a href="#ProcModel" class="auto internal xref">Section 6.1</a>), or because the token is valid but does not carry what the action requires: for example identity claims, a higher assurance level for a sensitive action, or a payment token.
 Not all actions carry the same risk; viewing a loyalty balance is far less sensitive than making a large payment, and a token attests only the assurance established when it was issued.<a href="#section-6.5-1" class="pilcrow">¶</a></p>
-<p id="section-6.5-2">In each case the recipient responds with 403 (Forbidden), or with 402 (Payment Required) where what is missing or insufficient is payment, and <span class="bcp14">SHOULD</span> include the <code>Accept-KYAPay-Token</code> field (<a href="#AcceptField" class="auto internal xref">Section 5.5</a>) stating what a request needs in order to succeed.
+<p id="section-6.5-2">Where the decline is returned to the agent in an HTTP response, that response is 403 (Forbidden), or 402 (Payment Required) where what is missing or insufficient is payment, and <span class="bcp14">SHOULD</span> include the <code>Accept-KYAPay-Token</code> field (<a href="#AcceptField" class="auto internal xref">Section 5.5</a>) stating what a request needs in order to succeed.
+Over other interfaces (<a href="#OtherInterfaces" class="auto internal xref">Section 5.3</a>), how a decline is signalled is left to the binding for that interface.
 A recipient <span class="bcp14">SHOULD NOT</span> use 401 (Unauthorized) for these cases: that status requires a <code>WWW-Authenticate</code> challenge (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-15.5.2" class="relref">Section 15.5.2</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>), and a KYAPay token is not an <code>Authorization</code> credential.
 A recipient <span class="bcp14">MAY</span> describe the reason in a problem details body <span>[<a href="#RFC9457" class="cite xref">RFC9457</a>]</span>.<a href="#section-6.5-2" class="pilcrow">¶</a></p>
 <p id="section-6.5-3">An agent that receives such a response can compare it with what it sent.
@@ -2622,7 +2624,7 @@ for their contributions to the specification.<a href="#appendix-A-2" class="pilc
           <p id="appendix-B-3.2.1">Updated the Bot Managers section and introduce the concept of feedback loop to the agent through an error response in case of token assessment failure<a href="#appendix-B-3.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-B-3.3">
-          <p id="appendix-B-3.3.1">Added the <code>Accept-KYAPay-Token</code> response field, replaced Step-Up Authentication with Responding When a Token Falls Short (403, or 402 for payment; not 401), changed the Bot Managers error examples to match, and made a recipient decide from its own policy whether it uses tokens for a request and decline the request when a token it uses fails validation, rather than treat it as carrying no token.<a href="#appendix-B-3.3.1" class="pilcrow">¶</a></p>
+          <p id="appendix-B-3.3.1">Added the <code>Accept-KYAPay-Token</code> response field, replaced Step-Up Authentication with Responding When a Token Falls Short (over HTTP, 403, or 402 for payment; not 401), changed the Bot Managers error examples to match, and made a recipient decide from its own policy whether it uses tokens for a request and decline, within its role, a request whose token fails validation, rather than treat it as carrying no token.<a href="#appendix-B-3.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="appendix-B-4">-01<a href="#appendix-B-4" class="pilcrow">¶</a></p>

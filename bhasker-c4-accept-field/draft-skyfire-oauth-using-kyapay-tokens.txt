@@ -723,9 +723,14 @@ Table of Contents
    3.  MUST validate each token as specified in
        [I-D.skyfire-oauth-kyapay-token], Section 4.  A token that fails
        validation MUST NOT be treated as conveying a human presence
-       signal, and the intermediary MUST decline the request as
-       described in Section 6.5, rather than applying its policy for
-       requests that carry no token.
+       signal, and the intermediary MUST decline what it governs for
+       that request, rather than applying its policy for requests that
+       carry no token: a bot manager blocks the request, a fraud manager
+       declines the transaction, an ATO protector blocks the sign-in, a
+       CIAM system refuses the account action or token exchange, and a
+       payment service does not proceed with the payment.  Where the
+       decline is returned to the agent in an HTTP response, that
+       response is as described in Section 6.5.
 
    4.  MUST verify the token signature against a key obtained from the
        issuer's JWK Set, discovered via the iss claim using the /.well-
@@ -980,14 +985,16 @@ Table of Contents
    payment, and a token attests only the assurance established when it
    was issued.
 
-   In each case the recipient responds with 403 (Forbidden), or with 402
-   (Payment Required) where what is missing or insufficient is payment,
-   and SHOULD include the Accept-KYAPay-Token field (Section 5.5)
-   stating what a request needs in order to succeed.  A recipient SHOULD
-   NOT use 401 (Unauthorized) for these cases: that status requires a
-   WWW-Authenticate challenge (Section 15.5.2 of [RFC9110]), and a
-   KYAPay token is not an Authorization credential.  A recipient MAY
-   describe the reason in a problem details body [RFC9457].
+   Where the decline is returned to the agent in an HTTP response, that
+   response is 403 (Forbidden), or 402 (Payment Required) where what is
+   missing or insufficient is payment, and SHOULD include the Accept-
+   KYAPay-Token field (Section 5.5) stating what a request needs in
+   order to succeed.  Over other interfaces (Section 5.3), how a decline
+   is signalled is left to the binding for that interface.  A recipient
+   SHOULD NOT use 401 (Unauthorized) for these cases: that status
+   requires a WWW-Authenticate challenge (Section 15.5.2 of [RFC9110]),
+   and a KYAPay token is not an Authorization credential.  A recipient
+   MAY describe the reason in a problem details body [RFC9457].
 
    An agent that receives such a response can compare it with what it
    sent.  If it sent no token, or a token that was refused, it can
@@ -1627,12 +1634,12 @@ Document History
       token assessment failure
 
    *  Added the Accept-KYAPay-Token response field, replaced Step-Up
-      Authentication with Responding When a Token Falls Short (403, or
-      402 for payment; not 401), changed the Bot Managers error examples
-      to match, and made a recipient decide from its own policy whether
-      it uses tokens for a request and decline the request when a token
-      it uses fails validation, rather than treat it as carrying no
-      token.
+      Authentication with Responding When a Token Falls Short (over
+      HTTP, 403, or 402 for payment; not 401), changed the Bot Managers
+      error examples to match, and made a recipient decide from its own
+      policy whether it uses tokens for a request and decline, within
+      its role, a request whose token fails validation, rather than
+      treat it as carrying no token.
 
    -01
 
