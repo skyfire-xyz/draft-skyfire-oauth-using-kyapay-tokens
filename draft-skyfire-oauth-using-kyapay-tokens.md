@@ -415,9 +415,11 @@ Any kind of request may carry a `KYAPay-Token` field; whether it does, and which
 
 * A Target may rely on other hosts, such as its own hosts in other domains or vendors acting on its behalf.
   A request to such a host carries a token that names the Target in its audience claims ({{Counterparty}}) and carries the claims that apply to that host, which may include payment claims.
+  Where no claims are set for the host, the token carries only the base claims: `hid` limited to its `id` member and assurance claims, `apd`, and `aid` without `creation_ip`, with no payment claims.
   Where the claims for the host match those of the Target's token, the agent MAY send the Target's token.
 
 * A request to any other host SHOULD NOT carry a token.
+  If it does, the token MUST NOT carry more than the base claims.
 
 This applies however the token is attached. An agent that adds the field below the page, for example by browser-level header injection, applies these rules to each request according to its destination, because a page also sends requests to hosts that are neither the Target nor acting on its behalf.
 
@@ -576,7 +578,7 @@ KYAPay tokens let it separate three cases that previously looked alike: a direct
 * It SHOULD treat a validated KYAPay token, bound to its request per {{TrustStack}}, as evidence that a session is a human-initiated agentic session rather than an unattended attack, and SHOULD record that distinction for auditing.
 
 * When the agent needs to act within an existing account, the token MAY be exchanged for an OAuth access token using KYAPay Token Exchange {{I-D.skyfire-oauth-kyapay-token-exchange}} or OAuth 2.0 Token Exchange {{RFC8693}}.
-A Security Token Service, Identity Provider, or OAuth 2.0 {{RFC6749}} Authorization Server validates the KYA token, extracts principal claims such as the email address from `hid`, and issues an access token that the agent uses against the Target.
+A Security Token Service, Identity Provider, or OAuth 2.0 {{RFC6749}} Authorization Server validates the KYA token, extracts principal claims from `hid` (`hid.id`, and an email address or other identifier where the Target requested it), and issues an access token that the agent uses against the Target.
 
 * The access token resulting from such an exchange SHOULD be sender-constrained (for example, via DPoP {{RFC9449}} or mutual TLS {{RFC8705}}) rather than issued as a freely transferable bearer token, so that exchanging the KYA token does not simply reintroduce a replayable credential.
 
@@ -585,16 +587,33 @@ A Security Token Service, Identity Provider, or OAuth 2.0 {{RFC6749}} Authorizat
 * A valid token attests authorization at the moment of issuance, not continuous human control.
   An ATO protector SHOULD NOT assume that the human remains in control for the token's whole lifetime, SHOULD prefer short token lifetimes, and SHOULD apply step-up ({{StepUp}}) for sensitive actions.
 
+A KYAPay token attests the identity of the principal who authorized the agent.
+It does not convey authority over any account at the Target.
+An ATO protector MUST NOT treat a validated token, on its own, as evidence that the session is authorized for the account it is acting on.
+
+Where a KYAPay token is presented to gain access to an account (at sign-in, at account creation, or when the token is exchanged for an access token as described above), a recipient SHOULD check that the token's principal is linked to that account.
+The principal is linked when the account already records the token's `hid.id`, or when a verified identifier in `hid` matches the corresponding identifier registered on the account.
+A match is a strong positive signal that the agent is acting within its own principal's account, and a recipient MAY weight it accordingly.
+A mismatch SHOULD be treated as grounds for step-up ({{StepUp}}) rather than as conclusive.
+Because an issuer asserts an identifier only where it has verified that the principal controls it, a match is evidence of control rather than of mere knowledge.
+
 ## CIAM Systems
 
 A CIAM system manages account creation and login for a Target's customers.
 With KYAPay tokens it can manage agents consistently with humans:
 
-* It MAY create an account for an agent (or for the human principal behind an agent) directly from a validated KYA or KYA-PAY token, drawing account attributes such as the email address from the `hid` claim.
+* It MAY create an account for an agent (or for the human principal behind an agent) directly from a validated KYA or KYA-PAY token, drawing account attributes from the `hid` claim, such as an email address where the CIAM system requested it.
 
 * It SHOULD use KYAPay Token Exchange {{I-D.skyfire-oauth-kyapay-token-exchange}} or OAuth 2.0 Token Exchange {{RFC8693}} to exchange a KYA token for an access token, enabling logged-in experiences (loyalty, saved preferences, offers) for human-via-agent sessions, applying the sender-constraining and cross-domain-trust considerations of {{ATOProt}}.
 
 * It SHOULD maintain the linkage between a human principal and the agents authorized to act for them, so that a principal can be given visibility into, and control over, agent activity and vice versa.
+
+* A validated token identifies the principal who authorized the agent; it does not by itself convey authority over an existing account.
+  A CIAM system MAY create a new account from a validated token, in which case the token's principal is the account holder by construction, and it SHOULD record the token's `hid.id` against the account.
+  To admit an agent to an existing account, a CIAM system MUST additionally establish that the token's principal is linked to that account.
+  Any of the following is sufficient: the account already records the token's `hid.id`; a verified identifier in `hid` matches the corresponding attribute registered on the account; or an existing session for that account authenticated by other means.
+  A mismatch, or the absence of any link, SHOULD be treated as grounds for step-up ({{StepUp}}) rather than as conclusive.
+  A validated token alone MUST NOT be treated as sufficient.
 
 ## Consistency Across Layers
 
@@ -642,7 +661,9 @@ it then hands off to the human, who completes checkout in a browser, in a later 
 In such flows, the KYA token (carried without a PAY token) still provides the human presence signal that lets a security intermediary admit the agent's discovery and cart-building activity.
 Intermediaries SHOULD accept KYA-only requests (those conveying a KYA token but no PAY token) for actions that do not themselves settle a payment, and MUST NOT treat the absence of a PAY token as a reason to classify an otherwise valid human-via-agent request as a bot.
 
-Because the human identity claim `hid` (for example, an email address) is stable across these touchpoints, a Target or fraud manager MAY link the agent's earlier work to the human's eventual purchase -- for attribution, personalization, and fraud analysis -- even when the purchase completes outside the agent session or on a different channel.
+Because `hid.id` is stable for the human principal at a Target service, a Target or its fraud manager MAY link the agent's earlier work at that service to the principal's eventual purchase there, for attribution, personalization and fraud analysis.
+`hid.id`, `sub` and `aid.id` differ at every other Target service ({{I-D.skyfire-oauth-kyapay-token}}).
+Linking to a purchase completed outside the agent session, or on a different channel, needs an identifier available in both places, such as an email address, which a token carries only where the Target requested it and the principal authorized its disclosure.
 
 # Token Creation Considerations {#TokCreat}
 
@@ -774,6 +795,8 @@ In particular:
 
 Only the information needed to facilitate the intended interaction should be placed in a token and conveyed to intermediaries and Targets.
 Issuers and senders SHOULD prefer the least revealing set of claims sufficient for the decision at hand -- for example, an assurance level or a boolean verified status rather than underlying identity documents or personally identifying verification data.
+For example, a bot manager deciding whether to admit a request to browse a catalog needs no identifying claim: `sub` and `hid.id` let it rate-limit and recognize a returning principal at that Target service, and the assurance claims in `hid` say how strongly the principal was verified.
+By default a token identifies the principal only by `hid.id` ({{I-D.skyfire-oauth-kyapay-token}}); identifying claims are added only where a Target requires them for the action at hand.
 Because KYA tokens are JWTs, selective disclosure (for example, SD-JWT {{RFC9901}}) is a forward-compatible path to revealing only the claims a given Target needs.
 
 ## Consent
@@ -833,6 +856,7 @@ for their contributions to the specification.
 * Updated the traditional bot detection methods in the introduction
 * Updated the Bot Managers section and introduce the concept of feedback loop to the agent through 401 status code in case of token assessment failure
 * Added Attaching Tokens to Requests, scoped the zero-tech-lift principle to agents that control a request's header fields, and added CORS preflight and caching requirements.
+* Used `hid.id` for account binding at ATO protectors and CIAM systems, defined the base claims for hosts with no claims set, made linkage per Target service, and added a minimal-disclosure example.
 
 -01
 
