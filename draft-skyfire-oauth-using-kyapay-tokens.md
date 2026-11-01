@@ -69,6 +69,7 @@ informative:
   RFC8705: # OAuth 2.0 Mutual-TLS
   RFC8792: # Line wrapping in examples
   RFC9457: # Problem Details
+  RFC9470: # OAuth 2.0 Step Up Authentication Challenge
   RFC9449: # DPoP
   RFC9901: # SD-JWT
   I-D.skyfire-oauth-amr-values:
@@ -521,7 +522,7 @@ A bearer token captured within its validity window can be replayed; a bot manage
 ### Token present but invalid
 
 In some cases, a KYA token may be present in the request but the validation process may reveal some anomalies.
-The bot manager then responds as described in {{StepUp}}, with 403 (Forbidden) and the `Accept-KYAPay-Token` field stating what a request needs in order to succeed.
+The bot manager then responds as described in {{StepUp}}, with 403 (Forbidden), and can include the `Accept-KYAPay-Token` field stating what a request needs in order to succeed.
 
 In the examples in this section and the next, the `issuers` parameter ({{AcceptField}}) lists the issuers from which the bot manager accepts tokens, and a problem details body {{RFC9457}} gives the reason.
 This document does not define those problem types; they are examples for discussion only.
@@ -582,10 +583,11 @@ the token supplements, and does not replace, those signals.
 A recipient can decline a request because it carries no KYAPay token, because the token fails validation ({{ProcModel}}), or because the token is valid but does not carry what the action requires: for example identity claims, a higher assurance level for a sensitive action, or a payment token.
 Not all actions carry the same risk; viewing a loyalty balance is far less sensitive than making a large payment, and a token attests only the assurance established when it was issued.
 
-Where the decline is returned to the agent in an HTTP response, that response is 403 (Forbidden), or 402 (Payment Required) where what is missing or insufficient is payment, and SHOULD include the `Accept-KYAPay-Token` field ({{AcceptField}}) stating what a request needs in order to succeed.
-Over other interfaces ({{OtherInterfaces}}), how a decline is signalled is left to the binding for that interface.
+Where the decline is returned to the agent in an HTTP response, that response is 403 (Forbidden), or 402 (Payment Required) where what is missing or insufficient is payment, and MAY include the `Accept-KYAPay-Token` field ({{AcceptField}}) stating what a request needs in order to succeed ({{DisclosingRequirements}}).
+Where the request is to an endpoint whose protocol specifies its own error responses, the recipient instead responds as that protocol specifies, and MAY include the `Accept-KYAPay-Token` field; for example, an OAuth 2.0 authorization server that declines a token exchange responds as specified in {{Section 2.2.2 of RFC8693}}.
+Over other interfaces ({{OtherInterfaces}}), how a decline is signaled is left to the binding for that interface.
 A recipient SHOULD NOT use 401 (Unauthorized) for these cases: that status requires a `WWW-Authenticate` challenge ({{Section 15.5.2 of RFC9110}}), and a KYAPay token is not an `Authorization` credential.
-A recipient MAY describe the reason in a problem details body {{RFC9457}}.
+A recipient MAY describe the reason in a problem details body {{RFC9457}} ({{DisclosingRequirements}}).
 
 An agent that receives such a response can compare it with what it sent.
 If it sent no token, or a token that was refused, it can obtain a new token and retry.
@@ -791,6 +793,22 @@ Recipients SHOULD treat high-value actions as warranting step-up ({{StepUp}}) ra
 If an issuer or platform rotates a signing key, tokens signed with the old key may fail validation prematurely.
 Issuers SHOULD retain superseded verification keys in their JWK Set for at least the maximum token lifetime after rotation.
 
+## Disclosing Requirements {#DisclosingRequirements}
+
+The `Accept-KYAPay-Token` field ({{AcceptField}}) and any problem details a recipient returns ({{StepUp}}) tell the sender what the recipient requires.
+That helps a legitimate agent obtain a suitable token, and it also reaches anyone else who sends a request.
+How much to state is a decision for the recipient, in light of its own risk:
+
+* It can omit the field, state only some of its requirements, or leave out the `issuers` parameter, which names the issuers it accepts.
+
+* It can instead publish its requirements in advance, or agree them with initiators out of band.
+
+* Requirements that differ by principal, by account, or by the outcome of a risk assessment can reveal those facts, for example which accounts are of high value or that a request has been flagged ({{Section 9 of RFC9470}} describes the same risk for authentication requirements).
+
+* Saying which validation check a token failed can help an attacker probe the recipient; a generic reason avoids this ({{Section 5 of RFC9457}}).
+
+Stating requirements does not weaken the token itself: a request still succeeds only with a token signed by an issuer the recipient trusts.
+
 # Privacy Considerations {#PrivCon}
 
 The privacy considerations of {{I-D.skyfire-oauth-kyapay-token}} apply.
@@ -864,7 +882,7 @@ for their contributions to the specification.
 
 * Updated the traditional bot detection methods in the introduction
 * Updated the Bot Managers section and introduce the concept of feedback loop to the agent through an error response in case of token assessment failure
-* Added the `Accept-KYAPay-Token` response field, replaced Step-Up Authentication with Responding When a Token Falls Short (over HTTP, 403, or 402 for payment; not 401), changed the Bot Managers error examples to match, and made a recipient decide from its own policy whether it uses tokens for a request and decline, within its role, a request whose token fails validation, rather than treat it as carrying no token.
+* Added the `Accept-KYAPay-Token` response field, which a recipient MAY send, replaced Step-Up Authentication with Responding When a Token Falls Short (over HTTP, 403, or 402 for payment, unless the protocol in use specifies its own errors; not 401), changed the Bot Managers error examples to match, made a recipient decide from its own policy whether it uses tokens for a request and decline, within its role, a request whose token fails validation, rather than treat it as carrying no token, and added Disclosing Requirements.
 
 -01
 
