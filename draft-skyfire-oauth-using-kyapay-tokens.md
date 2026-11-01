@@ -395,7 +395,7 @@ In all cases, the validation and usage rules of {{SecInt}} apply to the token, o
 
 The `aud` and `tsi` claims are identifiers assigned by the Token Issuer (the Identifying the Target section of {{I-D.skyfire-oauth-kyapay-token}}); their values are known to a Target that has onboarded to that issuer and are not otherwise discoverable.
 The `tdm` claim names the Target's domain, is not issuer-specific, and requires no relationship with the issuer to interpret.
-A Target that has onboarded to an issuer MAY check any of the three, and a security intermediary acting for such a Target MAY be configured with that Target's `aud` and `tsi` values and check them.
+A Target that has onboarded to an issuer checks `aud` and `tsi`, and MAY also check `tdm`; a security intermediary acting for such a Target MAY be configured with that Target's `aud` and `tsi` values and check them.
 A recipient that has not onboarded, including a security intermediary acting for many Targets, SHOULD check at least that `tdm` names the domain it is protecting for that request; where `tdm` also names a host or a path, the recipient MAY check those too.
 `tdm` MUST be present in tokens whose Target is identified by a domain name.
 At the transport and discovery layers, mechanisms such as DNS domain names (with TLS server authentication), A2A agent cards {{A2A}}, and MCP server identification {{MCP}} help an agent confirm that it is communicating with the correct counterparty before presenting a token.
