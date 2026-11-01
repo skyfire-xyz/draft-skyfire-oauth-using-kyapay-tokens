@@ -1028,15 +1028,14 @@ Table of Contents
    sign-in, at account creation, or when the token is exchanged for an
    access token as described above), a recipient SHOULD check that the
    token's principal is linked to that account.  The principal is linked
-   when the account already records the token's hid.id, or when a
-   verified identifier in hid matches the corresponding identifier
-   registered on the account.  A match is a strong positive signal that
-   the agent is acting within its own principal's account, and a
-   recipient MAY weight it accordingly.  A mismatch SHOULD be treated as
-   grounds for step-up (Section 6.5) rather than as conclusive.  Because
-   an issuer asserts an identifier only where it has verified that the
-   principal controls it, a match is evidence of control rather than of
-   mere knowledge.
+   when the account already records the token's iss and hid.id, or when
+   a verified identifier in hid matches one the account records as
+   verified.  A match is a strong positive signal that the agent is
+   acting within its own principal's account, and a recipient MAY weight
+   it accordingly.  A mismatch SHOULD be treated as grounds for step-up
+   (Section 6.5) rather than as conclusive.  Because an issuer asserts
+   an identifier only where it has verified that the principal controls
+   it, a match is evidence of control rather than of mere knowledge.
 
 6.7.  CIAM Systems
 
@@ -1065,17 +1064,16 @@ Table of Contents
       agent; it does not by itself convey authority over an existing
       account.  A CIAM system MAY create a new account from a validated
       token, in which case the token's principal is the account holder
-      by construction, and it SHOULD record the token's hid.id against
-      the account.  To admit an agent to an existing account, a CIAM
-      system MUST additionally establish that the token's principal is
-      linked to that account.  Any of the following is sufficient: the
-      account already records the token's hid.id; a verified identifier
-      in hid matches the corresponding attribute registered on the
-      account; or an existing session for that account authenticated by
-      other means.  A mismatch, or the absence of any link, SHOULD be
-      treated as grounds for step-up (Section 6.5) rather than as
-      conclusive.  A validated token alone MUST NOT be treated as
-      sufficient.
+      by construction, and it SHOULD record the token's iss and hid.id
+      against the account.  To admit an agent to an existing account, a
+      CIAM system MUST additionally establish that the token's principal
+      is linked to that account.  Any of the following is sufficient:
+      the account already records the token's iss and hid.id; a verified
+      identifier in hid matches one the account records as verified; or
+      an existing session for that account authenticated by other means.
+      A mismatch, or the absence of any link, SHOULD be treated as
+      grounds for step-up (Section 6.5) rather than as conclusive.  A
+      validated token alone MUST NOT be treated as sufficient.
 
 6.8.  Consistency Across Layers
 
