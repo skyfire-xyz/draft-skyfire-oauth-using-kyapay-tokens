@@ -1252,6 +1252,17 @@ the token itself is the interoperability contract.<a href="#section-abstract-1" 
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
                 <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-bot-managers" class="internal xref">Bot Managers</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.1">
+                    <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1" class="auto internal xref">6.3.1</a>.  <a href="#name-token-is-present-and-valid" class="internal xref">Token is present and valid</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.2">
+                    <p id="section-toc.1-1.6.2.3.2.2.1"><a href="#section-6.3.2" class="auto internal xref">6.3.2</a>.  <a href="#name-token-present-but-invalid" class="internal xref">Token present but invalid</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.3">
+                    <p id="section-toc.1-1.6.2.3.2.3.1"><a href="#section-6.3.3" class="auto internal xref">6.3.3</a>.  <a href="#name-token-not-present" class="internal xref">Token not present</a></p>
+</li>
+                </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
                 <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-fraud-managers" class="internal xref">Fraud Managers</a></p>
@@ -1376,8 +1387,8 @@ the token itself is the interoperability contract.<a href="#section-abstract-1" 
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">Legitimate automated traffic acting on behalf of users is a long-standing feature of the web. Financial aggregation tools, automated booking agents, and data synchronizers routinely interact with web services at the direction of their subscribers. To prevent legitimate automation from being blocked by defenses designed to detect malicious bots, security intermediaries have traditionally relied on static network metadata -- including published IP ranges, Autonomous System Numbers (ASNs), and User-Agent strings -- to identify bots and apply configured policies.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">This network-level model identifies bots primarily by associating their traffic with a known operator or network. However, its verification mechanisms are brittle: User-Agent headers are easily forged, IP ranges change across cloud providers and shared egress infrastructure, and network metadata cannot establish which individual subscriber authorized a particular request. The result is that network-level bot identification can establish where automated traffic comes from, but not which principal it is acting for.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-1">Legitimate automated traffic acting on behalf of users is a long-standing feature of the web. Financial aggregation tools, automated booking agents, and data synchronizers routinely interact with web services at the direction of their subscribers. To prevent legitimate automation from being blocked by defenses designed to detect malicious bots, security intermediaries have traditionally relied on a combination of static network metadata -- including published IP ranges, Autonomous System Numbers (ASNs), HTTP header name/value pairs, use of a specific header name, or matching keyword in the User-Agent strings -- to identify bots that serve a legitimate and valuable purpose and apply configured policies.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">This model identifies bots primarily by associating their traffic with a known operator, network, and/or an HTTP header signature.  However, its verification mechanisms are brittle: HTTP headers are easily forged, IP ranges change across cloud providers and shared egress infrastructure, and network metadata cannot establish which individual subscriber authorized a particular request. Worst yet, not all legitimate bots identify themselves through these methods, resulting in traffic being blocked by security intermediaries running a bot detection layer. Traditional bot identification can only approximately establish where automated traffic comes from, but not which principal it is acting for.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">The rise of capable AI agents makes this limitation more significant. An account aggregation service reimplemented as an LLM-orchestrated agent may perform the same task for the same subscriber, but through dynamic execution flows. The relevant distinction is therefore not simply between human and automated traffic, but between:<a href="#section-1-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1-4.1">
@@ -1859,24 +1870,83 @@ A recipient <span class="bcp14">MAY</span> combine the token signal with its exi
 <a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-bot-managers" class="section-name selfRef">Bot Managers</a>
         </h3>
 <p id="section-6.3-1">A bot manager sits inline in the request path to make per-request admission decisions with minimal added latency. Traditionally, it relies on a detection pipeline -- client-side behavioral telemetry, browser fingerprinting, request timing, and network-signal analysis -- to infer whether a request is automated and who operates it.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
-<p id="section-6.3-2">KYAPay tokens transform this detection model into a self-identification model. By presenting a valid KYA token, an agent explicitly identifies itself as automated up front. The bot manager verifies the token -- checking the cryptographic signature against the issuer's published keys, issuer trust, validity window, and audience -- and classifies the request as a verified agent.<a href="#section-6.3-2" class="pilcrow">¶</a></p>
-<p id="section-6.3-3">For token-bearing traffic, the identification question is settled: the bot manager does not need to execute its behavioral or fingerprinting detection heuristics to prove the request is automated. Untokened or unverifiable requests fall back to the standard detection pipeline.<a href="#section-6.3-3" class="pilcrow">¶</a></p>
-<p id="section-6.3-4">Settling identification, however, does not grant automatic access. Identification is distinct from admission: classifying a request as a verified agent simply provides authenticated context. The bot manager uses the token's verified identity layer -- the human principal (<code>hid</code>), the agent platform (<code>apd</code>), and the agent instance (<code>aid</code>) -- to select and evaluate the site's configured access policy to determine the final disposition (admit, rate-limit, require step-up, or deny) rather than applying bot-blocking challenges designed for unattended, unattributed automation.<a href="#section-6.3-4" class="pilcrow">¶</a></p>
-<p id="section-6.3-5">KYAPay tokens are well-suited to inline bot management for several reasons:<a href="#section-6.3-5" class="pilcrow">¶</a></p>
+<div id="token-is-present-and-valid">
+<section id="section-6.3.1">
+          <h4 id="name-token-is-present-and-valid">
+<a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-token-is-present-and-valid" class="section-name selfRef">Token is present and valid</a>
+          </h4>
+<p id="section-6.3.1-1">KYAPay tokens transform this detection model into a self-identification model. By presenting a valid KYA token, an agent explicitly identifies itself as automated up front. The bot manager verifies the token -- checking the cryptographic signature against the issuer's published keys, issuer trust, validity window, and audience -- and classifies the request as a verified agent.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-2">For token-bearing traffic, the identification question is settled: the bot manager does not need to execute its behavioral or fingerprinting detection heuristics to prove the request is automated. Untokened or unverifiable requests fall back to the standard detection pipeline.<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-3">Settling identification, however, does not grant automatic access. Identification is distinct from admission: classifying a request as a verified agent simply provides authenticated context. The bot manager uses the token's verified identity layer -- the human principal (<code>hid</code>), the agent platform (<code>apd</code>), and the agent instance (<code>aid</code>) -- to select and evaluate the site's configured access policy to determine the final disposition (admit, rate-limit, require step-up, or deny) rather than applying bot-blocking challenges designed for unattended, unattributed automation.<a href="#section-6.3.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-4">KYAPay tokens are well-suited to inline bot management for several reasons:<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.3-6.1">
-            <p id="section-6.3-6.1.1"><strong>Low Latency.</strong>
-Because the token is a self-contained, signed JWT, the bot manager performs standard JWT verification locally and needs no per-request callout to a third party. Issuer keys <span class="bcp14">SHOULD</span> be cached.<a href="#section-6.3-6.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.3.1-5.1">
+              <p id="section-6.3.1-5.1.1"><strong>Low Latency.</strong>
+Because the token is a self-contained, signed JWT, the bot manager performs standard JWT verification locally and needs no per-request callout to a third party. Issuer keys <span class="bcp14">SHOULD</span> be cached.<a href="#section-6.3.1-5.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-6.3-6.2">
-            <p id="section-6.3-6.2.1"><strong>Policy Selection via Identity Context.</strong>
-A validated token provides verified initiator identity (and, when targeting an agent, target identity), which the bot manager uses to select and evaluate the appropriate site policy rather than treating the traffic as suspected automation. By contrast, network-origin claims (such as declared source IP ranges) are unreliable as proof of origin -- addresses change and can be masked by VPNs, CGNAT, or shared pools -- so a recipient <span class="bcp14">MAY</span> use them as a weak corroborating signal only, but <span class="bcp14">MUST NOT</span> treat an IP match alone as sufficient to bypass controls nor an IP mismatch as conclusive. Short lifetimes, audience binding, and proof-of-possession (<a href="#TrustStack" class="auto internal xref">Section 4</a>), not IP correlation, are the recommended controls against token misuse.<a href="#section-6.3-6.2.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-6.3.1-5.2">
+              <p id="section-6.3.1-5.2.1"><strong>Policy Selection via Identity Context.</strong>
+A validated token provides verified initiator identity (and, when targeting an agent, target identity), which the bot manager uses to select and evaluate the appropriate site policy rather than treating the traffic as suspected automation. By contrast, network-origin claims (such as declared source IP ranges) are unreliable as proof of origin -- addresses change and can be masked by VPNs, CGNAT, or shared pools -- so a recipient <span class="bcp14">MAY</span> use them as a weak corroborating signal only, but <span class="bcp14">MUST NOT</span> treat an IP match alone as sufficient to bypass controls nor an IP mismatch as conclusive. Short lifetimes, audience binding, and proof-of-possession (<a href="#TrustStack" class="auto internal xref">Section 4</a>), not IP correlation, are the recommended controls against token misuse.<a href="#section-6.3.1-5.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-6.3-6.3">
-            <p id="section-6.3-6.3.1"><strong>Replay Resistance.</strong>
-A bearer token captured within its validity window can be replayed; a bot manager bounds this with short lifetimes, audience binding, and TLS (<a href="#SecCon" class="auto internal xref">Section 8</a>). Where a token carries a proof-of-possession key (<a href="#TrustStack" class="auto internal xref">Section 4</a>), the bot manager (or the edge/CDN provider acting for the Target) <span class="bcp14">SHOULD</span> additionally verify the per-request signature <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> against that key, which removes in-window replay exposure.<a href="#section-6.3-6.3.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-6.3.1-5.3">
+              <p id="section-6.3.1-5.3.1"><strong>Replay Resistance.</strong>
+A bearer token captured within its validity window can be replayed; a bot manager bounds this with short lifetimes, audience binding, and TLS (<a href="#SecCon" class="auto internal xref">Section 8</a>). Where a token carries a proof-of-possession key (<a href="#TrustStack" class="auto internal xref">Section 4</a>), the bot manager (or the edge/CDN provider acting for the Target) <span class="bcp14">SHOULD</span> additionally verify the per-request signature <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> against that key, which removes in-window replay exposure.<a href="#section-6.3.1-5.3.1" class="pilcrow">¶</a></p>
 </li>
-        </ul>
+          </ul>
+</section>
+</div>
+<div id="token-present-but-invalid">
+<section id="section-6.3.2">
+          <h4 id="name-token-present-but-invalid">
+<a href="#section-6.3.2" class="section-number selfRef">6.3.2. </a><a href="#name-token-present-but-invalid" class="section-name selfRef">Token present but invalid</a>
+          </h4>
+<p id="section-6.3.2-1">The error responses in this section and the next are examples for discussion only.
+The status code and the syntax for reporting these errors have not been decided.<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-2">In some cases, a KYA token may be present in the request but the validation process may reveal some anomalies.<a href="#section-6.3.2-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.3.2-3.1">
+              <p id="section-6.3.2-3.1.1"><strong>Token expired</strong>
+Because tokens have a short validity window, a bot manager may occasionally detect a token that expires during the validation process. In this scenario, the bot manager must return an HTTP 401 Unauthorized response. This response must include a WWW-Authenticate header specifying the reason for the authorization failure, along with a space-separated list of authorized token issuers where a valid token can be requested.<a href="#section-6.3.2-3.1.1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-6.3.2-3.1.2">
+<pre>
+  `WWW-Authenticate: KYAPay error="expired_token", error_description="Retrieve a new token a KYA Token issuer", issuer="https://issuer.example.com https://iss.example.org"`
+</pre><a href="#section-6.3.2-3.1.2" class="pilcrow">¶</a>
+</div>
+</li>
+            <li class="normal" id="section-6.3.2-3.2">
+              <p id="section-6.3.2-3.2.1"><strong>Token invalid</strong>
+Some anomalies may be detected when validating the token as described in section 6.1 and 6.2. The bot manager should return a HTTP 401 - Unauthorized status code including a WWW-Authenticate header in the response with the reason for the unauthorized access and a space-separated list of authorized token issuers where a valid token can be requested.<a href="#section-6.3.2-3.2.1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-6.3.2-3.2.2">
+<pre>
+  `WWW-Authenticate: KYAPay error="invalid_token", error_description="A valid KYA token is required", issuer="https://issuer.example.com https://iss.example.org"`
+</pre><a href="#section-6.3.2-3.2.2" class="pilcrow">¶</a>
+</div>
+</li>
+          </ul>
+</section>
+</div>
+<div id="token-not-present">
+<section id="section-6.3.3">
+          <h4 id="name-token-not-present">
+<a href="#section-6.3.3" class="section-number selfRef">6.3.3. </a><a href="#name-token-not-present" class="section-name selfRef">Token not present</a>
+          </h4>
+<p id="section-6.3.3-1">Organizations and individuals developing AI agents may be unaware of the requirement to identify their traffic using a Know Your Agent (KYA) token. Consequently, bot managers utilizing advanced detection methods may misclassify this agentic traffic as malicious and block it. To prevent a degraded user experience, which can lead to lost business opportunities for the host website—bot managers should issue a custom challenge response instead of an outright block. This proactive approach gently encourages developers to adopt and implement the KYA standard.<a href="#section-6.3.3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.3.3-2.1">
+              <p id="section-6.3.3-2.1.1">When a bot manager detects advanced automation that lacks a Know Your Agent (KYA) token or other standard forms of identification, the detection engine should return an HTTP 401 Unauthorized response including a WWW-Authenticate header in the response with the reason for the unauthorized access and a space-separated list of authorized token issuers where a valid token can be requested.<a href="#section-6.3.3-2.1.1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-6.3.3-2.1.2">
+<pre>
+  `WWW-Authenticate: KYAPay error="missing_token", error_description="A valid KYA token is required", issuer="https://issuer.example.com https://iss.example.org"`
+</pre><a href="#section-6.3.3-2.1.2" class="pilcrow">¶</a>
+</div>
+</li>
+            <li class="normal" id="section-6.3.3-2.2">
+              <p id="section-6.3.3-2.2.1">After the agent acquires a valid KYA token and reissues the request, the transaction can complete successfully.<a href="#section-6.3.3-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-6.3.3-3">This light challenge is designed to help with KYA standard adoption and improve agentic traffic acceptance with merchants and increase agent autonomy in successfully completing tasks on behalf of their user principal.<a href="#section-6.3.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="fraud-managers">
@@ -2459,8 +2529,10 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
       </h2>
 <p id="appendix-A-1">The authors thank the contributors to the KYAPay Token <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span> specification and the partners in the KYAPay consortium (see <span>[<a href="#KYAPAY-ORG" class="cite xref">KYAPAY-ORG</a>]</span>) -- including bot-management, fraud, CIAM, and ATO vendors and merchants -- whose deployment and review experience informed the usage patterns and open issues described here.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 <p id="appendix-A-2">We would like to thank
+David Senecal
+and
 Jean Diaconu
-for his contributions to the specification.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+for their contributions to the specification.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="document-history">
@@ -2469,22 +2541,31 @@ for his contributions to the specification.<a href="#appendix-A-2" class="pilcro
 <a href="#name-document-history" class="section-name selfRef">Document History</a>
       </h2>
 <p id="appendix-B-1">[[ to be removed by the RFC Editor before publication as an RFC ]]<a href="#appendix-B-1" class="pilcrow">¶</a></p>
-<p id="appendix-B-2">-01<a href="#appendix-B-2" class="pilcrow">¶</a></p>
+<p id="appendix-B-2">-02<a href="#appendix-B-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-B-3.1">
-          <p id="appendix-B-3.1.1">Rewrote the Introduction to frame agents as an evolution of verified bot traffic.<a href="#appendix-B-3.1.1" class="pilcrow">¶</a></p>
+          <p id="appendix-B-3.1.1">Updated the traditional bot detection methods in the introduction<a href="#appendix-B-3.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-B-3.2">
-          <p id="appendix-B-3.2.1">Clarified the meaning of Verifier and differentiated from Recipient.<a href="#appendix-B-3.2.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="appendix-B-3.3">
-          <p id="appendix-B-3.3.1">Added {:vspace} syntax to definition list entries.<a href="#appendix-B-3.3.1" class="pilcrow">¶</a></p>
+          <p id="appendix-B-3.2.1">Updated the Bot Managers section and introduce the concept of feedback loop to the agent through 401 status code in case of token assessment failure<a href="#appendix-B-3.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="appendix-B-4">-00<a href="#appendix-B-4" class="pilcrow">¶</a></p>
+<p id="appendix-B-4">-01<a href="#appendix-B-4" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-B-5.1">
-          <p id="appendix-B-5.1.1">Initial draft.<a href="#appendix-B-5.1.1" class="pilcrow">¶</a></p>
+          <p id="appendix-B-5.1.1">Rewrote the Introduction to frame agents as an evolution of verified bot traffic.<a href="#appendix-B-5.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-5.2">
+          <p id="appendix-B-5.2.1">Clarified the meaning of Verifier and differentiated from Recipient.<a href="#appendix-B-5.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-5.3">
+          <p id="appendix-B-5.3.1">Added {:vspace} syntax to definition list entries.<a href="#appendix-B-5.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="appendix-B-6">-00<a href="#appendix-B-6" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B-7.1">
+          <p id="appendix-B-7.1.1">Initial draft.<a href="#appendix-B-7.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
