@@ -365,7 +365,7 @@ A recipient:
 * MUST determine the type of each token from its `typ` header parameter ({{I-D.skyfire-oauth-kyapay-token}}), not from its position;
 * MUST parse the field as a List {{RFC9651}}. A field that fails to parse fails as a whole, and a recipient MUST NOT attempt to recover individual members from it;
 * MUST reject the request if the field fails to parse, or if any member is not a Token whose value is a well-formed JWT. {{Section 4.2 of RFC9651}} permits either ignoring a field that fails to parse or treating the message as malformed; this document requires the latter; and
-* MUST accept List members as long as the field value it is required to accept ({{TokenSize}}).
+* MUST accept List members of up to the length given in {{TokenSize}}.
 
 Intermediaries and caches MUST treat `KYAPay-Token` as containing sensitive, request-specific credentials;
 it MUST NOT be cached in a way that would allow it to be replayed on a different request, and it MUST NOT be logged or forwarded to parties other than legitimate participants (see {{PrivCon}}).
