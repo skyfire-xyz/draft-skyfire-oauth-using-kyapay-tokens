@@ -706,8 +706,9 @@ Table of Contents
    recipient that does not MAY ignore the KYAPay-Token field.  A
    recipient that does, on receiving a request that carries one or more
    KYAPay tokens, processes the tokens of the types it accepts
-   ([I-D.skyfire-oauth-kyapay-token]) as follows, and MAY ignore tokens
-   of other types.  A security intermediary:
+   ([I-D.skyfire-oauth-kyapay-token]) as follows, and sets aside tokens
+   of other types ([I-D.skyfire-oauth-kyapay-token], Section 4).  A
+   security intermediary:
 
    1.  MUST extract each token as described in Section 5.
 
