@@ -5,10 +5,10 @@
 Web Authorization Protocol                                    A. Agarwal
 Internet-Draft                                      Skyfire Systems Inc.
 Intended status: Standards Track                             M. B. Jones
-Expires: 5 May 2027                               Self-Issued Consulting
+Expires: 6 May 2027                               Self-Issued Consulting
                                                                S. Thumma
                                                                   Akamai
-                                                         1 November 2026
+                                                         2 November 2026
 
 
                           Using KYAPay Tokens
@@ -69,7 +69,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 May 2027.
+   This Internet-Draft will expire on 6 May 2027.
 
 Copyright Notice
 
@@ -102,6 +102,7 @@ Table of Contents
      4.1.  KYA is an Issuer-Signed Bearer Token Today
      4.2.  Identity and Proof of Possession are Different Layers
      4.3.  The Proof-of-Possession Path (Planned Evolution)
+     4.4.  Request Signatures for Proof of Possession
    5.  Conveying KYAPay Tokens in Requests
      5.1.  The KYAPay-Token HTTP Header Field
      5.2.  Token Size
@@ -132,10 +133,11 @@ Table of Contents
      8.3.  Replay and Proof of Possession
      8.4.  Malicious or Compromised Target Reuse
      8.5.  Compromised Agent Host (Irreducible)
-     8.6.  Issuer Trust
-     8.7.  Revocation
-     8.8.  Continuity of Human Control
-     8.9.  Key Management
+     8.6.  Token Exposure in the Agent Runtime
+     8.7.  Issuer Trust
+     8.8.  Revocation
+     8.9.  Continuity of Human Control
+     8.10. Key Management
    9.  Privacy Considerations
      9.1.  Minimal Disclosure
      9.2.  Consent
@@ -275,7 +277,11 @@ Table of Contents
       An HTTP request or protocol message issued by an agent that
       carries a valid KYAPay token attesting that the agent is acting on
       behalf of an identified, authorizing human principal (an
-      individual or an organization).
+      individual or an organization).  The principal need not be present
+      at the time of the request: the agent may be acting on an
+      instruction given earlier, or on a standing authorization that the
+      agent itself triggers, for example on a price change or on a
+      schedule.
 
    *Bot*:
       Unattended automation that is not acting on behalf of, or with the
@@ -357,8 +363,9 @@ Table of Contents
    an agent at all.  The goal is therefore agentic access to the
    existing web, not a parallel, agent-only surface that must be set up
    in advance.  This goal can only be met if security intermediaries
-   admit legitimate human-via-agent requests by default when a valid
-   token is present.
+   admit legitimate human-via-agent requests without per-site setup when
+   a valid token is present and the verified identity it carries meets
+   the site's policy for the requested action (Section 6.3).
 
 3.3.  Works with Today's Web at Zero Merchant Tech Lift
 
@@ -431,8 +438,8 @@ Table of Contents
 
    *  short token lifetimes (exp), so a captured token expires quickly;
 
-   *  audience binding (aud, and where used tdm/tsi), so a token minted
-      for one Target cannot be presented to another;
+   *  audience binding (Section 5.4), so a token minted for one Target
+      cannot be presented to another;
 
    *  TLS on every hop, which mitigates on-the-wire capture and man-in-
       the-middle; and
@@ -443,6 +450,14 @@ Table of Contents
 
    The accepted residual threats, and the irreducible ones, are stated
    in Section 8.
+
+   A KYAPay token is reusable within its validity period and audience.
+   Unless a recipient knows that the issuer issues a distinct token for
+   each request, it MUST NOT treat repeated presentation of the same
+   token, within that period and audience, as evidence of replay.
+   Nothing here prevents an issuer from issuing a distinct token for
+   each request where that is practical; this document describes the
+   general case, in which a token is presented more than once.
 
 4.2.  Identity and Proof of Possession are Different Layers
 
@@ -472,6 +487,21 @@ Table of Contents
    A complete proof-of-possession design uses both, bound together, as
    described next.
 
+   A KYA token is verified the same way however a request is routed,
+   because it is a self-contained JWT and not a signature over the
+   request.  A signature over the request is different: it can be
+   verified only where the request still has the form the agent signed.
+   Requests are routinely rewritten on the way to an origin.  CDNs, load
+   balancers, API gateways and edge workers add or strip path prefixes,
+   route to internal host names and normalize URIs, and sites
+   deliberately keep their external and internal URLs separate so as not
+   to expose their internal architecture.  A design in which every
+   recipient verified a signature over the request would fail at each
+   such hop, or need special handling there.  This is why KYA is a
+   bearer token by default (Section 4.1), and why, where proof of
+   possession is used, the request signature is verified at the first
+   hop (Section 4.4).
+
 4.3.  The Proof-of-Possession Path (Planned Evolution)
 
    When per-request signing becomes practical at scale, the planned
@@ -493,17 +523,17 @@ Table of Contents
        when that proviso is met -- it knows neither which recipients a
        token will reach, nor the initiator's intent, nor the state of
        any interaction between initiator and target.  Nor can it rely on
-       continuity between tokens: where a target de-duplicates on jti to
-       prevent replay, each token is fresh and must stand on its own.
-       Carrying the key is therefore the only form that works in the
-       general case.  Other confirmation members MAY additionally be
-       present; a recipient MUST NOT be required to obtain the key by
-       any means other than reading cnf.jwk; and
+       continuity between tokens: a recipient may meet any given token
+       first, so each token must stand on its own.  Carrying the key is
+       therefore the only form that works in the general case.  Other
+       confirmation members MAY additionally be present; a recipient
+       MUST NOT be required to obtain the key by any means other than
+       reading cnf.jwk; and
 
-   4.  the agent signs each request in place -- a signature over the
-       request (method, path, body digest, timestamp/nonce) using
-       [RFC9421] -- verified against the key in cnf, with no separate
-       proof-of-possession token.
+   4.  the agent signs each request in place using [RFC9421], covering
+       the components listed in Section 4.4, and the signature is
+       verified against the key in cnf, with no separate proof-of-
+       possession token.
 
    This yields an unbroken chain from request to key to identity: the
    request is signed by a key, and that key is vouched for as the
@@ -513,22 +543,72 @@ Table of Contents
    caches the cnf key, then performs only a fast per-request signature
    check, instead of validating two artifacts and confirming they are
    bound to each other.  When present, this binding is consumed as
-   specified in Section 6.1 and closes the in-window replay and
-   malicious-Target-reuse risks of the bearer model (Section 8).
+   specified in Section 6.1 and closes the malicious-Target-reuse risk
+   of the bearer model and stops a stolen token being used on its own
+   (Section 8).
 
    Adoption remains the constraint on when this becomes mandatory.  Per-
    request signing is costly: hardware-protected keys are secure but
    slow, software keys are fast but exfiltratable, and post-quantum
-   algorithms do not make signing faster.  Defeating replay of the proof
-   itself further requires either per-Target nonce caches or binding the
-   signature to the request content, and other request-bound designs
-   considered (mutual TLS [RFC8705], TLS channel binding, session-based
-   schemes) each raise the participation bar or add Target-side state.
-   Until fast, secure signing and a workable anti-replay approach exist
-   that keep the Target's job about as simple as verifying a JWT, KYA
-   remains a bearer token by default and proof of possession is an
-   optional, forward-compatible upgrade rather than a precondition for
-   participation.
+   algorithms do not make signing faster.  Binding the signature to the
+   request (Section 4.4) stops a captured signature from being altered
+   or presented with a different request; an identical request can still
+   be resent until the signature expires, and this document does not
+   rely on per-Target nonce caches to prevent that (Section 8.3).  Other
+   request-bound designs considered (mutual TLS [RFC8705], TLS channel
+   binding, session-based schemes) each raise the participation bar or
+   add Target-side state.  Until fast, secure signing and a workable
+   anti-replay approach exist that keep the Target's job about as simple
+   as verifying a JWT, KYA remains a bearer token by default and proof
+   of possession is an optional, forward-compatible upgrade rather than
+   a precondition for participation.
+
+4.4.  Request Signatures for Proof of Possession
+
+   Where a token carries a proof-of-possession key (Section 4.3), the
+   agent signs each request with that key using HTTP Message Signatures
+   [RFC9421].  The signature MUST cover:
+
+   *  the @method derived component;
+
+   *  the @target-uri derived component;
+
+   *  the KYAPay-Token header field, so that a signature cannot be
+      presented with a different token; and
+
+   *  the Content-Digest header field [RFC9530], whenever the request
+      has content.
+
+   The signature MUST carry the created and expires parameters.
+
+   Proof of possession is optional.  A token that carries no proof-of-
+   possession key is a bearer token (Section 4.1), and nothing in this
+   section applies to it.
+
+   A covered component has to hold the same value when the signature is
+   verified as when it was created, and a hop that rewrites a request
+   changes the components that say where it is going.  The signature is
+   therefore verified by the first recipient to receive the request as
+   the agent sent it, before any rewriting, which is usually the CDN,
+   bot manager, or edge worker in front of the Target.  The first
+   recipient that rewrites a request MUST verify the signature before
+   rewriting it.  The recipient that verifies the signature MUST NOT
+   forward a request whose signature is absent or invalid; it rejects
+   the request (Section 6.1).  Where the signature covers Content-
+   Digest, the field MUST be checked against the content [RFC9530]
+   before the request is acted on, by the recipient that verifies the
+   signature or by a recipient behind it that receives both the content
+   and the signed Content-Digest value unchanged; a mismatch, or a
+   digest that cannot be checked, MUST be treated as an invalid
+   signature.  A recipient behind that hop MAY rely on it instead of
+   verifying the signature itself, but only where the deployment ensures
+   that requests cannot reach it without passing through that hop.  It
+   still validates the token as described in Section 6.1.
+
+   The other elements that Section 1.4 of [RFC9421] requires a profile
+   to specify, including the source of the verification key, the keyid
+   and tag parameters, and error responses, are expected to be specified
+   in a future revision of this document.
 
 5.  Conveying KYAPay Tokens in Requests
 
@@ -572,7 +652,10 @@ Table of Contents
 
    *  MUST determine the type of each token from its typ header
       parameter ([I-D.skyfire-oauth-kyapay-token]), not from its
-      position; and
+      position;
+
+   *  MAY reject a request that carries more than one token of the same
+      typ; and
 
    *  MUST ignore a KYAPay-Token member it cannot parse as a JWT, while
       continuing to process the remaining members, unless local policy
@@ -641,14 +724,21 @@ Table of Contents
 
 5.4.  Authenticating the Counterparty
 
-   Conveying a token securely also requires that the sending agent
-   deliver it to the intended recipient and that the recipient be able
-   to bind the token to itself.  The aud claim, together with the
-   optional tdm (target domain) and tsi (target service identifier)
-   claims defined in [I-D.skyfire-oauth-kyapay-token], allows a
-   recipient to confirm that a token was minted for it and to mitigate
-   replay to a different party (Section 8).  At the transport and
-   discovery layers, mechanisms such as DNS domain names (with TLS
+   The aud and tsi claims are identifiers assigned by the Token Issuer
+   (the Identifying the Target section of
+   [I-D.skyfire-oauth-kyapay-token]); their values are known to a Target
+   that has onboarded to that issuer and are not otherwise discoverable.
+   The tdm claim names the Target's domain, is not issuer-specific, and
+   requires no relationship with the issuer to interpret.  A Target that
+   has onboarded to an issuer checks aud and tsi, and MAY also check
+   tdm; a security intermediary acting for such a Target MAY be
+   configured with that Target's aud and tsi values and check them.  A
+   recipient that has not onboarded, including a security intermediary
+   acting for many Targets, SHOULD check at least that tdm names the
+   domain it is protecting for that request; where tdm also names a host
+   or a path, the recipient MAY check those too. tdm MUST be present in
+   tokens whose Target is identified by a domain name.  At the transport
+   and discovery layers, mechanisms such as DNS domain names (with TLS
    server authentication), A2A agent cards [A2A], and MCP server
    identification [MCP] help an agent confirm that it is communicating
    with the correct counterparty before presenting a token.
@@ -691,8 +781,8 @@ Table of Contents
    validated token.  Throughout, "validate the token" means to perform
    the validation procedure defined in [I-D.skyfire-oauth-kyapay-token],
    Section 4 (JWT header validation, signature and issuer validation,
-   and validation of exp, iat, jti, aud, and env), plus the PAY-specific
-   validation for pay+jwt and kya-pay+jwt tokens.
+   and validation of exp, iat, jti, the audience, and env), plus the
+   PAY-specific validation for pay+jwt and kya-pay+jwt tokens.
 
 6.1.  Common Processing Model
 
@@ -710,6 +800,8 @@ Table of Contents
        would allow an unauthenticated request to cause an outbound fetch
        to an arbitrary URL of the sender's choosing.  The trusted-issuer
        set is configured out of band and is not derived from the token.
+       A recipient MUST NOT retrieve key material for an issuer that is
+       not in its configured set of trusted issuers.
 
    3.  MUST validate each token as specified in
        [I-D.skyfire-oauth-kyapay-token], Section 4.  A token that fails
@@ -725,24 +817,27 @@ Table of Contents
        issuer per request; issuer keys SHOULD be cached and refreshed
        according to standard JWK Set practice.
 
-   5.  MUST confirm that the token is intended for this recipient by
-       checking the aud claim (and, if used, the tdm and tsi claims) as
-       described in Section 8.
+   5.  MUST confirm that the token is intended for this recipient, as
+       described in Section 5.4.
 
    6.  MUST confirm that the env claim (for example, production) matches
-       the environment the intermediary is operating in.  When the token
-       carries a proof-of-possession key (the cnf claim [RFC7800],
-       Section 4), MUST verify that the request is signed by that key --
-       over HTTP, using HTTP Message Signatures [RFC9421] -- and reject
-       the request if the signature is absent or invalid.
+       the environment the intermediary is operating in.
 
-   7.  When the token carries no such key, it is a bearer token: the
+   7.  When the token carries a proof-of-possession key (the cnf claim
+       [RFC7800], Section 4.3), MUST verify that the request is signed
+       by that key as described in Section 4.4, and MUST reject the
+       request, and not forward it, if the signature is absent or
+       invalid.  An intermediary behind a hop that has already done so
+       MAY rely on that hop instead, as Section 4.4 describes.  When the
+       token carries no such key, this step does not apply.
+
+   8.  When the token carries no such key, it is a bearer token: the
        intermediary MUST rely on the controls in Section 8 (short
        lifetime, audience binding, TLS, issuer-gated onboarding) and
        MUST NOT assume that mere presentation of the token proves the
        sender holds a key bound to it.
 
-   8.  SHOULD use the token's claims to inform its decision, as
+   9.  SHOULD use the token's claims to inform its decision, as
        described in the following subsections, only after successful
        validation.
 
@@ -832,6 +927,10 @@ Table of Contents
    up, or deny) rather than applying bot-blocking challenges designed
    for unattended, unattributed automation.
 
+   Per-entity rate and abuse limits (Section 6.9) continue to apply to
+   admitted requests, and a site MAY still challenge, or require step-up
+   (Section 6.5) for, sensitive actions.
+
    KYAPay tokens are well-suited to inline bot management for several
    reasons:
 
@@ -857,10 +956,11 @@ Table of Contents
    *  *Replay Resistance.* A bearer token captured within its validity
       window can be replayed; a bot manager bounds this with short
       lifetimes, audience binding, and TLS (Section 8).  Where a token
-      carries a proof-of-possession key (Section 4), the bot manager (or
-      the edge/CDN provider acting for the Target) SHOULD additionally
-      verify the per-request signature [RFC9421] against that key, which
-      removes in-window replay exposure.
+      carries a proof-of-possession key (Section 4.3), the per-request
+      signature is verified at the first hop, before any rewriting,
+      which is usually the bot manager or the edge/CDN provider acting
+      for the Target (Section 4.4); this stops a stolen token being used
+      on its own (Section 8.3).
 
 6.3.2.  Token present but invalid
 
@@ -1249,8 +1349,8 @@ Table of Contents
 
    When validating the JWTs described here and in
    [I-D.skyfire-oauth-kyapay-token], implementers MUST follow the JSON
-   Web Token Best Current Practices [RFC8725], in addition to the
-   validation steps of [I-D.skyfire-oauth-kyapay-token], Section 4.
+   Web Token Best Current Practices, BCP 225 [RFC8725], in addition to
+   the validation steps of [I-D.skyfire-oauth-kyapay-token], Section 4.
 
 8.1.  Transport Confidentiality
 
@@ -1272,15 +1372,25 @@ Table of Contents
    A bare bearer token can be replayed by anyone who captures it within
    its validity window.  As deployed today (Section 4), KYAPay accepts
    this bounded in-window risk and mitigates rather than eliminates it:
-   recipients MUST validate the aud claim (and tdm/tsi where used) so
-   that a token minted for one Target cannot be presented to another,
-   MUST keep accepted lifetimes short, and SHOULD use the jti claim to
-   detect replay to the same recipient.  Where a token carries a proof-
+   recipients MUST confirm that the token is intended for them, as
+   described in Section 5.4, so that a token minted for one Target
+   cannot be presented to another, and MUST keep accepted lifetimes
+   short.  In-window replay within the token's audience is an accepted
+   risk of the bearer model.  Because a conforming token is presented on
+   many requests within its lifetime, a repeated jti is not by itself
+   evidence of replay, and the claim is used for correlation, audit, and
+   issuer feedback (Section 6.10) rather than for replay detection.
+   Where a deployment issues a distinct token for each request, a
+   repeated jti does carry that meaning; this document describes the
+   general case, in which it does not.  Where a token carries a proof-
    of-possession key (cnf [RFC7800]), recipients MUST additionally
-   verify a per-request signature [RFC9421] over that key (Section 6.1),
-   which removes the in-window replay exposure.  Access tokens produced
-   by token exchange (Section 6.6) SHOULD be sender-constrained
-   ([RFC9449], [RFC8705]).
+   verify a per-request signature [RFC9421] over that key (Section 4.4).
+   This stops a stolen token from being used on its own, turning an
+   open-ended token-theft exposure into a bounded window in which a
+   captured signed request could be replayed verbatim; it does not
+   prevent that verbatim replay.  Access tokens produced by token
+   exchange (Section 6.6) SHOULD be sender-constrained ([RFC9449],
+   [RFC8705]).
 
 8.4.  Malicious or Compromised Target Reuse
 
@@ -1302,7 +1412,56 @@ Table of Contents
    malware is evicted -- together with host-level controls such as
    attestation, anomaly detection, and hygiene.
 
-8.6.  Issuer Trust
+8.6.  Token Exposure in the Agent Runtime
+
+   Agents driven by language models process untrusted content and record
+   their activity in ways that conventional HTTP clients do not.  A
+   KYAPay token can therefore leave the agent through normal operation,
+   without the agent host being compromised.  Examples include:
+
+   *  the token appearing in model context, conversation transcripts, or
+      tool-call inputs and outputs that are logged, retained, or sent to
+      a model provider;
+
+   *  agent tracing, observability, or debugging systems that record
+      outbound request headers;
+
+   *  prompt injection, where content retrieved from a website or tool
+      instructs the agent to reveal the token or to include it in a
+      request to a party other than the intended Target.
+
+   For a bearer token (Section 4.1), anyone who obtains a leaked token
+   can present it at the Target it was minted for until it expires.
+   Audience binding (Section 5.4) does not help if the attacker presents
+   the token at that Target.
+
+   Agent developers and KYAPay Token Issuers SHOULD mint and attach
+   tokens in deterministic components (Section 7.1) whose outputs are
+   not placed in model context.  Agents SHOULD attach a token only to
+   requests sent to the Target for which the token was requested; where
+   the token carries tdm, that means a destination within the domain
+   that tdm names.  The component that attaches a token MUST make that
+   decision without relying on model output.
+
+   Agent runtimes MUST NOT write KYAPay token values to logs, traces, or
+   observability exports.
+
+   Agents SHOULD request a new token for each Target and task rather
+   than reusing one broadly, and SHOULD request the shortest lifetime
+   that fits the task.  Proof of possession (Section 4.3) reduces this
+   exposure only if the private key is also kept out of model context.
+
+   Some architectures place a token in model context unavoidably.  Where
+   an agent obtains a token by invoking a tool, the tool result is
+   returned to the model, and any retained transcript of that session
+   therefore contains the token.  A deployment in that position SHOULD
+   treat the token as disclosed to every party with access to that
+   context, including the model provider.  For such a deployment, per-
+   Target, short-lived tokens are the main mitigation, together with
+   proof of possession where the private key is held outside model
+   context.
+
+8.7.  Issuer Trust
 
    A token is only as trustworthy as its issuer and the verifiers it
    cites.  The system is federated: many issuers are possible, and a
@@ -1315,7 +1474,7 @@ Table of Contents
    exists.  Until it does, trust is established out of band (for
    example, configured relationships with well-known issuers).
 
-8.7.  Revocation
+8.8.  Revocation
 
    An agent whose platform is deregistered, or a human whose identity
    verification is revoked, may still hold unexpired tokens.  This
@@ -1324,7 +1483,7 @@ Table of Contents
    consult an issuer's live-status or revocation endpoint, where one is
    offered, for high-assurance or high-value actions.
 
-8.8.  Continuity of Human Control
+8.9.  Continuity of Human Control
 
    A valid token attests that the human principal authorized the agent
    at the time of issuance.  It does not prove the human remains in
@@ -1333,7 +1492,7 @@ Table of Contents
    SHOULD treat high-value actions as warranting step-up (Section 6.5)
    rather than relying solely on a previously issued token.
 
-8.9.  Key Management
+8.10.  Key Management
 
    If an issuer or platform rotates a signing key, tokens signed with
    the old key may fail validation prematurely.  Issuers SHOULD retain
@@ -1448,6 +1607,11 @@ Table of Contents
               DOI 10.17487/RFC8693, January 2020,
               <https://www.rfc-editor.org/rfc/rfc8693>.
 
+   [RFC8725]  Sheffer, Y., Hardt, D., and M. Jones, "JSON Web Token Best
+              Current Practices", BCP 225, RFC 8725,
+              DOI 10.17487/RFC8725, February 2020,
+              <https://www.rfc-editor.org/rfc/rfc8725>.
+
    [RFC9110]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
               Ed., "HTTP Semantics", STD 97, RFC 9110,
               DOI 10.17487/RFC9110, June 2022,
@@ -1456,6 +1620,10 @@ Table of Contents
    [RFC9421]  Backman, A., Ed., Richer, J., Ed., and M. Sporny, "HTTP
               Message Signatures", RFC 9421, DOI 10.17487/RFC9421,
               February 2024, <https://www.rfc-editor.org/rfc/rfc9421>.
+
+   [RFC9530]  Polli, R. and L. Pardue, "Digest Fields", RFC 9530,
+              DOI 10.17487/RFC9530, February 2024,
+              <https://www.rfc-editor.org/rfc/rfc9530>.
 
 11.2.  Informative References
 
@@ -1526,11 +1694,6 @@ Table of Contents
               DOI 10.17487/RFC8705, February 2020,
               <https://www.rfc-editor.org/rfc/rfc8705>.
 
-   [RFC8725]  Sheffer, Y., Hardt, D., and M. Jones, "JSON Web Token Best
-              Current Practices", BCP 225, RFC 8725,
-              DOI 10.17487/RFC8725, February 2020,
-              <https://www.rfc-editor.org/rfc/rfc8725>.
-
    [RFC9111]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
               Ed., "HTTP Caching", STD 98, RFC 9111,
               DOI 10.17487/RFC9111, June 2022,
@@ -1569,7 +1732,8 @@ Acknowledgments
    described here.
 
    We would like to thank Bhasker Allam, Jean Diaconu, and David Senecal
-   for their contributions to the specification.
+   for their contributions to the specification.  Bhasker Allam also
+   wrote the text on which Section 8.6 is based.
 
 Document History
 
@@ -1582,6 +1746,33 @@ Document History
    *  Updated the Bot Managers section and introduce the concept of
       feedback loop to the agent through 401 status code in case of
       token assessment failure
+
+   *  Stated that the principal need not be present at the time of a
+      human-via-agent request.
+
+   *  Made admission depend on the site's policy for the requested
+      action, and stated that rate and abuse limits and step-up still
+      apply to admitted requests.
+
+   *  Stated that a token is reusable within its validity period and
+      audience, and that a repeated jti is not by itself evidence of
+      replay, and rewrote the replay considerations to match.
+
+   *  Described how a recipient confirms the audience: aud and tsi where
+      it has onboarded to the issuer, tdm otherwise; required tdm where
+      the Target is identified by a domain name.
+
+   *  Prohibited retrieving key material for an issuer that is not
+      trusted.
+
+   *  Made BCP 225 a normative reference, and let a recipient reject a
+      request carrying more than one token of the same typ.
+
+   *  Added Token Exposure in the Agent Runtime to the Security
+      Considerations.
+
+   *  Added Request Signatures for Proof of Possession: the covered
+      components, and verification at the first hop.
 
    *  Added Attaching Tokens to Requests, scoped the zero-tech-lift
       principle to agents that control a request's header fields, and
