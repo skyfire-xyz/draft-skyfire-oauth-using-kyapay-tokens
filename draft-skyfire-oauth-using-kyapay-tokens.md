@@ -53,6 +53,7 @@ normative:
   RFC8174:
   RFC7515: # JWS
   RFC7519: # JWT
+  RFC8725: # JWT BCP (BCP 225)
   RFC8693: # OAuth 2.0 Token Exchange
   RFC9110: # HTTP Semantics
   RFC9421: # HTTP Message Signatures
@@ -63,7 +64,6 @@ normative:
 
 informative:
   RFC6749: # OAuth 2.0
-  RFC8725: # JWT BCP
   RFC8176: # AMR values
   RFC8705: # OAuth 2.0 Mutual-TLS
   RFC9449: # DPoP
@@ -364,7 +364,8 @@ A sender:
 
 A recipient:
 
-* MUST determine the type of each token from its `typ` header parameter ({{I-D.skyfire-oauth-kyapay-token}}), not from its position; and
+* MUST determine the type of each token from its `typ` header parameter ({{I-D.skyfire-oauth-kyapay-token}}), not from its position;
+* MAY reject a request that carries more than one token of the same `typ`; and
 * MUST ignore a `KYAPay-Token` member it cannot parse as a JWT, while continuing to process the remaining members, unless local policy requires rejecting the whole request.
 
 Intermediaries and caches MUST treat `KYAPay-Token` as containing sensitive, request-specific credentials;
@@ -690,7 +691,7 @@ The objective of all of the above is a single outcome: a valid KYAPay JWT that i
 
 # Security Considerations {#SecCon}
 
-When validating the JWTs described here and in {{I-D.skyfire-oauth-kyapay-token}}, implementers MUST follow the JSON Web Token Best Current Practices {{RFC8725}}, in addition to the validation steps of {{I-D.skyfire-oauth-kyapay-token}}, Section 4.
+When validating the JWTs described here and in {{I-D.skyfire-oauth-kyapay-token}}, implementers MUST follow the JSON Web Token Best Current Practices, BCP 225 {{RFC8725}}, in addition to the validation steps of {{I-D.skyfire-oauth-kyapay-token}}, Section 4.
 
 ## Transport Confidentiality
 
@@ -825,6 +826,7 @@ for their contributions to the specification.
 * Stated that a token is reusable within its validity period and audience, and that a repeated `jti` is not by itself evidence of replay, and rewrote the replay considerations to match.
 * Described how a recipient confirms the audience: `aud` and `tsi` where it has onboarded to the issuer, `tdm` otherwise; required `tdm` where the Target is identified by a domain name.
 * Prohibited retrieving key material for an issuer that is not trusted.
+* Made BCP 225 a normative reference, and let a recipient reject a request carrying more than one token of the same `typ`.
 
 -01
 
