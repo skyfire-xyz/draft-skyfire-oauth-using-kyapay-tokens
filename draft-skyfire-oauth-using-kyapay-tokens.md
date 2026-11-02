@@ -192,6 +192,7 @@ This document defines the following terms:
 {:vspace}
 **Human-via-agent request**:
 : An HTTP request or protocol message issued by an agent that carries a valid KYAPay token attesting that the agent is acting on behalf of an identified, authorizing human principal (an individual or an organization).
+  The principal need not be present at the time of the request: the agent may be acting on an instruction given earlier, or on a standing authorization that the agent itself triggers, for example on a price change or on a schedule.
 
 {:vspace}
 **Bot**:
@@ -789,9 +790,10 @@ The `amr` extensions and the `ivm` and `aml` claims and values are registered by
 The authors thank the contributors to the KYAPay Token {{I-D.skyfire-oauth-kyapay-token}} specification and the partners in the KYAPay consortium (see {{KYAPAY-ORG}}) -- including bot-management, fraud, CIAM, and ATO vendors and merchants -- whose deployment and review experience informed the usage patterns and open issues described here.
 
 We would like to thank
-David Senecal
+Bhasker Allam,
+Jean Diaconu,
 and
-Jean Diaconu
+David Senecal
 for their contributions to the specification.
 
 
@@ -804,6 +806,7 @@ for their contributions to the specification.
 
 * Updated the traditional bot detection methods in the introduction
 * Updated the Bot Managers section and introduce the concept of feedback loop to the agent through 401 status code in case of token assessment failure
+* Stated that the principal need not be present at the time of a human-via-agent request.
 
 -01
 
