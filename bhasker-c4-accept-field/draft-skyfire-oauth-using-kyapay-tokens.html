@@ -1222,6 +1222,9 @@ the token itself is the interoperability contract.<a href="#section-abstract-1" 
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
                 <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-the-proof-of-possession-pat" class="internal xref">The Proof-of-Possession Path (Planned Evolution)</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-request-signatures-for-proo" class="internal xref">Request Signatures for Proof of Possession</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
@@ -1240,7 +1243,10 @@ the token itself is the interoperability contract.<a href="#section-abstract-1" 
                 <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-authenticating-the-counterp" class="internal xref">Authenticating the Counterparty</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5">
-                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="auto internal xref">5.5</a>.  <a href="#name-the-accept-kyapay-token-res" class="internal xref">The Accept-KYAPay-Token Response Field</a></p>
+                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="auto internal xref">5.5</a>.  <a href="#name-attaching-tokens-to-request" class="internal xref">Attaching Tokens to Requests</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.6">
+                <p id="section-toc.1-1.5.2.6.1"><a href="#section-5.6" class="auto internal xref">5.6</a>.  <a href="#name-the-accept-kyapay-token-res" class="internal xref">The Accept-KYAPay-Token Response Field</a></p>
 </li>
             </ul>
 </li>
@@ -1323,19 +1329,22 @@ the token itself is the interoperability contract.<a href="#section-abstract-1" 
                 <p id="section-toc.1-1.8.2.5.1"><a href="#section-8.5" class="auto internal xref">8.5</a>.  <a href="#name-compromised-agent-host-irre" class="internal xref">Compromised Agent Host (Irreducible)</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.6">
-                <p id="section-toc.1-1.8.2.6.1"><a href="#section-8.6" class="auto internal xref">8.6</a>.  <a href="#name-issuer-trust" class="internal xref">Issuer Trust</a></p>
+                <p id="section-toc.1-1.8.2.6.1"><a href="#section-8.6" class="auto internal xref">8.6</a>.  <a href="#name-token-exposure-in-the-agent" class="internal xref">Token Exposure in the Agent Runtime</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.7">
-                <p id="section-toc.1-1.8.2.7.1"><a href="#section-8.7" class="auto internal xref">8.7</a>.  <a href="#name-revocation" class="internal xref">Revocation</a></p>
+                <p id="section-toc.1-1.8.2.7.1"><a href="#section-8.7" class="auto internal xref">8.7</a>.  <a href="#name-issuer-trust" class="internal xref">Issuer Trust</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.8">
-                <p id="section-toc.1-1.8.2.8.1"><a href="#section-8.8" class="auto internal xref">8.8</a>.  <a href="#name-continuity-of-human-control" class="internal xref">Continuity of Human Control</a></p>
+                <p id="section-toc.1-1.8.2.8.1"><a href="#section-8.8" class="auto internal xref">8.8</a>.  <a href="#name-revocation" class="internal xref">Revocation</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.9">
-                <p id="section-toc.1-1.8.2.9.1"><a href="#section-8.9" class="auto internal xref">8.9</a>.  <a href="#name-key-management" class="internal xref">Key Management</a></p>
+                <p id="section-toc.1-1.8.2.9.1"><a href="#section-8.9" class="auto internal xref">8.9</a>.  <a href="#name-continuity-of-human-control" class="internal xref">Continuity of Human Control</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.10">
-                <p id="section-toc.1-1.8.2.10.1"><a href="#section-8.10" class="auto internal xref">8.10</a>. <a href="#name-disclosing-requirements" class="internal xref">Disclosing Requirements</a></p>
+                <p id="section-toc.1-1.8.2.10.1"><a href="#section-8.10" class="auto internal xref">8.10</a>. <a href="#name-key-management" class="internal xref">Key Management</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.11">
+                <p id="section-toc.1-1.8.2.11.1"><a href="#section-8.11" class="auto internal xref">8.11</a>. <a href="#name-disclosing-requirements" class="internal xref">Disclosing Requirements</a></p>
 </li>
             </ul>
 </li>
@@ -1461,7 +1470,8 @@ and the identity grouping claims <code>hid</code>, <code>apd</code>, and <code>a
           <dt id="section-2.1-3.1">
 <strong>Human-via-agent request</strong>:</dt>
           <dd style="margin-left: 1.5em" id="section-2.1-3.2">
-            <p id="section-2.1-3.2.1">An HTTP request or protocol message issued by an agent that carries a valid KYAPay token attesting that the agent is acting on behalf of an identified, authorizing human principal (an individual or an organization).<a href="#section-2.1-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-2.1-3.2.1">An HTTP request or protocol message issued by an agent that carries a valid KYAPay token attesting that the agent is acting on behalf of an identified, authorizing human principal (an individual or an organization).
+The principal need not be present at the time of the request: the agent may be acting on an instruction given earlier, or on a standing authorization that the agent itself triggers, for example on a price change or on a schedule.<a href="#section-2.1-3.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-2.1-3.3">
@@ -1557,7 +1567,7 @@ KYAPay tokens are structured to convey these identities so that this auditable, 
 <p id="section-3.2-1">Agents are useful in proportion to the breadth of the web they can act across.
 If a human must pre-configure access for an agent at each site before the agent can act, the result is indistinguishable from the workflow automation that already exists, and the principal loses the probabilistic discovery -- of new merchants, products, services, and alternatives -- that is one of the main reasons to use an agent at all.
 The goal is therefore agentic access to the existing web, not a parallel, agent-only surface that must be set up in advance.
-This goal can only be met if security intermediaries admit legitimate human-via-agent requests by default when a valid token is present.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+This goal can only be met if security intermediaries admit legitimate human-via-agent requests without per-site setup when a valid token is present and the verified identity it carries meets the site's policy for the requested action (<a href="#BotMgr" class="auto internal xref">Section 6.3</a>).<a href="#section-3.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="works-with-todays-web-at-zero-merchant-tech-lift">
@@ -1569,7 +1579,9 @@ This goal can only be met if security intermediaries admit legitimate human-via-
 A key property of a website (and, similarly, of a merchant-controlled MCP <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> server) is that the merchant controls its own interface and is not locked into an API schema that must be carefully versioned;
 agents driven by large language models (LLMs) can frequently learn to use these interfaces automatically.
 A protocol for delivering agent identity and payment credentials should therefore work with today's web without requiring merchants to build new APIs.
-KYAPay meets this by conveying credentials in the HTTP request itself (<a href="#ConveyingRequests" class="auto internal xref">Section 5</a>), which requires no change to how a merchant's site is built.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+KYAPay meets this by conveying credentials in the HTTP request itself (<a href="#ConveyingRequests" class="auto internal xref">Section 5</a>), which requires no change to how a merchant's site is built.
+This holds where the party attaching the token controls the header fields of the request that reaches the Target.
+Where it does not, the token is conveyed by another binding (<a href="#OtherInterfaces" class="auto internal xref">Section 5.3</a>) or the interaction does not use this header field.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="one-source-of-truth-across-all-layers-of-defense">
@@ -1601,7 +1613,7 @@ As one illustration, a merchant that recognizes a KYAPay-bearing request <span c
       </h2>
 <p id="section-4-1">This section is informative.
 It situates KYAPay tokens among the other mechanisms a recipient encounters and, importantly, distinguishes what is deployed today from the planned evolution, so that the consumption requirements in <a href="#SecInt" class="auto internal xref">Section 6</a> are read against the correct baseline.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<div id="kya-is-an-issuer-signed-bearer-token-today">
+<div id="Bearer">
 <section id="section-4.1">
         <h3 id="name-kya-is-an-issuer-signed-bea">
 <a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-kya-is-an-issuer-signed-bea" class="section-name selfRef">KYA is an Issuer-Signed Bearer Token Today</a>
@@ -1618,7 +1630,7 @@ Today this residual, in-window risk is bounded rather than eliminated, by means 
             <p id="section-4.1-3.1.1">short token lifetimes (<code>exp</code>), so a captured token expires quickly;<a href="#section-4.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-4.1-3.2">
-            <p id="section-4.1-3.2.1">audience binding (<code>aud</code>, and where used <code>tdm</code>/<code>tsi</code>), so a token minted for one Target cannot be presented to another;<a href="#section-4.1-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-4.1-3.2.1">audience binding (<a href="#Counterparty" class="auto internal xref">Section 5.4</a>), so a token minted for one Target cannot be presented to another;<a href="#section-4.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-4.1-3.3">
             <p id="section-4.1-3.3.1">TLS on every hop, which mitigates on-the-wire capture and man-in-the-middle; and<a href="#section-4.1-3.3.1" class="pilcrow">¶</a></p>
@@ -1628,6 +1640,9 @@ Today this residual, in-window risk is bounded rather than eliminated, by means 
 </li>
         </ul>
 <p id="section-4.1-4">The accepted residual threats, and the irreducible ones, are stated in <a href="#SecCon" class="auto internal xref">Section 8</a>.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+<p id="section-4.1-5">A KYAPay token is reusable within its validity period and audience.
+Unless a recipient knows that the issuer issues a distinct token for each request, it <span class="bcp14">MUST NOT</span> treat repeated presentation of the same token, within that period and audience, as evidence of replay.
+Nothing here prevents an issuer from issuing a distinct token for each request where that is practical; this document describes the general case, in which a token is presented more than once.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="identity-and-proof-of-possession-are-different-layers">
@@ -1640,7 +1655,7 @@ Today this residual, in-window risk is bounded rather than eliminated, by means 
 <li class="normal" id="section-4.2-2.1">
             <p id="section-4.2-2.1.1"><em>Who is behind this request?</em>
 This is answered by the KYA token: a trusted, neutral issuer that performs KYC/KYB attests to the identity of the human principal (<code>hid</code>), agent platform (<code>apd</code>), and agent (<code>aid</code>), acting as a client-side trust anchor analogous to a Certificate Authority.
-KYA is a set of verifiable <em>nouns</em> -- identity, verification status, authorization, payment -- and, being a JWT, it is transport-agnostic: the same token rides HTTP, WebSockets, gRPC metadata, a message queue, or a stdio MCP channel, and can be logged and independently re-verified at rest.<a href="#section-4.2-2.1.1" class="pilcrow">¶</a></p>
+KYA is a set of verifiable <em>nouns</em> -- identity, verification status, authorization, payment -- and, being a JWT, it is transport-agnostic: the same token rides HTTP, WebSockets, gRPC metadata, a message queue, or a stdio MCP channel, and a recipient that needs it for audit or dispute resolution can retain it and re-verify it later (<span><a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-02#section-5.2" class="relref">Section 5.2</a> of [<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>).<a href="#section-4.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-4.2-2.2">
             <p id="section-4.2-2.2.1"><em>Did the sender actually hold the credential's key?</em>
@@ -1653,9 +1668,15 @@ A signature proves control of a key but says nothing about whose key it is -- it
 <p id="section-4.2-3">Because these are different layers, HTTP Message Signatures <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> and similar request-signing mechanisms are complementary to KYA, not alternatives to it;
 request signing supplies authenticity and possession, while KYA supplies identity, authorization, and payment.
 A complete proof-of-possession design uses both, bound together, as described next.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-4">A KYA token is verified the same way however a request is routed, because it is a self-contained JWT and not a signature over the request.
+A signature over the request is different: it can be verified only where the request still has the form the agent signed.
+Requests are routinely rewritten on the way to an origin.
+CDNs, load balancers, API gateways and edge workers add or strip path prefixes, route to internal host names and normalize URIs, and sites deliberately keep their external and internal URLs separate so as not to expose their internal architecture.
+A design in which every recipient verified a signature over the request would fail at each such hop, or need special handling there.
+This is why KYA is a bearer token by default (<a href="#Bearer" class="auto internal xref">Section 4.1</a>), and why, where proof of possession is used, the request signature is verified at the first hop (<a href="#PoPSignatures" class="auto internal xref">Section 4.4</a>).<a href="#section-4.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="the-proof-of-possession-path-planned-evolution">
+<div id="PoPPath">
 <section id="section-4.3">
         <h3 id="name-the-proof-of-possession-pat">
 <a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-the-proof-of-possession-pat" class="section-name selfRef">The Proof-of-Possession Path (Planned Evolution)</a>
@@ -1669,19 +1690,54 @@ A complete proof-of-possession design uses both, bound together, as described ne
             <p id="section-4.3-2.2.1">the agent generates a key pair and provides its public key to the issuer;<a href="#section-4.3-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-4.3-2.3">
-            <p id="section-4.3-2.3.1">the issuer binds that public key into the KYA token using the JWT confirmation claim <code>cnf</code> <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span>. The token <span class="bcp14">MUST</span> carry <code>cnf.jwk</code> -- the key itself. A key identifier would satisfy <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span> only on its own terms, which hold "provided the recipient is able to obtain the identified key": a recipient meeting the agent for the first time holds no such key, and a thumbprint is a one-way hash from which none can be recovered. The issuer cannot determine when that proviso is met -- it knows neither which recipients a token will reach, nor the initiator's intent, nor the state of any interaction between initiator and target. Nor can it rely on continuity between tokens: where a target de-duplicates on <code>jti</code> to prevent replay, each token is fresh and must stand on its own. Carrying the key is therefore the only form that works in the general case. Other confirmation members <span class="bcp14">MAY</span> additionally be present; a recipient <span class="bcp14">MUST NOT</span> be required to obtain the key by any means other than reading <code>cnf.jwk</code>; and<a href="#section-4.3-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-4.3-2.3.1">the issuer binds that public key into the KYA token using the JWT confirmation claim <code>cnf</code> <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span>. The token <span class="bcp14">MUST</span> carry <code>cnf.jwk</code> -- the key itself. A key identifier would satisfy <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span> only on its own terms, which hold "provided the recipient is able to obtain the identified key": a recipient meeting the agent for the first time holds no such key, and a thumbprint is a one-way hash from which none can be recovered. The issuer cannot determine when that proviso is met -- it knows neither which recipients a token will reach, nor the initiator's intent, nor the state of any interaction between initiator and target. Nor can it rely on continuity between tokens: a recipient may meet any given token first, so each token must stand on its own. Carrying the key is therefore the only form that works in the general case. Other confirmation members <span class="bcp14">MAY</span> additionally be present; a recipient <span class="bcp14">MUST NOT</span> be required to obtain the key by any means other than reading <code>cnf.jwk</code>; and<a href="#section-4.3-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-4.3-2.4">
-            <p id="section-4.3-2.4.1">the agent signs each request in place -- a signature over the request (method, path, body digest, timestamp/nonce) using <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> -- verified against the key in <code>cnf</code>, with no separate proof-of-possession token.<a href="#section-4.3-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-4.3-2.4.1">the agent signs each request in place using <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span>, covering the components listed in <a href="#PoPSignatures" class="auto internal xref">Section 4.4</a>, and the signature is verified against the key in <code>cnf</code>, with no separate proof-of-possession token.<a href="#section-4.3-2.4.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
 <p id="section-4.3-3">This yields an unbroken chain from request to key to identity: the request is signed by a key, and that key is vouched for as the initiator's by the issuer.
 Preferring a request signed against the <code>cnf</code> key over a detached, DPoP-style proof <span>[<a href="#RFC9449" class="cite xref">RFC9449</a>]</span> keeps a single token -- the recipient validates the KYA token once (per session), caches the <code>cnf</code> key, then performs only a fast per-request signature check, instead of validating two artifacts and confirming they are bound to each other.
-When present, this binding is consumed as specified in <a href="#ProcModel" class="auto internal xref">Section 6.1</a> and closes the in-window replay and malicious-Target-reuse risks of the bearer model (<a href="#SecCon" class="auto internal xref">Section 8</a>).<a href="#section-4.3-3" class="pilcrow">¶</a></p>
+When present, this binding is consumed as specified in <a href="#ProcModel" class="auto internal xref">Section 6.1</a> and closes the malicious-Target-reuse risk of the bearer model and stops a stolen token being used on its own (<a href="#SecCon" class="auto internal xref">Section 8</a>).<a href="#section-4.3-3" class="pilcrow">¶</a></p>
 <p id="section-4.3-4">Adoption remains the constraint on when this becomes mandatory.
 Per-request signing is costly: hardware-protected keys are secure but slow, software keys are fast but exfiltratable, and post-quantum algorithms do not make signing faster.
-Defeating replay of the proof itself further requires either per-Target nonce caches or binding the signature to the request content, and other request-bound designs considered (mutual TLS <span>[<a href="#RFC8705" class="cite xref">RFC8705</a>]</span>, TLS channel binding, session-based schemes) each raise the participation bar or add Target-side state.
+Binding the signature to the request (<a href="#PoPSignatures" class="auto internal xref">Section 4.4</a>) stops a captured signature from being altered or presented with a different request; an identical request can still be resent until the signature expires, and this document does not rely on per-Target nonce caches to prevent that (<a href="#Replay" class="auto internal xref">Section 8.3</a>).
+Other request-bound designs considered (mutual TLS <span>[<a href="#RFC8705" class="cite xref">RFC8705</a>]</span>, TLS channel binding, session-based schemes) each raise the participation bar or add Target-side state.
 Until fast, secure signing and a workable anti-replay approach exist that keep the Target's job about as simple as verifying a JWT, KYA remains a bearer token by default and proof of possession is an optional, forward-compatible upgrade rather than a precondition for participation.<a href="#section-4.3-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="PoPSignatures">
+<section id="section-4.4">
+        <h3 id="name-request-signatures-for-proo">
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-request-signatures-for-proo" class="section-name selfRef">Request Signatures for Proof of Possession</a>
+        </h3>
+<p id="section-4.4-1">Where a token carries a proof-of-possession key (<a href="#PoPPath" class="auto internal xref">Section 4.3</a>), the agent signs each request with that key using HTTP Message Signatures <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span>.
+The signature <span class="bcp14">MUST</span> cover:<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.4-2.1">
+            <p id="section-4.4-2.1.1">the <code>@method</code> derived component;<a href="#section-4.4-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.4-2.2">
+            <p id="section-4.4-2.2.1">the <code>@target-uri</code> derived component;<a href="#section-4.4-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.4-2.3">
+            <p id="section-4.4-2.3.1">the <code>KYAPay-Token</code> header field, so that a signature cannot be presented with a different token; and<a href="#section-4.4-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.4-2.4">
+            <p id="section-4.4-2.4.1">the <code>Content-Digest</code> header field <span>[<a href="#RFC9530" class="cite xref">RFC9530</a>]</span>, whenever the request has content.<a href="#section-4.4-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-4.4-3">The signature <span class="bcp14">MUST</span> carry the <code>created</code> and <code>expires</code> parameters.<a href="#section-4.4-3" class="pilcrow">¶</a></p>
+<p id="section-4.4-4">Proof of possession is optional.
+A token that carries no proof-of-possession key is a bearer token (<a href="#Bearer" class="auto internal xref">Section 4.1</a>), and nothing in this section applies to it.<a href="#section-4.4-4" class="pilcrow">¶</a></p>
+<p id="section-4.4-5">A covered component has to hold the same value when the signature is verified as when it was created, and a hop that rewrites a request changes the components that say where it is going.
+The signature is therefore verified by the first recipient to receive the request as the agent sent it, before any rewriting, which is usually the CDN, bot manager, or edge worker in front of the Target.
+The first recipient that rewrites a request <span class="bcp14">MUST</span> verify the signature before rewriting it.
+The recipient that verifies the signature <span class="bcp14">MUST NOT</span> forward a request whose signature is absent or invalid; it rejects the request (<a href="#ProcModel" class="auto internal xref">Section 6.1</a>).
+Where the signature covers <code>Content-Digest</code>, the field <span class="bcp14">MUST</span> be checked against the content <span>[<a href="#RFC9530" class="cite xref">RFC9530</a>]</span> before the request is acted on, by the recipient that verifies the signature or by a recipient behind it that receives both the content and the signed <code>Content-Digest</code> value unchanged; a mismatch, or a digest that cannot be checked, <span class="bcp14">MUST</span> be treated as an invalid signature.
+A recipient behind that hop <span class="bcp14">MAY</span> rely on it instead of verifying the signature itself, but only where the deployment ensures that requests cannot reach it without passing through that hop.
+It still validates the token as described in <a href="#ProcModel" class="auto internal xref">Section 6.1</a>.<a href="#section-4.4-5" class="pilcrow">¶</a></p>
+<p id="section-4.4-6">The other elements that <span><a href="https://rfc-editor.org/rfc/rfc9421#section-1.4" class="relref">Section 1.4</a> of [<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> requires a profile to specify, including the source of the verification key, the <code>keyid</code> and <code>tag</code> parameters, and error responses, are expected to be specified in a future revision of this document.<a href="#section-4.4-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1701,45 +1757,59 @@ For a directly interacting human, such details are typically carried in the requ
 for a human-via-agent request, they are carried in the <code>KYAPay-Token</code> header field defined here.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 <p id="section-5.1-2">The <code>KYAPay-Token</code> header field is an HTTP request header field whose value is a KYA, PAY, or KYA-PAY token, as defined in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>.
 HTTP field names are case-insensitive <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5.1-3">
+<p id="section-5.1-3"><code>KYAPay-Token</code> is a List Structured Field (<span><a href="https://rfc-editor.org/rfc/rfc9651#section-3.1" class="relref">Section 3.1</a> of [<a href="#RFC9651" class="cite xref">RFC9651</a>]</span>).
+Each member is a Token (<span><a href="https://rfc-editor.org/rfc/rfc9651#section-3.3.4" class="relref">Section 3.3.4</a> of [<a href="#RFC9651" class="cite xref">RFC9651</a>]</span>) whose value is a JWT, with no parameters.
+A compact JWT consists only of base64url characters and periods, and it begins with the encoding of a JSON object, so its first character is a letter; it is therefore a valid Token as it stands.
+For example:<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.1-4">
 <pre>
-KYAPay-Token = token-jwt *( OWS "," OWS token-jwt )
-token-jwt    = 1*( ALPHA / DIGIT / "-" / "_" / "." )
-</pre><a href="#section-5.1-3" class="pilcrow">¶</a>
+KYAPay-Token: eyJhbGciOiJFUzI1NiIsInR5cCI6Imt5YStqd3QifQ.eyJpc3Mi...
+</pre><a href="#section-5.1-4" class="pilcrow">¶</a>
 </div>
-<p id="section-5.1-4">A request <span class="bcp14">MAY</span> convey more than one token (for example, separate KYA and PAY tokens) either as a comma-separated list in a single <code>KYAPay-Token</code> header field or as multiple <code>KYAPay-Token</code> header fields;
-per <span><a href="https://rfc-editor.org/rfc/rfc9110#section-5.2" class="relref">Section 5.2</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>, multiple field lines with the same name are equivalent to a single comma-separated field line.
-Because a JWT uses only the base64url alphabet plus the period (".") separator, it never contains a comma, so list parsing is unambiguous.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
-<p id="section-5.1-5">A sender:<a href="#section-5.1-5" class="pilcrow">¶</a></p>
+<p id="section-5.1-5">A request <span class="bcp14">MAY</span> convey more than one token (for example, separate KYA and PAY tokens), either as members of one field line or in several <code>KYAPay-Token</code> field lines, which are combined before parsing as described in <span><a href="https://rfc-editor.org/rfc/rfc9651#section-4.2" class="relref">Section 4.2</a> of [<a href="#RFC9651" class="cite xref">RFC9651</a>]</span>.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
+<p id="section-5.1-6">A sender:<a href="#section-5.1-6" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-5.1-6.1">
-            <p id="section-5.1-6.1.1"><span class="bcp14">MUST</span> place exactly one JWT in each list member;<a href="#section-5.1-6.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-5.1-7.1">
+            <p id="section-5.1-7.1.1"><span class="bcp14">MUST</span> place exactly one JWT in each list member;<a href="#section-5.1-7.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.1-6.2">
-            <p id="section-5.1-6.2.1"><span class="bcp14">SHOULD NOT</span> send more than one token of the same <code>typ</code> (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>) in a single request; and<a href="#section-5.1-6.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.1-7.2">
+            <p id="section-5.1-7.2.1"><span class="bcp14">SHOULD NOT</span> send more than one token of the same <code>typ</code> (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>) in a single request; and<a href="#section-5.1-7.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.1-6.3">
-            <p id="section-5.1-6.3.1"><span class="bcp14">MUST NOT</span> rely on the ordering of tokens within the field to convey meaning.<a href="#section-5.1-6.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.1-7.3">
+            <p id="section-5.1-7.3.1"><span class="bcp14">MUST NOT</span> rely on the ordering of tokens within the field to convey meaning.<a href="#section-5.1-7.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.1-7">A recipient:<a href="#section-5.1-7" class="pilcrow">¶</a></p>
+<p id="section-5.1-8">A recipient:<a href="#section-5.1-8" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-5.1-8.1">
-            <p id="section-5.1-8.1.1"><span class="bcp14">MUST</span> determine the type of each token from its <code>typ</code> header parameter (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>), not from its position; and<a href="#section-5.1-8.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-5.1-9.1">
+            <p id="section-5.1-9.1.1"><span class="bcp14">MUST</span> determine the type of each token from its <code>typ</code> header parameter (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>), not from its position;<a href="#section-5.1-9.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.1-8.2">
-            <p id="section-5.1-8.2.1"><span class="bcp14">MUST</span> ignore a <code>KYAPay-Token</code> member it cannot parse as a JWT, while continuing to process the remaining members, unless local policy requires rejecting the whole request.<a href="#section-5.1-8.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.1-9.2">
+            <p id="section-5.1-9.2.1"><span class="bcp14">MAY</span> reject a request that carries more than one token of the same <code>typ</code>;<a href="#section-5.1-9.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.1-9.3">
+            <p id="section-5.1-9.3.1"><span class="bcp14">MUST</span> parse the field as a List <span>[<a href="#RFC9651" class="cite xref">RFC9651</a>]</span>. A field that fails to parse fails as a whole, and a recipient <span class="bcp14">MUST NOT</span> attempt to recover individual members from it;<a href="#section-5.1-9.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.1-9.4">
+            <p id="section-5.1-9.4.1"><span class="bcp14">MUST</span> reject the request if the field fails to parse, or if any member is not a Token whose value is a well-formed JWT. <span><a href="https://rfc-editor.org/rfc/rfc9651#section-4.2" class="relref">Section 4.2</a> of [<a href="#RFC9651" class="cite xref">RFC9651</a>]</span> permits either ignoring a field that fails to parse or treating the message as malformed; this document requires the latter; and<a href="#section-5.1-9.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.1-9.5">
+            <p id="section-5.1-9.5.1"><span class="bcp14">MUST</span> accept List members of up to the length given in <a href="#TokenSize" class="auto internal xref">Section 5.2</a>.<a href="#section-5.1-9.5.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.1-9">Intermediaries and caches <span class="bcp14">MUST</span> treat <code>KYAPay-Token</code> as containing sensitive, request-specific credentials;
-it <span class="bcp14">MUST NOT</span> be cached in a way that would allow it to be replayed on a different request, and it <span class="bcp14">MUST NOT</span> be logged or forwarded to parties other than legitimate participants (see <a href="#PrivCon" class="auto internal xref">Section 9</a>).<a href="#section-5.1-9" class="pilcrow">¶</a></p>
-<p id="section-5.1-10">The <code>KYAPay-Token</code> header field is intended for use over TLS.
+<p id="section-5.1-10">Intermediaries and caches <span class="bcp14">MUST</span> treat <code>KYAPay-Token</code> as containing sensitive, request-specific credentials;
+it <span class="bcp14">MUST NOT</span> be cached in a way that would allow it to be replayed on a different request, and it <span class="bcp14">MUST NOT</span> be logged or forwarded to parties other than legitimate participants (see <a href="#PrivCon" class="auto internal xref">Section 9</a>).<a href="#section-5.1-10" class="pilcrow">¶</a></p>
+<p id="section-5.1-11">The <code>KYAPay-Token</code> header field is intended for use over TLS.
 A token <span class="bcp14">MUST NOT</span> be sent over a non-TLS-protected connection.
 When the token carries a proof-of-possession key (<a href="#TrustStack" class="auto internal xref">Section 4</a>), it <span class="bcp14">SHOULD</span> be accompanied by a request Message Signature <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> over that key;
-otherwise it is a bearer token, subject to the controls and accepted risks in <a href="#SecCon" class="auto internal xref">Section 8</a>.<a href="#section-5.1-10" class="pilcrow">¶</a></p>
-<p id="section-5.1-11">KYAPay tokens are carried in a dedicated header field rather than in <code>Authorization</code>.
+otherwise it is a bearer token, subject to the controls and accepted risks in <a href="#SecCon" class="auto internal xref">Section 8</a>.<a href="#section-5.1-11" class="pilcrow">¶</a></p>
+<p id="section-5.1-12">A CORS preflight request does not carry the <code>KYAPay-Token</code> field: the user agent sends it to ask whether the field may be sent.
+A recipient <span class="bcp14">MUST NOT</span> apply its token-absent policy to a preflight request.<a href="#section-5.1-12" class="pilcrow">¶</a></p>
+<p id="section-5.1-13">Where a response depends on the <code>KYAPay-Token</code> field, the response <span class="bcp14">MUST</span> include <code>Vary: KYAPay-Token</code> and <span class="bcp14">MUST</span> be marked so that shared caches do not store it, for example with <code>Cache-Control: private</code>.
+The protection in <span><a href="https://rfc-editor.org/rfc/rfc9111#section-3.5" class="relref">Section 3.5</a> of [<a href="#RFC9111" class="cite xref">RFC9111</a>]</span> applies only to requests that carry the <code>Authorization</code> field.<a href="#section-5.1-13" class="pilcrow">¶</a></p>
+<p id="section-5.1-14">KYAPay tokens are carried in a dedicated header field rather than in <code>Authorization</code>.
 A Target commonly uses <code>Authorization</code> for its own authentication; a KYAPay token is not a credential for access to the Target's resources; and the same token is carried over transports other than HTTP (<a href="#OtherInterfaces" class="auto internal xref">Section 5.3</a>), where <code>Authorization</code> has no meaning.
-For the same reasons, a recipient states its requirements in the <code>Accept-KYAPay-Token</code> response field (<a href="#AcceptField" class="auto internal xref">Section 5.5</a>) rather than in a <code>WWW-Authenticate</code> challenge.<a href="#section-5.1-11" class="pilcrow">¶</a></p>
+For the same reasons, a recipient states its requirements in the <code>Accept-KYAPay-Token</code> response field (<a href="#AcceptField" class="auto internal xref">Section 5.6</a>) rather than in a <code>WWW-Authenticate</code> challenge.<a href="#section-5.1-14" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="TokenSize">
@@ -1765,57 +1835,85 @@ within common origin-server limits for a single header field.<a href="#section-5
         </h3>
 <p id="section-5.3-1">Beyond HTTP requests to websites and APIs, agents interact through a growing set of interfaces and protocols, including agent-to-tool interactions such as MCP <span>[<a href="#MCP" class="cite xref">MCP</a>]</span>, agent-to-agent interactions such as A2A <span>[<a href="#A2A" class="cite xref">A2A</a>]</span>, agent-to-API interactions (for example, OpenAPI descriptions converted into locally callable tools), and emerging protocols such as Universal Commerce Protocol <span>[<a href="#UCP" class="cite xref">UCP</a>]</span> and Verifiable Intent <span>[<a href="#VINTENT" class="cite xref">VINTENT</a>]</span>.
 KYAPay is designed so that the same self-contained token can be conveyed across any of these interfaces -- as an HTTP header field, a message field, or a tool argument -- to deliver verified identity and payment credentials to the receiving service, API, or agent.
-Because a KYA token is a self-contained JWT, it is transport-agnostic in a way that a request-signing mechanism is not: HTTP Message Signatures <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> are meaningful only for HTTP exchanges, whereas the same token can ride HTTP, WebSockets, gRPC metadata, message queues, or a stdio MCP channel, and can also sit at rest in a store or audit log for later verification.
+Because a KYA token is a self-contained JWT, it is transport-agnostic in a way that a request-signing mechanism is not: HTTP Message Signatures <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> are meaningful only for HTTP exchanges, whereas the same token can ride HTTP, WebSockets, gRPC metadata, message queues, or a stdio MCP channel, and can be retained by a recipient that needs it for audit or dispute resolution and verified again later (<span><a href="https://datatracker.ietf.org/doc/html/draft-skyfire-oauth-kyapay-token-02#section-5.2" class="relref">Section 5.2</a> of [<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>).
 This document specifies only the HTTP header binding in <a href="#HeaderField" class="auto internal xref">Section 5.1</a>;
 bindings for other protocols are expected to be defined by those protocols or by companion specifications.
 In all cases, the validation and usage rules of <a href="#SecInt" class="auto internal xref">Section 6</a> apply to the token, once received.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="authenticating-the-counterparty">
+<div id="Counterparty">
 <section id="section-5.4">
         <h3 id="name-authenticating-the-counterp">
 <a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-authenticating-the-counterp" class="section-name selfRef">Authenticating the Counterparty</a>
         </h3>
-<p id="section-5.4-1">Conveying a token securely also requires that the sending agent deliver it to the intended recipient and that the recipient be able to bind the token to itself.
-The <code>aud</code> claim, together with the optional <code>tdm</code> (target domain) and <code>tsi</code> (target service identifier) claims defined in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, allows a recipient to confirm that a token was minted for it and to mitigate replay to a different party (<a href="#SecCon" class="auto internal xref">Section 8</a>).
+<p id="section-5.4-1">The <code>aud</code> and <code>tsi</code> claims are identifiers assigned by the Token Issuer (the Identifying the Target section of <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>); their values are known to a Target that has onboarded to that issuer and are not otherwise discoverable.
+The <code>tdm</code> claim names the Target's domain, is not issuer-specific, and requires no relationship with the issuer to interpret.
+A Target that has onboarded to an issuer checks <code>aud</code> and <code>tsi</code>, and <span class="bcp14">MAY</span> also check <code>tdm</code>; a security intermediary acting for such a Target <span class="bcp14">MAY</span> be configured with that Target's <code>aud</code> and <code>tsi</code> values and check them.
+A recipient that has not onboarded, including a security intermediary acting for many Targets, <span class="bcp14">SHOULD</span> check at least that <code>tdm</code> names the domain it is protecting for that request; where <code>tdm</code> also names a host or a path, the recipient <span class="bcp14">MAY</span> check those too.
+<code>tdm</code> <span class="bcp14">MUST</span> be present in tokens whose Target is identified by a domain name.
 At the transport and discovery layers, mechanisms such as DNS domain names (with TLS server authentication), A2A agent cards <span>[<a href="#A2A" class="cite xref">A2A</a>]</span>, and MCP server identification <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> help an agent confirm that it is communicating with the correct counterparty before presenting a token.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="AcceptField">
+<div id="Attaching">
 <section id="section-5.5">
-        <h3 id="name-the-accept-kyapay-token-res">
-<a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-the-accept-kyapay-token-res" class="section-name selfRef">The Accept-KYAPay-Token Response Field</a>
+        <h3 id="name-attaching-tokens-to-request">
+<a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-attaching-tokens-to-request" class="section-name selfRef">Attaching Tokens to Requests</a>
         </h3>
-<p id="section-5.5-1"><code>Accept-KYAPay-Token</code> is a Dictionary Structured Field (<span><a href="https://rfc-editor.org/rfc/rfc9651#section-3.2" class="relref">Section 3.2</a> of [<a href="#RFC9651" class="cite xref">RFC9651</a>]</span>) that a recipient sends in a response to state what a request needs to carry for the recipient to accept it.
-Each member states one requirement.
-The member's key is a label chosen by the recipient.
-Its value is an Inner List of Strings, each naming a claim, using the claim names of <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span> with a period between a claim and its sub-claim (for example, "hid.email").<a href="#section-5.5-1" class="pilcrow">¶</a></p>
-<p id="section-5.5-2">Parameters on a member qualify the requirement.
-Uses of KYAPay vary too widely for this document to define a complete set, so recipients define the parameters and values they need.
-Three that are commonly useful are:<a href="#section-5.5-2" class="pilcrow">¶</a></p>
+<p id="section-5.5-1">How an agent attaches a token to a request is an implementation matter, for the reasons given in <a href="#TokCreat" class="auto internal xref">Section 7</a>.
+Any kind of request may carry a <code>KYAPay-Token</code> field; whether it does, and which token it carries, depends on where the request is sent:<a href="#section-5.5-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-5.5-3.1">
-            <p id="section-5.5-3.1.1"><code>purpose</code>: a Token saying why the recipient needs the claims, which an agent can show to the human principal when asking for consent;<a href="#section-5.5-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-5.5-2.1">
+            <p id="section-5.5-2.1.1">A request to the Target carries the token requested for that Target.<a href="#section-5.5-2.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.5-3.2">
-            <p id="section-5.5-3.2.1"><code>optional</code>: a Boolean; when true, the recipient would like the claims but does not require them; and<a href="#section-5.5-3.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.5-2.2">
+            <p id="section-5.5-2.2.1">A Target may rely on other hosts, such as its own hosts in other domains or vendors acting on its behalf.
+A request to such a host carries a token that names the Target in its audience claims (<a href="#Counterparty" class="auto internal xref">Section 5.4</a>) and carries the claims that apply to that host, which may include payment claims.
+Where the claims for the host match those of the Target's token, the agent <span class="bcp14">MAY</span> send the Target's token.<a href="#section-5.5-2.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.5-3.3">
-            <p id="section-5.5-3.3.1"><code>issuers</code>: a String listing the issuers whose tokens the recipient accepts for this requirement, each as the value it uses in the <code>iss</code> claim, separated by single spaces.<a href="#section-5.5-3.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.5-2.3">
+            <p id="section-5.5-2.3.1">A request to any other host <span class="bcp14">SHOULD NOT</span> carry a token.<a href="#section-5.5-2.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.5-4">For example (with line wrapping per <span>[<a href="#RFC8792" class="cite xref">RFC8792</a>]</span>):<a href="#section-5.5-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5.5-5">
+<p id="section-5.5-3">This applies however the token is attached. An agent that adds the field below the page, for example by browser-level header injection, applies these rules to each request according to its destination, because a page also sends requests to hosts that are neither the Target nor acting on its behalf.<a href="#section-5.5-3" class="pilcrow">¶</a></p>
+<p id="section-5.5-4">The Target determines which hosts act on its behalf and which claims each receives.
+Until a mechanism exists for the Target to declare this, an agent learns it by configuration or from an arrangement with the Target.<a href="#section-5.5-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="AcceptField">
+<section id="section-5.6">
+        <h3 id="name-the-accept-kyapay-token-res">
+<a href="#section-5.6" class="section-number selfRef">5.6. </a><a href="#name-the-accept-kyapay-token-res" class="section-name selfRef">The Accept-KYAPay-Token Response Field</a>
+        </h3>
+<p id="section-5.6-1"><code>Accept-KYAPay-Token</code> is a Dictionary Structured Field (<span><a href="https://rfc-editor.org/rfc/rfc9651#section-3.2" class="relref">Section 3.2</a> of [<a href="#RFC9651" class="cite xref">RFC9651</a>]</span>) that a recipient sends in a response to state what a request needs to carry for the recipient to accept it.
+Each member states one requirement.
+The member's key is a label chosen by the recipient.
+Its value is an Inner List of Strings, each naming a claim, using the claim names of <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span> with a period between a claim and its sub-claim (for example, "hid.email").<a href="#section-5.6-1" class="pilcrow">¶</a></p>
+<p id="section-5.6-2">Parameters on a member qualify the requirement.
+Uses of KYAPay vary too widely for this document to define a complete set, so recipients define the parameters and values they need.
+Three that are commonly useful are:<a href="#section-5.6-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.6-3.1">
+            <p id="section-5.6-3.1.1"><code>purpose</code>: a Token saying why the recipient needs the claims, which an agent can show to the human principal when asking for consent;<a href="#section-5.6-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.6-3.2">
+            <p id="section-5.6-3.2.1"><code>optional</code>: a Boolean; when true, the recipient would like the claims but does not require them; and<a href="#section-5.6-3.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.6-3.3">
+            <p id="section-5.6-3.3.1"><code>issuers</code>: a String listing the issuers whose tokens the recipient accepts for this requirement, each as the value it uses in the <code>iss</code> claim, separated by single spaces.<a href="#section-5.6-3.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-5.6-4">For example (with line wrapping per <span>[<a href="#RFC8792" class="cite xref">RFC8792</a>]</span>):<a href="#section-5.6-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.6-5">
 <pre>
 NOTE: '\' line wrapping per RFC 8792
 
 Accept-KYAPay-Token: checkout=("hid.email");purpose=checkout, \
   fraud=("hid.phone_number");purpose=fraud_prevention;optional
-</pre><a href="#section-5.5-5" class="pilcrow">¶</a>
+</pre><a href="#section-5.6-5" class="pilcrow">¶</a>
 </div>
-<p id="section-5.5-6">A recipient that requires payment names payment claims in the same way, for example <code>pay=("amt" "cur");purpose=checkout</code>.<a href="#section-5.5-6" class="pilcrow">¶</a></p>
-<p id="section-5.5-7">An agent <span class="bcp14">MUST</span> ignore parameters it does not recognize.
-A recipient that responds to cross-origin requests <span class="bcp14">MUST</span> list <code>Accept-KYAPay-Token</code> in <code>Access-Control-Expose-Headers</code>, so that a browser-based agent can read it.<a href="#section-5.5-7" class="pilcrow">¶</a></p>
+<p id="section-5.6-6">A recipient that requires payment names payment claims in the same way, for example <code>pay=("amt" "cur");purpose=checkout</code>.<a href="#section-5.6-6" class="pilcrow">¶</a></p>
+<p id="section-5.6-7">An agent <span class="bcp14">MUST</span> ignore parameters it does not recognize.
+A recipient that responds to cross-origin requests <span class="bcp14">MUST</span> list <code>Accept-KYAPay-Token</code> in <code>Access-Control-Expose-Headers</code>, so that a browser-based agent can read it.<a href="#section-5.6-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1827,7 +1925,7 @@ A recipient that responds to cross-origin requests <span class="bcp14">MUST</spa
       </h2>
 <p id="section-6-1">This section is normative.
 It defines a common processing model and then describes how each kind of security intermediary uses the validated token.
-Throughout, "validate the token" means to perform the validation procedure defined in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, Section 4 (JWT header validation, signature and issuer validation, and validation of <code>exp</code>, <code>iat</code>, <code>jti</code>, <code>aud</code>, and <code>env</code>), plus the PAY-specific validation for <code>pay+jwt</code> and <code>kya-pay+jwt</code> tokens.<a href="#section-6-1" class="pilcrow">¶</a></p>
+Throughout, "validate the token" means to perform the validation procedure defined in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, Section 4 (JWT header validation, signature and issuer validation, and validation of <code>exp</code>, <code>iat</code>, <code>jti</code>, the audience, and <code>env</code>), plus the PAY-specific validation for <code>pay+jwt</code> and <code>kya-pay+jwt</code> tokens.<a href="#section-6-1" class="pilcrow">¶</a></p>
 <div id="ProcModel">
 <section id="section-6.1">
         <h3 id="name-common-processing-model">
@@ -1845,7 +1943,8 @@ A security intermediary:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
             <p id="section-6.1-2.2.1"><span class="bcp14">MUST</span> confirm that the token's issuer is one the recipient trusts for the claims being relied upon (see <a href="#SecCon" class="auto internal xref">Section 8</a>).
 This check <span class="bcp14">MUST</span> precede any processing that resolves a value taken from the token, and in particular any network retrieval driven by the <code>iss</code> claim.
 Until the token has been verified, <code>iss</code> is supplied by the sender: resolving it before the issuer is known to be trusted would allow an unauthenticated request to cause an outbound fetch to an arbitrary URL of the sender's choosing.
-The trusted-issuer set is configured out of band and is not derived from the token.<a href="#section-6.1-2.2.1" class="pilcrow">¶</a></p>
+The trusted-issuer set is configured out of band and is not derived from the token.
+A recipient <span class="bcp14">MUST NOT</span> retrieve key material for an issuer that is not in its configured set of trusted issuers.<a href="#section-6.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.3">
             <p id="section-6.1-2.3.1"><span class="bcp14">MUST</span> validate each token as specified in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, Section 4.
@@ -1858,17 +1957,21 @@ Because KYAPay tokens are self-contained, this verification <span class="bcp14">
 issuer keys <span class="bcp14">SHOULD</span> be cached and refreshed according to standard JWK Set practice.<a href="#section-6.1-2.4.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.5">
-            <p id="section-6.1-2.5.1"><span class="bcp14">MUST</span> confirm that the token is intended for this recipient by checking the <code>aud</code> claim (and, if used, the <code>tdm</code> and <code>tsi</code> claims) as described in <a href="#SecCon" class="auto internal xref">Section 8</a>.<a href="#section-6.1-2.5.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-2.5.1"><span class="bcp14">MUST</span> confirm that the token is intended for this recipient, as described in <a href="#Counterparty" class="auto internal xref">Section 5.4</a>.<a href="#section-6.1-2.5.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.6">
-            <p id="section-6.1-2.6.1"><span class="bcp14">MUST</span> confirm that the <code>env</code> claim (for example, <code>production</code>) matches the environment the intermediary is operating in.
-When the token carries a proof-of-possession key (the <code>cnf</code> claim <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span>, Section 4), <span class="bcp14">MUST</span> verify that the request is signed by that key -- over HTTP, using HTTP Message Signatures <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> -- and reject the request if the signature is absent or invalid.<a href="#section-6.1-2.6.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-2.6.1"><span class="bcp14">MUST</span> confirm that the <code>env</code> claim (for example, <code>production</code>) matches the environment the intermediary is operating in.<a href="#section-6.1-2.6.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.7">
-            <p id="section-6.1-2.7.1">When the token carries no such key, it is a bearer token: the intermediary <span class="bcp14">MUST</span> rely on the controls in <a href="#SecCon" class="auto internal xref">Section 8</a> (short lifetime, audience binding, TLS, issuer-gated onboarding) and <span class="bcp14">MUST NOT</span> assume that mere presentation of the token proves the sender holds a key bound to it.<a href="#section-6.1-2.7.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-2.7.1">When the token carries a proof-of-possession key (the <code>cnf</code> claim <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span>, <a href="#PoPPath" class="auto internal xref">Section 4.3</a>), <span class="bcp14">MUST</span> verify that the request is signed by that key as described in <a href="#PoPSignatures" class="auto internal xref">Section 4.4</a>, and <span class="bcp14">MUST</span> reject the request, and not forward it, if the signature is absent or invalid.
+An intermediary behind a hop that has already done so <span class="bcp14">MAY</span> rely on that hop instead, as <a href="#PoPSignatures" class="auto internal xref">Section 4.4</a> describes.
+When the token carries no such key, this step does not apply.<a href="#section-6.1-2.7.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.8">
-            <p id="section-6.1-2.8.1"><span class="bcp14">SHOULD</span> use the token's claims to inform its decision, as described in the following subsections, only after successful validation.<a href="#section-6.1-2.8.1" class="pilcrow">¶</a></p>
+            <p id="section-6.1-2.8.1">When the token carries no such key, it is a bearer token: the intermediary <span class="bcp14">MUST</span> rely on the controls in <a href="#SecCon" class="auto internal xref">Section 8</a> (short lifetime, audience binding, TLS, issuer-gated onboarding) and <span class="bcp14">MUST NOT</span> assume that mere presentation of the token proves the sender holds a key bound to it.<a href="#section-6.1-2.8.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-2.9">
+            <p id="section-6.1-2.9.1"><span class="bcp14">SHOULD</span> use the token's claims to inform its decision, as described in the following subsections, only after successful validation.<a href="#section-6.1-2.9.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
 <p id="section-6.1-3">A security intermediary <span class="bcp14">MUST NOT</span> treat the mere presence of a <code>KYAPay-Token</code> header field as a human presence signal;
@@ -1928,19 +2031,20 @@ A recipient <span class="bcp14">MAY</span> combine the token signal with its exi
 <p id="section-6.3.1-1">KYAPay tokens transform this detection model into a self-identification model. By presenting a valid KYA token, an agent explicitly identifies itself as automated up front. The bot manager verifies the token -- checking the cryptographic signature against the issuer's published keys, issuer trust, validity window, and audience -- and classifies the request as a verified agent.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
 <p id="section-6.3.1-2">For token-bearing traffic, the identification question is settled: the bot manager does not need to execute its behavioral or fingerprinting detection heuristics to prove the request is automated. Requests that carry no token fall back to the standard detection pipeline; a request whose token fails validation is declined (<a href="#ProcModel" class="auto internal xref">Section 6.1</a>).<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
 <p id="section-6.3.1-3">Settling identification, however, does not grant automatic access. Identification is distinct from admission: classifying a request as a verified agent simply provides authenticated context. The bot manager uses the token's verified identity layer -- the human principal (<code>hid</code>), the agent platform (<code>apd</code>), and the agent instance (<code>aid</code>) -- to select and evaluate the site's configured access policy to determine the final disposition (admit, rate-limit, require step-up, or deny) rather than applying bot-blocking challenges designed for unattended, unattributed automation.<a href="#section-6.3.1-3" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-4">KYAPay tokens are well-suited to inline bot management for several reasons:<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-4">Per-entity rate and abuse limits (<a href="#BadActor" class="auto internal xref">Section 6.9</a>) continue to apply to admitted requests, and a site <span class="bcp14">MAY</span> still challenge, or require step-up (<a href="#StepUp" class="auto internal xref">Section 6.5</a>) for, sensitive actions.<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-5">KYAPay tokens are well-suited to inline bot management for several reasons:<a href="#section-6.3.1-5" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.3.1-5.1">
-              <p id="section-6.3.1-5.1.1"><strong>Low Latency.</strong>
-Because the token is a self-contained, signed JWT, the bot manager performs standard JWT verification locally and needs no per-request callout to a third party. Issuer keys <span class="bcp14">SHOULD</span> be cached.<a href="#section-6.3.1-5.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.3.1-6.1">
+              <p id="section-6.3.1-6.1.1"><strong>Low Latency.</strong>
+Because the token is a self-contained, signed JWT, the bot manager performs standard JWT verification locally and needs no per-request callout to a third party. Issuer keys <span class="bcp14">SHOULD</span> be cached.<a href="#section-6.3.1-6.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-6.3.1-5.2">
-              <p id="section-6.3.1-5.2.1"><strong>Policy Selection via Identity Context.</strong>
-A validated token provides verified initiator identity (and, when targeting an agent, target identity), which the bot manager uses to select and evaluate the appropriate site policy rather than treating the traffic as suspected automation. By contrast, network-origin claims (such as declared source IP ranges) are unreliable as proof of origin -- addresses change and can be masked by VPNs, CGNAT, or shared pools -- so a recipient <span class="bcp14">MAY</span> use them as a weak corroborating signal only, but <span class="bcp14">MUST NOT</span> treat an IP match alone as sufficient to bypass controls nor an IP mismatch as conclusive. Short lifetimes, audience binding, and proof-of-possession (<a href="#TrustStack" class="auto internal xref">Section 4</a>), not IP correlation, are the recommended controls against token misuse.<a href="#section-6.3.1-5.2.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-6.3.1-6.2">
+              <p id="section-6.3.1-6.2.1"><strong>Policy Selection via Identity Context.</strong>
+A validated token provides verified initiator identity (and, when targeting an agent, target identity), which the bot manager uses to select and evaluate the appropriate site policy rather than treating the traffic as suspected automation. By contrast, network-origin claims (such as declared source IP ranges) are unreliable as proof of origin -- addresses change and can be masked by VPNs, CGNAT, or shared pools -- so a recipient <span class="bcp14">MAY</span> use them as a weak corroborating signal only, but <span class="bcp14">MUST NOT</span> treat an IP match alone as sufficient to bypass controls nor an IP mismatch as conclusive. Short lifetimes, audience binding, and proof-of-possession (<a href="#TrustStack" class="auto internal xref">Section 4</a>), not IP correlation, are the recommended controls against token misuse.<a href="#section-6.3.1-6.2.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-6.3.1-5.3">
-              <p id="section-6.3.1-5.3.1"><strong>Replay Resistance.</strong>
-A bearer token captured within its validity window can be replayed; a bot manager bounds this with short lifetimes, audience binding, and TLS (<a href="#SecCon" class="auto internal xref">Section 8</a>). Where a token carries a proof-of-possession key (<a href="#TrustStack" class="auto internal xref">Section 4</a>), the bot manager (or the edge/CDN provider acting for the Target) <span class="bcp14">SHOULD</span> additionally verify the per-request signature <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> against that key, which removes in-window replay exposure.<a href="#section-6.3.1-5.3.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-6.3.1-6.3">
+              <p id="section-6.3.1-6.3.1"><strong>Replay Resistance.</strong>
+A bearer token captured within its validity window can be replayed; a bot manager bounds this with short lifetimes, audience binding, and TLS (<a href="#SecCon" class="auto internal xref">Section 8</a>). Where a token carries a proof-of-possession key (<a href="#PoPPath" class="auto internal xref">Section 4.3</a>), the per-request signature is verified at the first hop, before any rewriting, which is usually the bot manager or the edge/CDN provider acting for the Target (<a href="#PoPSignatures" class="auto internal xref">Section 4.4</a>); this stops a stolen token being used on its own (<a href="#Replay" class="auto internal xref">Section 8.3</a>).<a href="#section-6.3.1-6.3.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 </section>
@@ -1952,7 +2056,7 @@ A bearer token captured within its validity window can be replayed; a bot manage
           </h4>
 <p id="section-6.3.2-1">In some cases, a KYA token may be present in the request but the validation process may reveal some anomalies.
 The bot manager then responds as described in <a href="#StepUp" class="auto internal xref">Section 6.5</a>, with 403 (Forbidden), and can include the <code>Accept-KYAPay-Token</code> field stating what a request needs in order to succeed.<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
-<p id="section-6.3.2-2">In the examples in this section and the next, the <code>issuers</code> parameter (<a href="#AcceptField" class="auto internal xref">Section 5.5</a>) lists the issuers from which the bot manager accepts tokens, and a problem details body <span>[<a href="#RFC9457" class="cite xref">RFC9457</a>]</span> gives the reason.
+<p id="section-6.3.2-2">In the examples in this section and the next, the <code>issuers</code> parameter (<a href="#AcceptField" class="auto internal xref">Section 5.6</a>) lists the issuers from which the bot manager accepts tokens, and a problem details body <span>[<a href="#RFC9457" class="cite xref">RFC9457</a>]</span> gives the reason.
 This document does not define those problem types; they are examples for discussion only.<a href="#section-6.3.2-2" class="pilcrow">¶</a></p>
 <p id="section-6.3.2-3"><strong>Token expired.</strong>
 Because tokens have a short validity window, a bot manager may occasionally detect a token that expires during the validation process.
@@ -2032,11 +2136,11 @@ the token supplements, and does not replace, those signals.<a href="#section-6.4
         </h3>
 <p id="section-6.5-1">A recipient can decline a request because it carries no KYAPay token, because the token fails validation (<a href="#ProcModel" class="auto internal xref">Section 6.1</a>), or because the token is valid but does not carry what the action requires: for example identity claims, a higher assurance level for a sensitive action, or a payment token.
 Not all actions carry the same risk; viewing a loyalty balance is far less sensitive than making a large payment, and a token attests only the assurance established when it was issued.<a href="#section-6.5-1" class="pilcrow">¶</a></p>
-<p id="section-6.5-2">Where the decline is returned to the agent in an HTTP response, that response is 403 (Forbidden), or 402 (Payment Required) where what is missing or insufficient is payment, and <span class="bcp14">MAY</span> include the <code>Accept-KYAPay-Token</code> field (<a href="#AcceptField" class="auto internal xref">Section 5.5</a>) stating what a request needs in order to succeed (<a href="#DisclosingRequirements" class="auto internal xref">Section 8.10</a>).
+<p id="section-6.5-2">Where the decline is returned to the agent in an HTTP response, that response is 403 (Forbidden), or 402 (Payment Required) where what is missing or insufficient is payment, and <span class="bcp14">MAY</span> include the <code>Accept-KYAPay-Token</code> field (<a href="#AcceptField" class="auto internal xref">Section 5.6</a>) stating what a request needs in order to succeed (<a href="#DisclosingRequirements" class="auto internal xref">Section 8.11</a>).
 Where the request is to an endpoint whose protocol specifies its own error responses, the recipient instead responds as that protocol specifies, and <span class="bcp14">MAY</span> include the <code>Accept-KYAPay-Token</code> field; for example, an OAuth 2.0 authorization server that declines a token exchange responds as specified in <span><a href="https://rfc-editor.org/rfc/rfc8693#section-2.2.2" class="relref">Section 2.2.2</a> of [<a href="#RFC8693" class="cite xref">RFC8693</a>]</span>.
 Over other interfaces (<a href="#OtherInterfaces" class="auto internal xref">Section 5.3</a>), how a decline is signaled is left to the binding for that interface.
 A recipient <span class="bcp14">SHOULD NOT</span> use 401 (Unauthorized) for these cases: that status requires a <code>WWW-Authenticate</code> challenge (<span><a href="https://rfc-editor.org/rfc/rfc9110#section-15.5.2" class="relref">Section 15.5.2</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>), and a KYAPay token is not an <code>Authorization</code> credential.
-A recipient <span class="bcp14">MAY</span> describe the reason in a problem details body <span>[<a href="#RFC9457" class="cite xref">RFC9457</a>]</span> (<a href="#DisclosingRequirements" class="auto internal xref">Section 8.10</a>).<a href="#section-6.5-2" class="pilcrow">¶</a></p>
+A recipient <span class="bcp14">MAY</span> describe the reason in a problem details body <span>[<a href="#RFC9457" class="cite xref">RFC9457</a>]</span> (<a href="#DisclosingRequirements" class="auto internal xref">Section 8.11</a>).<a href="#section-6.5-2" class="pilcrow">¶</a></p>
 <p id="section-6.5-3">An agent that receives such a response can compare it with what it sent.
 If it sent no token, or a token that was refused, it can obtain a new token and retry.
 If the token lacked something the recipient requires, obtaining it may involve the human principal, for example, to agree to share an attribute or to complete further verification with the issuer, which can take minutes to days.<a href="#section-6.5-3" class="pilcrow">¶</a></p>
@@ -2251,7 +2355,7 @@ claims, rather than through any mandated creation flow.<a href="#section-7.2-3" 
       <h2 id="name-security-considerations">
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-8-1">When validating the JWTs described here and in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, implementers <span class="bcp14">MUST</span> follow the JSON Web Token Best Current Practices <span>[<a href="#RFC8725" class="cite xref">RFC8725</a>]</span>, in addition to the validation steps of <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, Section 4.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-1">When validating the JWTs described here and in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, implementers <span class="bcp14">MUST</span> follow the JSON Web Token Best Current Practices, BCP 225 <span>[<a href="#RFC8725" class="cite xref">RFC8725</a>]</span>, in addition to the validation steps of <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, Section 4.<a href="#section-8-1" class="pilcrow">¶</a></p>
 <div id="transport-confidentiality">
 <section id="section-8.1">
         <h3 id="name-transport-confidentiality">
@@ -2272,14 +2376,18 @@ recipients <span class="bcp14">SHOULD</span> require short lifetimes (for high-a
 Recipients <span class="bcp14">SHOULD</span> reject tokens whose <code>iat</code> is outside an acceptable window.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="replay-and-proof-of-possession">
+<div id="Replay">
 <section id="section-8.3">
         <h3 id="name-replay-and-proof-of-possess">
 <a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-replay-and-proof-of-possess" class="section-name selfRef">Replay and Proof of Possession</a>
         </h3>
 <p id="section-8.3-1">A bare bearer token can be replayed by anyone who captures it within its validity window.
-As deployed today (<a href="#TrustStack" class="auto internal xref">Section 4</a>), KYAPay accepts this bounded in-window risk and mitigates rather than eliminates it: recipients <span class="bcp14">MUST</span> validate the <code>aud</code> claim (and <code>tdm</code>/<code>tsi</code> where used) so that a token minted for one Target cannot be presented to another, <span class="bcp14">MUST</span> keep accepted lifetimes short, and <span class="bcp14">SHOULD</span> use the <code>jti</code> claim to detect replay to the same recipient.
-Where a token carries a proof-of-possession key (<code>cnf</code> <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span>), recipients <span class="bcp14">MUST</span> additionally verify a per-request signature <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> over that key (<a href="#ProcModel" class="auto internal xref">Section 6.1</a>), which removes the in-window replay exposure.
+As deployed today (<a href="#TrustStack" class="auto internal xref">Section 4</a>), KYAPay accepts this bounded in-window risk and mitigates rather than eliminates it: recipients <span class="bcp14">MUST</span> confirm that the token is intended for them, as described in <a href="#Counterparty" class="auto internal xref">Section 5.4</a>, so that a token minted for one Target cannot be presented to another, and <span class="bcp14">MUST</span> keep accepted lifetimes short.
+In-window replay within the token's audience is an accepted risk of the bearer model.
+Because a conforming token is presented on many requests within its lifetime, a repeated <code>jti</code> is not by itself evidence of replay, and the claim is used for correlation, audit, and issuer feedback (<a href="#IssuerFeedback" class="auto internal xref">Section 6.10</a>) rather than for replay detection.
+Where a deployment issues a distinct token for each request, a repeated <code>jti</code> does carry that meaning; this document describes the general case, in which it does not.
+Where a token carries a proof-of-possession key (<code>cnf</code> <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span>), recipients <span class="bcp14">MUST</span> additionally verify a per-request signature <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> over that key (<a href="#PoPSignatures" class="auto internal xref">Section 4.4</a>).
+This stops a stolen token from being used on its own, turning an open-ended token-theft exposure into a bounded window in which a captured signed request could be replayed verbatim; it does not prevent that verbatim replay.
 Access tokens produced by token exchange (<a href="#ATOProt" class="auto internal xref">Section 6.6</a>) <span class="bcp14">SHOULD</span> be sender-constrained (<span>[<a href="#RFC9449" class="cite xref">RFC9449</a>]</span>, <span>[<a href="#RFC8705" class="cite xref">RFC8705</a>]</span>).<a href="#section-8.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2304,70 +2412,103 @@ Proof of possession does not prevent this: the malware's requests convey valid b
 This risk is bounded not by the token bindings but by short token lifetimes -- so anything signed during a compromise expires quickly once the malware is evicted -- together with host-level controls such as attestation, anomaly detection, and hygiene.<a href="#section-8.5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="issuer-trust">
+<div id="RuntimeExposure">
 <section id="section-8.6">
-        <h3 id="name-issuer-trust">
-<a href="#section-8.6" class="section-number selfRef">8.6. </a><a href="#name-issuer-trust" class="section-name selfRef">Issuer Trust</a>
+        <h3 id="name-token-exposure-in-the-agent">
+<a href="#section-8.6" class="section-number selfRef">8.6. </a><a href="#name-token-exposure-in-the-agent" class="section-name selfRef">Token Exposure in the Agent Runtime</a>
         </h3>
-<p id="section-8.6-1">A token is only as trustworthy as its issuer and the verifiers it cites.
+<p id="section-8.6-1">Agents driven by language models process untrusted content and record their activity in ways that conventional HTTP clients do not.
+A KYAPay token can therefore leave the agent through normal operation, without the agent host being compromised.
+Examples include:<a href="#section-8.6-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8.6-2.1">
+            <p id="section-8.6-2.1.1">the token appearing in model context, conversation transcripts, or tool-call inputs and outputs that are logged, retained, or sent to a model provider;<a href="#section-8.6-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.6-2.2">
+            <p id="section-8.6-2.2.1">agent tracing, observability, or debugging systems that record outbound request headers;<a href="#section-8.6-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.6-2.3">
+            <p id="section-8.6-2.3.1">prompt injection, where content retrieved from a website or tool instructs the agent to reveal the token or to include it in a request to a party other than the intended Target.<a href="#section-8.6-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-8.6-3">For a bearer token (<a href="#Bearer" class="auto internal xref">Section 4.1</a>), anyone who obtains a leaked token can present it at the Target it was minted for until it expires.
+Audience binding (<a href="#Counterparty" class="auto internal xref">Section 5.4</a>) does not help if the attacker presents the token at that Target.<a href="#section-8.6-3" class="pilcrow">¶</a></p>
+<p id="section-8.6-4">Agent developers and KYAPay Token Issuers <span class="bcp14">SHOULD</span> mint and attach tokens in deterministic components (<a href="#NonPrescCreat" class="auto internal xref">Section 7.1</a>) whose outputs are not placed in model context.
+Agents <span class="bcp14">SHOULD</span> attach a token only to requests sent to the Target for which the token was requested; where the token carries <code>tdm</code>, that means a destination within the domain that <code>tdm</code> names.
+The component that attaches a token <span class="bcp14">MUST</span> make that decision without relying on model output.<a href="#section-8.6-4" class="pilcrow">¶</a></p>
+<p id="section-8.6-5">Agent runtimes <span class="bcp14">MUST NOT</span> write KYAPay token values to logs, traces, or observability exports.<a href="#section-8.6-5" class="pilcrow">¶</a></p>
+<p id="section-8.6-6">Agents <span class="bcp14">SHOULD</span> request a new token for each Target and task rather than reusing one broadly, and <span class="bcp14">SHOULD</span> request the shortest lifetime that fits the task.
+Proof of possession (<a href="#PoPPath" class="auto internal xref">Section 4.3</a>) reduces this exposure only if the private key is also kept out of model context.<a href="#section-8.6-6" class="pilcrow">¶</a></p>
+<p id="section-8.6-7">Some architectures place a token in model context unavoidably.
+Where an agent obtains a token by invoking a tool, the tool result is returned to the model, and any retained transcript of that session therefore contains the token.
+A deployment in that position <span class="bcp14">SHOULD</span> treat the token as disclosed to every party with access to that context, including the model provider.
+For such a deployment, per-Target, short-lived tokens are the main mitigation, together with proof of possession where the private key is held outside model context.<a href="#section-8.6-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="issuer-trust">
+<section id="section-8.7">
+        <h3 id="name-issuer-trust">
+<a href="#section-8.7" class="section-number selfRef">8.7. </a><a href="#name-issuer-trust" class="section-name selfRef">Issuer Trust</a>
+        </h3>
+<p id="section-8.7-1">A token is only as trustworthy as its issuer and the verifiers it cites.
 The system is federated: many issuers are possible, and a recipient <span class="bcp14">MUST</span> maintain an explicit set of trusted issuers and the claims and assurance levels it will accept from each.
 Establishing this trust at scale is an open problem analogous to the Certificate Authority model (audits, a maintained issuer list, a removal mechanism, and possibly transparency logs);
 this document does not define such a framework, and deployments should not assume one exists.
-Until it does, trust is established out of band (for example, configured relationships with well-known issuers).<a href="#section-8.6-1" class="pilcrow">¶</a></p>
+Until it does, trust is established out of band (for example, configured relationships with well-known issuers).<a href="#section-8.7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="revocation">
-<section id="section-8.7">
+<section id="section-8.8">
         <h3 id="name-revocation">
-<a href="#section-8.7" class="section-number selfRef">8.7. </a><a href="#name-revocation" class="section-name selfRef">Revocation</a>
+<a href="#section-8.8" class="section-number selfRef">8.8. </a><a href="#name-revocation" class="section-name selfRef">Revocation</a>
         </h3>
-<p id="section-8.7-1">An agent whose platform is deregistered, or a human whose identity verification is revoked, may still hold unexpired tokens.
+<p id="section-8.8-1">An agent whose platform is deregistered, or a human whose identity verification is revoked, may still hold unexpired tokens.
 This specification does not define a revocation mechanism.
-Recipients <span class="bcp14">SHOULD</span> keep accepted lifetimes short to bound exposure, and <span class="bcp14">SHOULD</span> consult an issuer's live-status or revocation endpoint, where one is offered, for high-assurance or high-value actions.<a href="#section-8.7-1" class="pilcrow">¶</a></p>
+Recipients <span class="bcp14">SHOULD</span> keep accepted lifetimes short to bound exposure, and <span class="bcp14">SHOULD</span> consult an issuer's live-status or revocation endpoint, where one is offered, for high-assurance or high-value actions.<a href="#section-8.8-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="continuity-of-human-control">
-<section id="section-8.8">
+<section id="section-8.9">
         <h3 id="name-continuity-of-human-control">
-<a href="#section-8.8" class="section-number selfRef">8.8. </a><a href="#name-continuity-of-human-control" class="section-name selfRef">Continuity of Human Control</a>
+<a href="#section-8.9" class="section-number selfRef">8.9. </a><a href="#name-continuity-of-human-control" class="section-name selfRef">Continuity of Human Control</a>
         </h3>
-<p id="section-8.8-1">A valid token attests that the human principal authorized the agent at the time of issuance.
+<p id="section-8.9-1">A valid token attests that the human principal authorized the agent at the time of issuance.
 It does not prove the human remains in control -- for example, if the agent is later prompt-injected, or if credentials are exfiltrated from the agent or its host.
-Recipients <span class="bcp14">SHOULD</span> treat high-value actions as warranting step-up (<a href="#StepUp" class="auto internal xref">Section 6.5</a>) rather than relying solely on a previously issued token.<a href="#section-8.8-1" class="pilcrow">¶</a></p>
+Recipients <span class="bcp14">SHOULD</span> treat high-value actions as warranting step-up (<a href="#StepUp" class="auto internal xref">Section 6.5</a>) rather than relying solely on a previously issued token.<a href="#section-8.9-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="key-management">
-<section id="section-8.9">
+<section id="section-8.10">
         <h3 id="name-key-management">
-<a href="#section-8.9" class="section-number selfRef">8.9. </a><a href="#name-key-management" class="section-name selfRef">Key Management</a>
+<a href="#section-8.10" class="section-number selfRef">8.10. </a><a href="#name-key-management" class="section-name selfRef">Key Management</a>
         </h3>
-<p id="section-8.9-1">If an issuer or platform rotates a signing key, tokens signed with the old key may fail validation prematurely.
-Issuers <span class="bcp14">SHOULD</span> retain superseded verification keys in their JWK Set for at least the maximum token lifetime after rotation.<a href="#section-8.9-1" class="pilcrow">¶</a></p>
+<p id="section-8.10-1">If an issuer or platform rotates a signing key, tokens signed with the old key may fail validation prematurely.
+Issuers <span class="bcp14">SHOULD</span> retain superseded verification keys in their JWK Set for at least the maximum token lifetime after rotation.<a href="#section-8.10-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="DisclosingRequirements">
-<section id="section-8.10">
+<section id="section-8.11">
         <h3 id="name-disclosing-requirements">
-<a href="#section-8.10" class="section-number selfRef">8.10. </a><a href="#name-disclosing-requirements" class="section-name selfRef">Disclosing Requirements</a>
+<a href="#section-8.11" class="section-number selfRef">8.11. </a><a href="#name-disclosing-requirements" class="section-name selfRef">Disclosing Requirements</a>
         </h3>
-<p id="section-8.10-1">The <code>Accept-KYAPay-Token</code> field (<a href="#AcceptField" class="auto internal xref">Section 5.5</a>) and any problem details a recipient returns (<a href="#StepUp" class="auto internal xref">Section 6.5</a>) tell the sender what the recipient requires.
+<p id="section-8.11-1">The <code>Accept-KYAPay-Token</code> field (<a href="#AcceptField" class="auto internal xref">Section 5.6</a>) and any problem details a recipient returns (<a href="#StepUp" class="auto internal xref">Section 6.5</a>) tell the sender what the recipient requires.
 That helps a legitimate agent obtain a suitable token, and it also reaches anyone else who sends a request.
-How much to state is a decision for the recipient, in light of its own risk:<a href="#section-8.10-1" class="pilcrow">¶</a></p>
+How much to state is a decision for the recipient, in light of its own risk:<a href="#section-8.11-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-8.10-2.1">
-            <p id="section-8.10-2.1.1">It can omit the field, state only some of its requirements, or leave out the <code>issuers</code> parameter, which names the issuers it accepts.<a href="#section-8.10-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-8.11-2.1">
+            <p id="section-8.11-2.1.1">It can omit the field, state only some of its requirements, or leave out the <code>issuers</code> parameter, which names the issuers it accepts.<a href="#section-8.11-2.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-8.10-2.2">
-            <p id="section-8.10-2.2.1">It can instead publish its requirements in advance, or agree them with initiators out of band.<a href="#section-8.10-2.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-8.11-2.2">
+            <p id="section-8.11-2.2.1">It can instead publish its requirements in advance, or agree them with initiators out of band.<a href="#section-8.11-2.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-8.10-2.3">
-            <p id="section-8.10-2.3.1">Requirements that differ by principal, by account, or by the outcome of a risk assessment can reveal those facts, for example, which accounts are of high value or that a request has been flagged (<span><a href="https://rfc-editor.org/rfc/rfc9470#section-9" class="relref">Section 9</a> of [<a href="#RFC9470" class="cite xref">RFC9470</a>]</span> describes the same risk for authentication requirements).<a href="#section-8.10-2.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-8.11-2.3">
+            <p id="section-8.11-2.3.1">Requirements that differ by principal, by account, or by the outcome of a risk assessment can reveal those facts, for example, which accounts are of high value or that a request has been flagged (<span><a href="https://rfc-editor.org/rfc/rfc9470#section-9" class="relref">Section 9</a> of [<a href="#RFC9470" class="cite xref">RFC9470</a>]</span> describes the same risk for authentication requirements).<a href="#section-8.11-2.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-8.10-2.4">
-            <p id="section-8.10-2.4.1">Saying which validation check a token failed can help an attacker probe the recipient; a generic reason avoids this (<span><a href="https://rfc-editor.org/rfc/rfc9457#section-5" class="relref">Section 5</a> of [<a href="#RFC9457" class="cite xref">RFC9457</a>]</span>).<a href="#section-8.10-2.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-8.11-2.4">
+            <p id="section-8.11-2.4.1">Saying which validation check a token failed can help an attacker probe the recipient; a generic reason avoids this (<span><a href="https://rfc-editor.org/rfc/rfc9457#section-5" class="relref">Section 5</a> of [<a href="#RFC9457" class="cite xref">RFC9457</a>]</span>).<a href="#section-8.11-2.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-8.10-3">Stating requirements does not weaken the token itself: a request still succeeds only with a token signed by an issuer the recipient trusts.<a href="#section-8.10-3" class="pilcrow">¶</a></p>
+<p id="section-8.11-3">Stating requirements does not weaken the token itself: a request still succeeds only with a token signed by an issuer the recipient trusts.<a href="#section-8.11-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2449,7 +2590,7 @@ They <span class="bcp14">MUST</span> treat <code>KYAPay-Token</code> values and 
             <p id="section-10.1-3.3.1">Structured Type: Dictionary<a href="#section-10.1-3.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-10.1-3.4">
-            <p id="section-10.1-3.4.1">Reference: <a href="#AcceptField" class="auto internal xref">Section 5.5</a> of this document<a href="#section-10.1-3.4.1" class="pilcrow">¶</a></p>
+            <p id="section-10.1-3.4.1">Reference: <a href="#AcceptField" class="auto internal xref">Section 5.6</a> of this document<a href="#section-10.1-3.4.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-10.1-3.5">
             <p id="section-10.1-3.5.1">Comments: States what a request must carry for a KYAPay recipient to accept it<a href="#section-10.1-3.5.1" class="pilcrow">¶</a></p>
@@ -2519,6 +2660,10 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
         <dd>
 <span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Nadalin, A.</span>, <span class="refAuthor">Campbell, B., Ed.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">C. Mortimore</span>, <span class="refTitle">"OAuth 2.0 Token Exchange"</span>, <span class="seriesInfo">RFC 8693</span>, <span class="seriesInfo">DOI 10.17487/RFC8693</span>, <time datetime="2020-01" class="refDate">January 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8693">https://www.rfc-editor.org/rfc/rfc8693</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC8725">[RFC8725]</dt>
+        <dd>
+<span class="refAuthor">Sheffer, Y.</span>, <span class="refAuthor">Hardt, D.</span>, and <span class="refAuthor">M. Jones</span>, <span class="refTitle">"JSON Web Token Best Current Practices"</span>, <span class="seriesInfo">BCP 225</span>, <span class="seriesInfo">RFC 8725</span>, <span class="seriesInfo">DOI 10.17487/RFC8725</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8725">https://www.rfc-editor.org/rfc/rfc8725</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC9110">[RFC9110]</dt>
         <dd>
 <span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP Semantics"</span>, <span class="seriesInfo">STD 97</span>, <span class="seriesInfo">RFC 9110</span>, <span class="seriesInfo">DOI 10.17487/RFC9110</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9110">https://www.rfc-editor.org/rfc/rfc9110</a>&gt;</span>. </dd>
@@ -2526,6 +2671,10 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
 <dt id="RFC9421">[RFC9421]</dt>
         <dd>
 <span class="refAuthor">Backman, A., Ed.</span>, <span class="refAuthor">Richer, J., Ed.</span>, and <span class="refAuthor">M. Sporny</span>, <span class="refTitle">"HTTP Message Signatures"</span>, <span class="seriesInfo">RFC 9421</span>, <span class="seriesInfo">DOI 10.17487/RFC9421</span>, <time datetime="2024-02" class="refDate">February 2024</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9421">https://www.rfc-editor.org/rfc/rfc9421</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9530">[RFC9530]</dt>
+        <dd>
+<span class="refAuthor">Polli, R.</span> and <span class="refAuthor">L. Pardue</span>, <span class="refTitle">"Digest Fields"</span>, <span class="seriesInfo">RFC 9530</span>, <span class="seriesInfo">DOI 10.17487/RFC9530</span>, <time datetime="2024-02" class="refDate">February 2024</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9530">https://www.rfc-editor.org/rfc/rfc9530</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9651">[RFC9651]</dt>
       <dd>
@@ -2588,13 +2737,13 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
         <dd>
 <span class="refAuthor">Campbell, B.</span>, <span class="refAuthor">Bradley, J.</span>, <span class="refAuthor">Sakimura, N.</span>, and <span class="refAuthor">T. Lodderstedt</span>, <span class="refTitle">"OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens"</span>, <span class="seriesInfo">RFC 8705</span>, <span class="seriesInfo">DOI 10.17487/RFC8705</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8705">https://www.rfc-editor.org/rfc/rfc8705</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC8725">[RFC8725]</dt>
-        <dd>
-<span class="refAuthor">Sheffer, Y.</span>, <span class="refAuthor">Hardt, D.</span>, and <span class="refAuthor">M. Jones</span>, <span class="refTitle">"JSON Web Token Best Current Practices"</span>, <span class="seriesInfo">BCP 225</span>, <span class="seriesInfo">RFC 8725</span>, <span class="seriesInfo">DOI 10.17487/RFC8725</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8725">https://www.rfc-editor.org/rfc/rfc8725</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="RFC8792">[RFC8792]</dt>
         <dd>
 <span class="refAuthor">Watsen, K.</span>, <span class="refAuthor">Auerswald, E.</span>, <span class="refAuthor">Farrel, A.</span>, and <span class="refAuthor">Q. Wu</span>, <span class="refTitle">"Handling Long Lines in Content of Internet-Drafts and RFCs"</span>, <span class="seriesInfo">RFC 8792</span>, <span class="seriesInfo">DOI 10.17487/RFC8792</span>, <time datetime="2020-06" class="refDate">June 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8792">https://www.rfc-editor.org/rfc/rfc8792</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9111">[RFC9111]</dt>
+        <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP Caching"</span>, <span class="seriesInfo">STD 98</span>, <span class="seriesInfo">RFC 9111</span>, <span class="seriesInfo">DOI 10.17487/RFC9111</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9111">https://www.rfc-editor.org/rfc/rfc9111</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9449">[RFC9449]</dt>
         <dd>
@@ -2640,7 +2789,8 @@ Bhasker Allam,
 Jean Diaconu,
 and
 David Senecal
-for their contributions to the specification.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+for their contributions to the specification.
+Bhasker Allam also wrote the text on which <a href="#RuntimeExposure" class="auto internal xref">Section 8.6</a> is based.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="document-history">
@@ -2658,7 +2808,40 @@ for their contributions to the specification.<a href="#appendix-A-2" class="pilc
           <p id="appendix-B-3.2.1">Updated the Bot Managers section and introduce the concept of feedback loop to the agent through an error response in case of token assessment failure<a href="#appendix-B-3.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-B-3.3">
-          <p id="appendix-B-3.3.1">Added the <code>Accept-KYAPay-Token</code> response field, which a recipient <span class="bcp14">MAY</span> send, replaced Step-Up Authentication with Responding When a Token Falls Short (over HTTP, 403, or 402 for payment, unless the protocol in use specifies its own errors; not 401), changed the Bot Managers error examples to match, made a recipient decide from its own policy whether it uses tokens for a request and decline, within its role, a request whose token fails validation, rather than treat it as carrying no token, and added Disclosing Requirements.<a href="#appendix-B-3.3.1" class="pilcrow">¶</a></p>
+          <p id="appendix-B-3.3.1">Stated that the principal need not be present at the time of a human-via-agent request.<a href="#appendix-B-3.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.4">
+          <p id="appendix-B-3.4.1">Made admission depend on the site's policy for the requested action, and stated that rate and abuse limits and step-up still apply to admitted requests.<a href="#appendix-B-3.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.5">
+          <p id="appendix-B-3.5.1">Stated that a token is reusable within its validity period and audience, and that a repeated <code>jti</code> is not by itself evidence of replay, and rewrote the replay considerations to match.<a href="#appendix-B-3.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.6">
+          <p id="appendix-B-3.6.1">Described how a recipient confirms the audience: <code>aud</code> and <code>tsi</code> where it has onboarded to the issuer, <code>tdm</code> otherwise; required <code>tdm</code> where the Target is identified by a domain name.<a href="#appendix-B-3.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.7">
+          <p id="appendix-B-3.7.1">Prohibited retrieving key material for an issuer that is not trusted.<a href="#appendix-B-3.7.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.8">
+          <p id="appendix-B-3.8.1">Made BCP 225 a normative reference, and let a recipient reject a request carrying more than one token of the same <code>typ</code>.<a href="#appendix-B-3.8.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.9">
+          <p id="appendix-B-3.9.1">Added Token Exposure in the Agent Runtime to the Security Considerations.<a href="#appendix-B-3.9.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.10">
+          <p id="appendix-B-3.10.1">Added Request Signatures for Proof of Possession: the covered components, and verification at the first hop.<a href="#appendix-B-3.10.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.11">
+          <p id="appendix-B-3.11.1">Added Attaching Tokens to Requests, scoped the zero-tech-lift principle to agents that control a request's header fields, and added CORS preflight and caching requirements.<a href="#appendix-B-3.11.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.12">
+          <p id="appendix-B-3.12.1">Described retaining a token for audit or dispute resolution.<a href="#appendix-B-3.12.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.13">
+          <p id="appendix-B-3.13.1">Defined <code>KYAPay-Token</code> as a List of Tokens, replacing the ABNF, and required a recipient to reject a field that fails to parse.<a href="#appendix-B-3.13.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.14">
+          <p id="appendix-B-3.14.1">Added the <code>Accept-KYAPay-Token</code> response field, which a recipient <span class="bcp14">MAY</span> send, replaced Step-Up Authentication with Responding When a Token Falls Short (over HTTP, 403, or 402 for payment, unless the protocol in use specifies its own errors; not 401), changed the Bot Managers error examples to match, made a recipient decide from its own policy whether it uses tokens for a request and decline, within its role, a request whose token fails validation, rather than treat it as carrying no token, and added Disclosing Requirements.<a href="#appendix-B-3.14.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="appendix-B-4">-01<a href="#appendix-B-4" class="pilcrow">¶</a></p>
