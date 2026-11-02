@@ -629,16 +629,19 @@ Table of Contents
    [I-D.skyfire-oauth-kyapay-token].  HTTP field names are case-
    insensitive [RFC9110].
 
-   KYAPay-Token = token-jwt *( OWS "," OWS token-jwt )
-   token-jwt    = 1*( ALPHA / DIGIT / "-" / "_" / "." )
+   KYAPay-Token is a List Structured Field (Section 3.1 of [RFC9651]).
+   Each member is a Token (Section 3.3.4 of [RFC9651]) whose value is a
+   JWT, with no parameters.  A compact JWT consists only of base64url
+   characters and periods, and it begins with the encoding of a JSON
+   object, so its first character is a letter; it is therefore a valid
+   Token as it stands.  For example:
+
+   KYAPay-Token: eyJhbGciOiJFUzI1NiIsInR5cCI6Imt5YStqd3QifQ.eyJpc3Mi...
 
    A request MAY convey more than one token (for example, separate KYA
-   and PAY tokens) either as a comma-separated list in a single KYAPay-
-   Token header field or as multiple KYAPay-Token header fields; per
-   Section 5.2 of [RFC9110], multiple field lines with the same name are
-   equivalent to a single comma-separated field line.  Because a JWT
-   uses only the base64url alphabet plus the period (".") separator, it
-   never contains a comma, so list parsing is unambiguous.
+   and PAY tokens), either as members of one field line or in several
+   KYAPay-Token field lines, which are combined before parsing as
+   described in Section 4.2 of [RFC9651].
 
    A sender:
 
@@ -657,11 +660,19 @@ Table of Contents
       position;
 
    *  MAY reject a request that carries more than one token of the same
-      typ; and
+      typ;
 
-   *  MUST ignore a KYAPay-Token member it cannot parse as a JWT, while
-      continuing to process the remaining members, unless local policy
-      requires rejecting the whole request.
+   *  MUST parse the field as a List [RFC9651].  A field that fails to
+      parse fails as a whole, and a recipient MUST NOT attempt to
+      recover individual members from it;
+
+   *  MUST reject the request if the field fails to parse, or if any
+      member is not a Token whose value is a well-formed JWT.
+      Section 4.2 of [RFC9651] permits either ignoring a field that
+      fails to parse or treating the message as malformed; this document
+      requires the latter; and
+
+   *  MUST accept List members of up to the length given in Section 5.2.
 
    Intermediaries and caches MUST treat KYAPay-Token as containing
    sensitive, request-specific credentials; it MUST NOT be cached in a
@@ -1629,6 +1640,10 @@ Table of Contents
               DOI 10.17487/RFC9530, February 2024,
               <https://www.rfc-editor.org/rfc/rfc9530>.
 
+   [RFC9651]  Nottingham, M. and P. Kamp, "Structured Field Values for
+              HTTP", RFC 9651, DOI 10.17487/RFC9651, September 2024,
+              <https://www.rfc-editor.org/rfc/rfc9651>.
+
 11.2.  Informative References
 
    [A2A]      A2A Project, "Agent2Agent (A2A) Protocol Specification",
@@ -1783,6 +1798,9 @@ Document History
       added CORS preflight and caching requirements.
 
    *  Described retaining a token for audit or dispute resolution.
+
+   *  Defined KYAPay-Token as a List of Tokens, replacing the ABNF, and
+      required a recipient to reject a field that fails to parse.
 
    -01
 

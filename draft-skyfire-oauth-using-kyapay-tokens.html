@@ -1751,49 +1751,56 @@ For a directly interacting human, such details are typically carried in the requ
 for a human-via-agent request, they are carried in the <code>KYAPay-Token</code> header field defined here.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 <p id="section-5.1-2">The <code>KYAPay-Token</code> header field is an HTTP request header field whose value is a KYA, PAY, or KYA-PAY token, as defined in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>.
 HTTP field names are case-insensitive <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5.1-3">
+<p id="section-5.1-3"><code>KYAPay-Token</code> is a List Structured Field (<span><a href="https://rfc-editor.org/rfc/rfc9651#section-3.1" class="relref">Section 3.1</a> of [<a href="#RFC9651" class="cite xref">RFC9651</a>]</span>).
+Each member is a Token (<span><a href="https://rfc-editor.org/rfc/rfc9651#section-3.3.4" class="relref">Section 3.3.4</a> of [<a href="#RFC9651" class="cite xref">RFC9651</a>]</span>) whose value is a JWT, with no parameters.
+A compact JWT consists only of base64url characters and periods, and it begins with the encoding of a JSON object, so its first character is a letter; it is therefore a valid Token as it stands.
+For example:<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5.1-4">
 <pre>
-KYAPay-Token = token-jwt *( OWS "," OWS token-jwt )
-token-jwt    = 1*( ALPHA / DIGIT / "-" / "_" / "." )
-</pre><a href="#section-5.1-3" class="pilcrow">¶</a>
+KYAPay-Token: eyJhbGciOiJFUzI1NiIsInR5cCI6Imt5YStqd3QifQ.eyJpc3Mi...
+</pre><a href="#section-5.1-4" class="pilcrow">¶</a>
 </div>
-<p id="section-5.1-4">A request <span class="bcp14">MAY</span> convey more than one token (for example, separate KYA and PAY tokens) either as a comma-separated list in a single <code>KYAPay-Token</code> header field or as multiple <code>KYAPay-Token</code> header fields;
-per <span><a href="https://rfc-editor.org/rfc/rfc9110#section-5.2" class="relref">Section 5.2</a> of [<a href="#RFC9110" class="cite xref">RFC9110</a>]</span>, multiple field lines with the same name are equivalent to a single comma-separated field line.
-Because a JWT uses only the base64url alphabet plus the period (".") separator, it never contains a comma, so list parsing is unambiguous.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
-<p id="section-5.1-5">A sender:<a href="#section-5.1-5" class="pilcrow">¶</a></p>
+<p id="section-5.1-5">A request <span class="bcp14">MAY</span> convey more than one token (for example, separate KYA and PAY tokens), either as members of one field line or in several <code>KYAPay-Token</code> field lines, which are combined before parsing as described in <span><a href="https://rfc-editor.org/rfc/rfc9651#section-4.2" class="relref">Section 4.2</a> of [<a href="#RFC9651" class="cite xref">RFC9651</a>]</span>.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
+<p id="section-5.1-6">A sender:<a href="#section-5.1-6" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-5.1-6.1">
-            <p id="section-5.1-6.1.1"><span class="bcp14">MUST</span> place exactly one JWT in each list member;<a href="#section-5.1-6.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-5.1-7.1">
+            <p id="section-5.1-7.1.1"><span class="bcp14">MUST</span> place exactly one JWT in each list member;<a href="#section-5.1-7.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.1-6.2">
-            <p id="section-5.1-6.2.1"><span class="bcp14">SHOULD NOT</span> send more than one token of the same <code>typ</code> (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>) in a single request; and<a href="#section-5.1-6.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.1-7.2">
+            <p id="section-5.1-7.2.1"><span class="bcp14">SHOULD NOT</span> send more than one token of the same <code>typ</code> (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>) in a single request; and<a href="#section-5.1-7.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.1-6.3">
-            <p id="section-5.1-6.3.1"><span class="bcp14">MUST NOT</span> rely on the ordering of tokens within the field to convey meaning.<a href="#section-5.1-6.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.1-7.3">
+            <p id="section-5.1-7.3.1"><span class="bcp14">MUST NOT</span> rely on the ordering of tokens within the field to convey meaning.<a href="#section-5.1-7.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.1-7">A recipient:<a href="#section-5.1-7" class="pilcrow">¶</a></p>
+<p id="section-5.1-8">A recipient:<a href="#section-5.1-8" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-5.1-8.1">
-            <p id="section-5.1-8.1.1"><span class="bcp14">MUST</span> determine the type of each token from its <code>typ</code> header parameter (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>), not from its position;<a href="#section-5.1-8.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-5.1-9.1">
+            <p id="section-5.1-9.1.1"><span class="bcp14">MUST</span> determine the type of each token from its <code>typ</code> header parameter (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>), not from its position;<a href="#section-5.1-9.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.1-8.2">
-            <p id="section-5.1-8.2.1"><span class="bcp14">MAY</span> reject a request that carries more than one token of the same <code>typ</code>; and<a href="#section-5.1-8.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.1-9.2">
+            <p id="section-5.1-9.2.1"><span class="bcp14">MAY</span> reject a request that carries more than one token of the same <code>typ</code>;<a href="#section-5.1-9.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-5.1-8.3">
-            <p id="section-5.1-8.3.1"><span class="bcp14">MUST</span> ignore a <code>KYAPay-Token</code> member it cannot parse as a JWT, while continuing to process the remaining members, unless local policy requires rejecting the whole request.<a href="#section-5.1-8.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-5.1-9.3">
+            <p id="section-5.1-9.3.1"><span class="bcp14">MUST</span> parse the field as a List <span>[<a href="#RFC9651" class="cite xref">RFC9651</a>]</span>. A field that fails to parse fails as a whole, and a recipient <span class="bcp14">MUST NOT</span> attempt to recover individual members from it;<a href="#section-5.1-9.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.1-9.4">
+            <p id="section-5.1-9.4.1"><span class="bcp14">MUST</span> reject the request if the field fails to parse, or if any member is not a Token whose value is a well-formed JWT. <span><a href="https://rfc-editor.org/rfc/rfc9651#section-4.2" class="relref">Section 4.2</a> of [<a href="#RFC9651" class="cite xref">RFC9651</a>]</span> permits either ignoring a field that fails to parse or treating the message as malformed; this document requires the latter; and<a href="#section-5.1-9.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.1-9.5">
+            <p id="section-5.1-9.5.1"><span class="bcp14">MUST</span> accept List members of up to the length given in <a href="#TokenSize" class="auto internal xref">Section 5.2</a>.<a href="#section-5.1-9.5.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.1-9">Intermediaries and caches <span class="bcp14">MUST</span> treat <code>KYAPay-Token</code> as containing sensitive, request-specific credentials;
-it <span class="bcp14">MUST NOT</span> be cached in a way that would allow it to be replayed on a different request, and it <span class="bcp14">MUST NOT</span> be logged or forwarded to parties other than legitimate participants (see <a href="#PrivCon" class="auto internal xref">Section 9</a>).<a href="#section-5.1-9" class="pilcrow">¶</a></p>
-<p id="section-5.1-10">The <code>KYAPay-Token</code> header field is intended for use over TLS.
+<p id="section-5.1-10">Intermediaries and caches <span class="bcp14">MUST</span> treat <code>KYAPay-Token</code> as containing sensitive, request-specific credentials;
+it <span class="bcp14">MUST NOT</span> be cached in a way that would allow it to be replayed on a different request, and it <span class="bcp14">MUST NOT</span> be logged or forwarded to parties other than legitimate participants (see <a href="#PrivCon" class="auto internal xref">Section 9</a>).<a href="#section-5.1-10" class="pilcrow">¶</a></p>
+<p id="section-5.1-11">The <code>KYAPay-Token</code> header field is intended for use over TLS.
 A token <span class="bcp14">MUST NOT</span> be sent over a non-TLS-protected connection.
 When the token carries a proof-of-possession key (<a href="#TrustStack" class="auto internal xref">Section 4</a>), it <span class="bcp14">SHOULD</span> be accompanied by a request Message Signature <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> over that key;
-otherwise it is a bearer token, subject to the controls and accepted risks in <a href="#SecCon" class="auto internal xref">Section 8</a>.<a href="#section-5.1-10" class="pilcrow">¶</a></p>
-<p id="section-5.1-11">A CORS preflight request does not carry the <code>KYAPay-Token</code> field: the user agent sends it to ask whether the field may be sent.
-A recipient <span class="bcp14">MUST NOT</span> apply its token-absent policy to a preflight request.<a href="#section-5.1-11" class="pilcrow">¶</a></p>
-<p id="section-5.1-12">Where a response depends on the <code>KYAPay-Token</code> field, the response <span class="bcp14">MUST</span> include <code>Vary: KYAPay-Token</code> and <span class="bcp14">MUST</span> be marked so that shared caches do not store it, for example with <code>Cache-Control: private</code>.
-The protection in <span><a href="https://rfc-editor.org/rfc/rfc9111#section-3.5" class="relref">Section 3.5</a> of [<a href="#RFC9111" class="cite xref">RFC9111</a>]</span> applies only to requests that carry the <code>Authorization</code> field.<a href="#section-5.1-12" class="pilcrow">¶</a></p>
+otherwise it is a bearer token, subject to the controls and accepted risks in <a href="#SecCon" class="auto internal xref">Section 8</a>.<a href="#section-5.1-11" class="pilcrow">¶</a></p>
+<p id="section-5.1-12">A CORS preflight request does not carry the <code>KYAPay-Token</code> field: the user agent sends it to ask whether the field may be sent.
+A recipient <span class="bcp14">MUST NOT</span> apply its token-absent policy to a preflight request.<a href="#section-5.1-12" class="pilcrow">¶</a></p>
+<p id="section-5.1-13">Where a response depends on the <code>KYAPay-Token</code> field, the response <span class="bcp14">MUST</span> include <code>Vary: KYAPay-Token</code> and <span class="bcp14">MUST</span> be marked so that shared caches do not store it, for example with <code>Cache-Control: private</code>.
+The protection in <span><a href="https://rfc-editor.org/rfc/rfc9111#section-3.5" class="relref">Section 3.5</a> of [<a href="#RFC9111" class="cite xref">RFC9111</a>]</span> applies only to requests that carry the <code>Authorization</code> field.<a href="#section-5.1-13" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="TokenSize">
@@ -2575,8 +2582,12 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
 <span class="refAuthor">Backman, A., Ed.</span>, <span class="refAuthor">Richer, J., Ed.</span>, and <span class="refAuthor">M. Sporny</span>, <span class="refTitle">"HTTP Message Signatures"</span>, <span class="seriesInfo">RFC 9421</span>, <span class="seriesInfo">DOI 10.17487/RFC9421</span>, <time datetime="2024-02" class="refDate">February 2024</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9421">https://www.rfc-editor.org/rfc/rfc9421</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9530">[RFC9530]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Polli, R.</span> and <span class="refAuthor">L. Pardue</span>, <span class="refTitle">"Digest Fields"</span>, <span class="seriesInfo">RFC 9530</span>, <span class="seriesInfo">DOI 10.17487/RFC9530</span>, <time datetime="2024-02" class="refDate">February 2024</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9530">https://www.rfc-editor.org/rfc/rfc9530</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9651">[RFC9651]</dt>
+      <dd>
+<span class="refAuthor">Nottingham, M.</span> and <span class="refAuthor">P. Kamp</span>, <span class="refTitle">"Structured Field Values for HTTP"</span>, <span class="seriesInfo">RFC 9651</span>, <span class="seriesInfo">DOI 10.17487/RFC9651</span>, <time datetime="2024-09" class="refDate">September 2024</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9651">https://www.rfc-editor.org/rfc/rfc9651</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -2722,6 +2733,9 @@ Bhasker Allam also wrote the text on which <a href="#RuntimeExposure" class="aut
 </li>
         <li class="normal" id="appendix-B-3.12">
           <p id="appendix-B-3.12.1">Described retaining a token for audit or dispute resolution.<a href="#appendix-B-3.12.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.13">
+          <p id="appendix-B-3.13.1">Defined <code>KYAPay-Token</code> as a List of Tokens, replacing the ABNF, and required a recipient to reject a field that fails to parse.<a href="#appendix-B-3.13.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="appendix-B-4">-01<a href="#appendix-B-4" class="pilcrow">¶</a></p>
