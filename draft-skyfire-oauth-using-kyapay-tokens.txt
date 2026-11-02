@@ -431,8 +431,8 @@ Table of Contents
 
    *  short token lifetimes (exp), so a captured token expires quickly;
 
-   *  audience binding (aud, and where used tdm/tsi), so a token minted
-      for one Target cannot be presented to another;
+   *  audience binding (Section 5.4), so a token minted for one Target
+      cannot be presented to another;
 
    *  TLS on every hop, which mitigates on-the-wire capture and man-in-
       the-middle; and
@@ -639,14 +639,21 @@ Table of Contents
 
 5.4.  Authenticating the Counterparty
 
-   Conveying a token securely also requires that the sending agent
-   deliver it to the intended recipient and that the recipient be able
-   to bind the token to itself.  The aud claim, together with the
-   optional tdm (target domain) and tsi (target service identifier)
-   claims defined in [I-D.skyfire-oauth-kyapay-token], allows a
-   recipient to confirm that a token was minted for it and to mitigate
-   replay to a different party (Section 8).  At the transport and
-   discovery layers, mechanisms such as DNS domain names (with TLS
+   The aud and tsi claims are identifiers assigned by the Token Issuer
+   (the Identifying the Target section of
+   [I-D.skyfire-oauth-kyapay-token]); their values are known to a Target
+   that has onboarded to that issuer and are not otherwise discoverable.
+   The tdm claim names the Target's domain, is not issuer-specific, and
+   requires no relationship with the issuer to interpret.  A Target that
+   has onboarded to an issuer checks aud and tsi, and MAY also check
+   tdm; a security intermediary acting for such a Target MAY be
+   configured with that Target's aud and tsi values and check them.  A
+   recipient that has not onboarded, including a security intermediary
+   acting for many Targets, SHOULD check at least that tdm names the
+   domain it is protecting for that request; where tdm also names a host
+   or a path, the recipient MAY check those too. tdm MUST be present in
+   tokens whose Target is identified by a domain name.  At the transport
+   and discovery layers, mechanisms such as DNS domain names (with TLS
    server authentication), A2A agent cards [A2A], and MCP server
    identification [MCP] help an agent confirm that it is communicating
    with the correct counterparty before presenting a token.
@@ -658,8 +665,8 @@ Table of Contents
    validated token.  Throughout, "validate the token" means to perform
    the validation procedure defined in [I-D.skyfire-oauth-kyapay-token],
    Section 4 (JWT header validation, signature and issuer validation,
-   and validation of exp, iat, jti, aud, and env), plus the PAY-specific
-   validation for pay+jwt and kya-pay+jwt tokens.
+   and validation of exp, iat, jti, the audience, and env), plus the
+   PAY-specific validation for pay+jwt and kya-pay+jwt tokens.
 
 6.1.  Common Processing Model
 
@@ -692,9 +699,8 @@ Table of Contents
        issuer per request; issuer keys SHOULD be cached and refreshed
        according to standard JWK Set practice.
 
-   5.  MUST confirm that the token is intended for this recipient by
-       checking the aud claim (and, if used, the tdm and tsi claims) as
-       described in Section 8.
+   5.  MUST confirm that the token is intended for this recipient, as
+       described in Section 5.4.
 
    6.  MUST confirm that the env claim (for example, production) matches
        the environment the intermediary is operating in.  When the token
@@ -1569,6 +1575,10 @@ Document History
    *  Stated that a token is reusable within its validity period and
       audience, and that a repeated jti is not by itself evidence of
       replay, and rewrote the replay considerations to match.
+
+   *  Described how a recipient confirms the audience: aud and tsi where
+      it has onboarded to the issuer, tdm otherwise; required tdm where
+      the Target is identified by a domain name.
 
    -01
 
