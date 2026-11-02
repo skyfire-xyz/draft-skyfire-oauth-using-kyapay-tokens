@@ -529,7 +529,7 @@ This document does not define those problem types; they are examples for discuss
 
 **Token expired.**
 Because tokens have a short validity window, a bot manager may occasionally detect a token that expires during the validation process.
-The agent can obtain a new token from one of the listed issuers and retry the request:
+The agent can obtain a new token from one of the listed issuers and retry the request.
 
     NOTE: '\' line wrapping per RFC 8792
 
@@ -547,7 +547,7 @@ The response has the same form, with a different problem type:
     {"type": "https://bot-manager.example/problems/invalid-token"}
 
 ### Token not present
-Organizations and individuals developing AI agents may be unaware of the requirement to identify their traffic using a Know Your Agent (KYA) token. Consequently, bot managers utilizing advanced detection methods may misclassify this agentic traffic as malicious and block it. To prevent a degraded user experience, which can lead to lost business opportunities for the host website—bot managers should issue a custom challenge response instead of an outright block. This proactive approach gently encourages developers to adopt and implement the KYA standard.
+Organizations and individuals developing AI agents may be unaware of the requirement to identify their traffic using a Know Your Agent (KYA) token. Consequently, bot managers utilizing advanced detection methods may misclassify this agentic traffic as malicious and block it. To prevent a degraded user experience, which can lead to lost business opportunities for the host website, bot managers should issue a custom challenge response instead of an outright block. This proactive approach gently encourages developers to adopt and implement the KYA standard.
 
 When a bot manager detects advanced automation that lacks a Know Your Agent (KYA) token or other standard forms of identification, it responds in the same way, with the problem type `https://bot-manager.example/problems/missing-token`.
 After the agent acquires a valid KYA token and reissues the request, the transaction can complete successfully.
@@ -592,7 +592,7 @@ A recipient MAY describe the reason in a problem details body {{RFC9457}} ({{Dis
 
 An agent that receives such a response can compare it with what it sent.
 If it sent no token, or a token that was refused, it can obtain a new token and retry.
-If the token lacked something the recipient requires, obtaining it may involve the human principal, for example to agree to share an attribute or to complete further verification with the issuer, which can take minutes to days.
+If the token lacked something the recipient requires, obtaining it may involve the human principal, for example, to agree to share an attribute or to complete further verification with the issuer, which can take minutes to days.
 
 The same requirements can also be published in advance, so that an agent obtains a suitable token the first time.
 This document does not define how.
@@ -804,7 +804,7 @@ How much to state is a decision for the recipient, in light of its own risk:
 
 * It can instead publish its requirements in advance, or agree them with initiators out of band.
 
-* Requirements that differ by principal, by account, or by the outcome of a risk assessment can reveal those facts, for example which accounts are of high value or that a request has been flagged ({{Section 9 of RFC9470}} describes the same risk for authentication requirements).
+* Requirements that differ by principal, by account, or by the outcome of a risk assessment can reveal those facts, for example, which accounts are of high value or that a request has been flagged ({{Section 9 of RFC9470}} describes the same risk for authentication requirements).
 
 * Saying which validation check a token failed can help an attacker probe the recipient; a generic reason avoids this ({{Section 5 of RFC9457}}).
 
