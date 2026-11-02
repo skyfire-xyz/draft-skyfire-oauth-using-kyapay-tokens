@@ -5,10 +5,10 @@
 Web Authorization Protocol                                    A. Agarwal
 Internet-Draft                                      Skyfire Systems Inc.
 Intended status: Standards Track                             M. B. Jones
-Expires: 5 May 2027                               Self-Issued Consulting
+Expires: 6 May 2027                               Self-Issued Consulting
                                                                S. Thumma
                                                                   Akamai
-                                                         1 November 2026
+                                                         2 November 2026
 
 
                           Using KYAPay Tokens
@@ -69,7 +69,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 May 2027.
+   This Internet-Draft will expire on 6 May 2027.
 
 Copyright Notice
 
@@ -1170,10 +1170,10 @@ Table of Contents
    classify an otherwise valid human-via-agent request as a bot.
 
    Because hid.id is stable for the human principal at a Target service,
-   a Target or its fraud manager MAY link the agent's earlier work at
-   that service to the principal's eventual purchase there, for
-   attribution, personalization and fraud analysis. hid.id, sub and
-   aid.id differ at every other Target service
+   for a given issuer and agent platform, a Target or its fraud manager
+   MAY link the agent's earlier work at that service to the principal's
+   eventual purchase there, for attribution, personalization and fraud
+   analysis. hid.id, sub and aid.id differ at every other Target service
    ([I-D.skyfire-oauth-kyapay-token]).  Linking to a purchase completed
    outside the agent session, or on a different channel, needs an
    identifier available in both places, such as an email address, which
