@@ -5,10 +5,10 @@
 Web Authorization Protocol                                    A. Agarwal
 Internet-Draft                                      Skyfire Systems Inc.
 Intended status: Standards Track                             M. B. Jones
-Expires: 5 May 2027                               Self-Issued Consulting
+Expires: 6 May 2027                               Self-Issued Consulting
                                                                S. Thumma
                                                                   Akamai
-                                                         1 November 2026
+                                                         2 November 2026
 
 
                           Using KYAPay Tokens
@@ -69,7 +69,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 May 2027.
+   This Internet-Draft will expire on 6 May 2027.
 
 Copyright Notice
 
@@ -544,10 +544,10 @@ Table of Contents
 
    KYAPay-Token is a List Structured Field (Section 3.1 of [RFC9651]).
    Each member is a Token (Section 3.3.4 of [RFC9651]) whose value is a
-   JWT in compact serialization, with no parameters.  A compact JWT
-   consists only of base64url characters and periods, and it begins with
-   the encoding of a JSON object, so its first character is a letter; it
-   is therefore a valid Token as it stands.  For example:
+   JWT, with no parameters.  A compact JWT consists only of base64url
+   characters and periods, and it begins with the encoding of a JSON
+   object, so its first character is a letter; it is therefore a valid
+   Token as it stands.  For example:
 
    KYAPay-Token: eyJhbGciOiJFUzI1NiIsInR5cCI6Imt5YStqd3QifQ.eyJpc3Mi...
 
