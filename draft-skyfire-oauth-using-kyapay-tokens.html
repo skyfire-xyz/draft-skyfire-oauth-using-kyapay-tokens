@@ -1868,10 +1868,12 @@ Any kind of request may carry a <code>KYAPay-Token</code> field; whether it does
           <li class="normal" id="section-5.5-2.2">
             <p id="section-5.5-2.2.1">A Target may rely on other hosts, such as its own hosts in other domains or vendors acting on its behalf.
 A request to such a host carries a token that names the Target in its audience claims (<a href="#Counterparty" class="auto internal xref">Section 5.4</a>) and carries the claims that apply to that host, which may include payment claims.
+Where no claims are set for the host, the token carries only the base claims: <code>hid</code> limited to its <code>id</code> member and assurance claims, <code>apd</code>, and <code>aid</code> without <code>creation_ip</code>, with no payment claims.
 Where the claims for the host match those of the Target's token, the agent <span class="bcp14">MAY</span> send the Target's token.<a href="#section-5.5-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.5-2.3">
-            <p id="section-5.5-2.3.1">A request to any other host <span class="bcp14">SHOULD NOT</span> carry a token.<a href="#section-5.5-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-5.5-2.3.1">A request to any other host <span class="bcp14">SHOULD NOT</span> carry a token.
+If it does, the token <span class="bcp14">MUST NOT</span> carry more than the base claims.<a href="#section-5.5-2.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-5.5-3">This applies however the token is attached. An agent that adds the field below the page, for example by browser-level header injection, applies these rules to each request according to its destination, because a page also sends requests to hosts that are neither the Target nor acting on its behalf.<a href="#section-5.5-3" class="pilcrow">¶</a></p>
@@ -2161,7 +2163,7 @@ KYAPay tokens let it separate three cases that previously looked alike: a direct
 </li>
           <li class="normal" id="section-6.6-2.2">
             <p id="section-6.6-2.2.1">When the agent needs to act within an existing account, the token <span class="bcp14">MAY</span> be exchanged for an OAuth access token using KYAPay Token Exchange <span>[<a href="#I-D.skyfire-oauth-kyapay-token-exchange" class="cite xref">I-D.skyfire-oauth-kyapay-token-exchange</a>]</span> or OAuth 2.0 Token Exchange <span>[<a href="#RFC8693" class="cite xref">RFC8693</a>]</span>.
-A Security Token Service, Identity Provider, or OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> Authorization Server validates the KYA token, extracts principal claims such as the email address from <code>hid</code>, and issues an access token that the agent uses against the Target.<a href="#section-6.6-2.2.1" class="pilcrow">¶</a></p>
+A Security Token Service, Identity Provider, or OAuth 2.0 <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> Authorization Server validates the KYA token, extracts principal claims from <code>hid</code> (<code>hid.id</code>, and an email address or other identifier where the Target requested it), and issues an access token that the agent uses against the Target.<a href="#section-6.6-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.6-2.3">
             <p id="section-6.6-2.3.1">The access token resulting from such an exchange <span class="bcp14">SHOULD</span> be sender-constrained (for example, via DPoP <span>[<a href="#RFC9449" class="cite xref">RFC9449</a>]</span> or mutual TLS <span>[<a href="#RFC8705" class="cite xref">RFC8705</a>]</span>) rather than issued as a freely transferable bearer token, so that exchanging the KYA token does not simply reintroduce a replayable credential.<a href="#section-6.6-2.3.1" class="pilcrow">¶</a></p>
@@ -2174,6 +2176,14 @@ A Security Token Service, Identity Provider, or OAuth 2.0 <span>[<a href="#RFC67
 An ATO protector <span class="bcp14">SHOULD NOT</span> assume that the human remains in control for the token's whole lifetime, <span class="bcp14">SHOULD</span> prefer short token lifetimes, and <span class="bcp14">SHOULD</span> apply step-up (<a href="#StepUp" class="auto internal xref">Section 6.5</a>) for sensitive actions.<a href="#section-6.6-2.5.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
+<p id="section-6.6-3">A KYAPay token attests the identity of the principal who authorized the agent.
+It does not convey authority over any account at the Target.
+An ATO protector <span class="bcp14">MUST NOT</span> treat a validated token, on its own, as evidence that the session is authorized for the account it is acting on.<a href="#section-6.6-3" class="pilcrow">¶</a></p>
+<p id="section-6.6-4">Where a KYAPay token is presented to gain access to an account (at sign-in, at account creation, or when the token is exchanged for an access token as described above), a recipient <span class="bcp14">SHOULD</span> check that the token's principal is linked to that account.
+The principal is linked when the account already records the token's <code>iss</code> and <code>hid.id</code>, or when a verified identifier in <code>hid</code> matches one the account records as verified.
+A match is a strong positive signal that the agent is acting within its own principal's account, and a recipient <span class="bcp14">MAY</span> weight it accordingly.
+A mismatch <span class="bcp14">SHOULD</span> be treated as grounds for step-up (<a href="#StepUp" class="auto internal xref">Section 6.5</a>) rather than as conclusive.
+Because an issuer asserts an identifier only where it has verified that the principal controls it, a match is evidence of control rather than of mere knowledge.<a href="#section-6.6-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="ciam-systems">
@@ -2185,13 +2195,21 @@ An ATO protector <span class="bcp14">SHOULD NOT</span> assume that the human rem
 With KYAPay tokens it can manage agents consistently with humans:<a href="#section-6.7-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6.7-2.1">
-            <p id="section-6.7-2.1.1">It <span class="bcp14">MAY</span> create an account for an agent (or for the human principal behind an agent) directly from a validated KYA or KYA-PAY token, drawing account attributes such as the email address from the <code>hid</code> claim.<a href="#section-6.7-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-6.7-2.1.1">It <span class="bcp14">MAY</span> create an account for an agent (or for the human principal behind an agent) directly from a validated KYA or KYA-PAY token, drawing account attributes from the <code>hid</code> claim, such as an email address where the CIAM system requested it.<a href="#section-6.7-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.7-2.2">
             <p id="section-6.7-2.2.1">It <span class="bcp14">SHOULD</span> use KYAPay Token Exchange <span>[<a href="#I-D.skyfire-oauth-kyapay-token-exchange" class="cite xref">I-D.skyfire-oauth-kyapay-token-exchange</a>]</span> or OAuth 2.0 Token Exchange <span>[<a href="#RFC8693" class="cite xref">RFC8693</a>]</span> to exchange a KYA token for an access token, enabling logged-in experiences (loyalty, saved preferences, offers) for human-via-agent sessions, applying the sender-constraining and cross-domain-trust considerations of <a href="#ATOProt" class="auto internal xref">Section 6.6</a>.<a href="#section-6.7-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-6.7-2.3">
             <p id="section-6.7-2.3.1">It <span class="bcp14">SHOULD</span> maintain the linkage between a human principal and the agents authorized to act for them, so that a principal can be given visibility into, and control over, agent activity and vice versa.<a href="#section-6.7-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.7-2.4">
+            <p id="section-6.7-2.4.1">A validated token identifies the principal who authorized the agent; it does not by itself convey authority over an existing account.
+A CIAM system <span class="bcp14">MAY</span> create a new account from a validated token, in which case the token's principal is the account holder by construction, and it <span class="bcp14">SHOULD</span> record the token's <code>iss</code> and <code>hid.id</code> against the account.
+To admit an agent to an existing account, a CIAM system <span class="bcp14">MUST</span> additionally establish that the token's principal is linked to that account.
+Any of the following is sufficient: the account already records the token's <code>iss</code> and <code>hid.id</code>; a verified identifier in <code>hid</code> matches one the account records as verified; or an existing session for that account authenticated by other means.
+A mismatch, or the absence of any link, <span class="bcp14">SHOULD</span> be treated as grounds for step-up (<a href="#StepUp" class="auto internal xref">Section 6.5</a>) rather than as conclusive.
+A validated token alone <span class="bcp14">MUST NOT</span> be treated as sufficient.<a href="#section-6.7-2.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -2265,7 +2283,9 @@ In a common pattern, the agent performs discovery and assembles a cart but does 
 it then hands off to the human, who completes checkout in a browser, in a later session, or even in a physical store.
 In such flows, the KYA token (carried without a PAY token) still provides the human presence signal that lets a security intermediary admit the agent's discovery and cart-building activity.
 Intermediaries <span class="bcp14">SHOULD</span> accept KYA-only requests (those conveying a KYA token but no PAY token) for actions that do not themselves settle a payment, and <span class="bcp14">MUST NOT</span> treat the absence of a PAY token as a reason to classify an otherwise valid human-via-agent request as a bot.<a href="#section-6.11-1" class="pilcrow">¶</a></p>
-<p id="section-6.11-2">Because the human identity claim <code>hid</code> (for example, an email address) is stable across these touchpoints, a Target or fraud manager <span class="bcp14">MAY</span> link the agent's earlier work to the human's eventual purchase -- for attribution, personalization, and fraud analysis -- even when the purchase completes outside the agent session or on a different channel.<a href="#section-6.11-2" class="pilcrow">¶</a></p>
+<p id="section-6.11-2">Because <code>hid.id</code> is stable for the human principal at a Target service, for a given issuer and agent platform, a Target or its fraud manager <span class="bcp14">MAY</span> link the agent's earlier work at that service to the principal's eventual purchase there, for attribution, personalization and fraud analysis.
+<code>hid.id</code>, <code>sub</code> and <code>aid.id</code> differ at every other Target service (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>).
+Linking to a purchase completed outside the agent session, or on a different channel, needs an identifier available in both places, such as an email address, which a token carries only where the Target requested it and the principal authorized its disclosure.<a href="#section-6.11-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2527,6 +2547,8 @@ In particular:<a href="#section-9-1" class="pilcrow">¶</a></p>
         </h3>
 <p id="section-9.1-1">Only the information needed to facilitate the intended interaction should be placed in a token and conveyed to intermediaries and Targets.
 Issuers and senders <span class="bcp14">SHOULD</span> prefer the least revealing set of claims sufficient for the decision at hand -- for example, an assurance level or a boolean verified status rather than underlying identity documents or personally identifying verification data.
+For example, a bot manager deciding whether to admit a request to browse a catalog needs no identifying claim: <code>sub</code> and <code>hid.id</code> let it rate-limit and recognize a returning principal at that Target service, and the assurance claims in <code>hid</code> say how strongly the principal was verified.
+By default, a token identifies the principal only by <code>hid.id</code> (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>); identifying claims are added only where a Target requires them for the action at hand.
 Because KYA tokens are JWTs, selective disclosure (for example, SD-JWT <span>[<a href="#RFC9901" class="cite xref">RFC9901</a>]</span>) is a forward-compatible path to revealing only the claims a given Target needs.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2842,6 +2864,9 @@ Bhasker Allam also wrote the text on which <a href="#RuntimeExposure" class="aut
 </li>
         <li class="normal" id="appendix-B-3.14">
           <p id="appendix-B-3.14.1">Added the <code>Accept-KYAPay-Token</code> response field, which a recipient <span class="bcp14">MAY</span> send, replaced Step-Up Authentication with Responding When a Token Falls Short (over HTTP, 403, or 402 for payment, unless the protocol in use specifies its own errors; not 401), changed the Bot Managers error examples to match, made a recipient decide from its own policy whether it uses tokens for a request and decline, within its role, a request whose token fails validation, rather than treat it as carrying no token, and added Disclosing Requirements.<a href="#appendix-B-3.14.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.15">
+          <p id="appendix-B-3.15.1">Used <code>hid.id</code> for account binding at ATO protectors and CIAM systems, defined the base claims for hosts with no claims set, made linkage per Target service, and added a minimal-disclosure example.<a href="#appendix-B-3.15.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="appendix-B-4">-01<a href="#appendix-B-4" class="pilcrow">¶</a></p>
