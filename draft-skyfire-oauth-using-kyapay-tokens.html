@@ -1723,10 +1723,13 @@ Because a JWT uses only the base64url alphabet plus the period (".") separator, 
 <p id="section-5.1-7">A recipient:<a href="#section-5.1-7" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5.1-8.1">
-            <p id="section-5.1-8.1.1"><span class="bcp14">MUST</span> determine the type of each token from its <code>typ</code> header parameter (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>), not from its position; and<a href="#section-5.1-8.1.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-8.1.1"><span class="bcp14">MUST</span> determine the type of each token from its <code>typ</code> header parameter (<span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>), not from its position;<a href="#section-5.1-8.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-5.1-8.2">
-            <p id="section-5.1-8.2.1"><span class="bcp14">MUST</span> ignore a <code>KYAPay-Token</code> member it cannot parse as a JWT, while continuing to process the remaining members, unless local policy requires rejecting the whole request.<a href="#section-5.1-8.2.1" class="pilcrow">¶</a></p>
+            <p id="section-5.1-8.2.1"><span class="bcp14">MAY</span> reject a request that carries more than one token of the same <code>typ</code>; and<a href="#section-5.1-8.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.1-8.3">
+            <p id="section-5.1-8.3.1"><span class="bcp14">MUST</span> ignore a <code>KYAPay-Token</code> member it cannot parse as a JWT, while continuing to process the remaining members, unless local policy requires rejecting the whole request.<a href="#section-5.1-8.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-5.1-9">Intermediaries and caches <span class="bcp14">MUST</span> treat <code>KYAPay-Token</code> as containing sensitive, request-specific credentials;
@@ -2211,7 +2214,7 @@ claims, rather than through any mandated creation flow.<a href="#section-7.2-3" 
       <h2 id="name-security-considerations">
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-8-1">When validating the JWTs described here and in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, implementers <span class="bcp14">MUST</span> follow the JSON Web Token Best Current Practices <span>[<a href="#RFC8725" class="cite xref">RFC8725</a>]</span>, in addition to the validation steps of <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, Section 4.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-1">When validating the JWTs described here and in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, implementers <span class="bcp14">MUST</span> follow the JSON Web Token Best Current Practices, BCP 225 <span>[<a href="#RFC8725" class="cite xref">RFC8725</a>]</span>, in addition to the validation steps of <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, Section 4.<a href="#section-8-1" class="pilcrow">¶</a></p>
 <div id="transport-confidentiality">
 <section id="section-8.1">
         <h3 id="name-transport-confidentiality">
@@ -2441,6 +2444,10 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
         <dd>
 <span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Nadalin, A.</span>, <span class="refAuthor">Campbell, B., Ed.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">C. Mortimore</span>, <span class="refTitle">"OAuth 2.0 Token Exchange"</span>, <span class="seriesInfo">RFC 8693</span>, <span class="seriesInfo">DOI 10.17487/RFC8693</span>, <time datetime="2020-01" class="refDate">January 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8693">https://www.rfc-editor.org/rfc/rfc8693</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC8725">[RFC8725]</dt>
+        <dd>
+<span class="refAuthor">Sheffer, Y.</span>, <span class="refAuthor">Hardt, D.</span>, and <span class="refAuthor">M. Jones</span>, <span class="refTitle">"JSON Web Token Best Current Practices"</span>, <span class="seriesInfo">BCP 225</span>, <span class="seriesInfo">RFC 8725</span>, <span class="seriesInfo">DOI 10.17487/RFC8725</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8725">https://www.rfc-editor.org/rfc/rfc8725</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC9110">[RFC9110]</dt>
         <dd>
 <span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP Semantics"</span>, <span class="seriesInfo">STD 97</span>, <span class="seriesInfo">RFC 9110</span>, <span class="seriesInfo">DOI 10.17487/RFC9110</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9110">https://www.rfc-editor.org/rfc/rfc9110</a>&gt;</span>. </dd>
@@ -2505,10 +2512,6 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
 <dt id="RFC8705">[RFC8705]</dt>
         <dd>
 <span class="refAuthor">Campbell, B.</span>, <span class="refAuthor">Bradley, J.</span>, <span class="refAuthor">Sakimura, N.</span>, and <span class="refAuthor">T. Lodderstedt</span>, <span class="refTitle">"OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens"</span>, <span class="seriesInfo">RFC 8705</span>, <span class="seriesInfo">DOI 10.17487/RFC8705</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8705">https://www.rfc-editor.org/rfc/rfc8705</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC8725">[RFC8725]</dt>
-        <dd>
-<span class="refAuthor">Sheffer, Y.</span>, <span class="refAuthor">Hardt, D.</span>, and <span class="refAuthor">M. Jones</span>, <span class="refTitle">"JSON Web Token Best Current Practices"</span>, <span class="seriesInfo">BCP 225</span>, <span class="seriesInfo">RFC 8725</span>, <span class="seriesInfo">DOI 10.17487/RFC8725</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8725">https://www.rfc-editor.org/rfc/rfc8725</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9449">[RFC9449]</dt>
         <dd>
@@ -2577,6 +2580,9 @@ for their contributions to the specification.<a href="#appendix-A-2" class="pilc
 </li>
         <li class="normal" id="appendix-B-3.7">
           <p id="appendix-B-3.7.1">Prohibited retrieving key material for an issuer that is not trusted.<a href="#appendix-B-3.7.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.8">
+          <p id="appendix-B-3.8.1">Made BCP 225 a normative reference, and let a recipient reject a request carrying more than one token of the same <code>typ</code>.<a href="#appendix-B-3.8.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="appendix-B-4">-01<a href="#appendix-B-4" class="pilcrow">¶</a></p>
