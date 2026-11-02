@@ -56,6 +56,7 @@ normative:
   RFC8725: # JWT BCP (BCP 225)
   RFC8693: # OAuth 2.0 Token Exchange
   RFC9110: # HTTP Semantics
+  RFC9651: # Structured Field Values
   RFC9421: # HTTP Message Signatures
   RFC7800: # JWT proof-of-possession (cnf)
   RFC9530: # Digest Fields
@@ -386,12 +387,14 @@ for a human-via-agent request, they are carried in the `KYAPay-Token` header fie
 The `KYAPay-Token` header field is an HTTP request header field whose value is a KYA, PAY, or KYA-PAY token, as defined in {{I-D.skyfire-oauth-kyapay-token}}.
 HTTP field names are case-insensitive {{RFC9110}}.
 
-    KYAPay-Token = token-jwt *( OWS "," OWS token-jwt )
-    token-jwt    = 1*( ALPHA / DIGIT / "-" / "_" / "." )
+`KYAPay-Token` is a List Structured Field ({{Section 3.1 of RFC9651}}).
+Each member is a Token ({{Section 3.3.4 of RFC9651}}) whose value is a JWT, with no parameters.
+A compact JWT consists only of base64url characters and periods, and it begins with the encoding of a JSON object, so its first character is a letter; it is therefore a valid Token as it stands.
+For example:
 
-A request MAY convey more than one token (for example, separate KYA and PAY tokens) either as a comma-separated list in a single `KYAPay-Token` header field or as multiple `KYAPay-Token` header fields;
-per {{Section 5.2 of RFC9110}}, multiple field lines with the same name are equivalent to a single comma-separated field line.
-Because a JWT uses only the base64url alphabet plus the period (".") separator, it never contains a comma, so list parsing is unambiguous.
+    KYAPay-Token: eyJhbGciOiJFUzI1NiIsInR5cCI6Imt5YStqd3QifQ.eyJpc3Mi...
+
+A request MAY convey more than one token (for example, separate KYA and PAY tokens), either as members of one field line or in several `KYAPay-Token` field lines, which are combined before parsing as described in {{Section 4.2 of RFC9651}}.
 
 A sender:
 
@@ -402,8 +405,10 @@ A sender:
 A recipient:
 
 * MUST determine the type of each token from its `typ` header parameter ({{I-D.skyfire-oauth-kyapay-token}}), not from its position;
-* MAY reject a request that carries more than one token of the same `typ`; and
-* MUST ignore a `KYAPay-Token` member it cannot parse as a JWT, while continuing to process the remaining members, unless local policy requires rejecting the whole request.
+* MAY reject a request that carries more than one token of the same `typ`;
+* MUST parse the field as a List {{RFC9651}}. A field that fails to parse fails as a whole, and a recipient MUST NOT attempt to recover individual members from it;
+* MUST reject the request if the field fails to parse, or if any member is not a Token whose value is a well-formed JWT. {{Section 4.2 of RFC9651}} permits either ignoring a field that fails to parse or treating the message as malformed; this document requires the latter; and
+* MUST accept List members of up to the length given in {{TokenSize}}.
 
 Intermediaries and caches MUST treat `KYAPay-Token` as containing sensitive, request-specific credentials;
 it MUST NOT be cached in a way that would allow it to be replayed on a different request, and it MUST NOT be logged or forwarded to parties other than legitimate participants (see {{PrivCon}}).
@@ -924,6 +929,7 @@ Bhasker Allam also wrote the text on which {{RuntimeExposure}} is based.
 * Added Request Signatures for Proof of Possession: the covered components, and verification at the first hop.
 * Added Attaching Tokens to Requests, scoped the zero-tech-lift principle to agents that control a request's header fields, and added CORS preflight and caching requirements.
 * Described retaining a token for audit or dispute resolution.
+* Defined `KYAPay-Token` as a List of Tokens, replacing the ABNF, and required a recipient to reject a field that fails to parse.
 
 -01
 
