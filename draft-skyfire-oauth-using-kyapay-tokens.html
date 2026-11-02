@@ -1623,6 +1623,9 @@ Today this residual, in-window risk is bounded rather than eliminated, by means 
 </li>
         </ul>
 <p id="section-4.1-4">The accepted residual threats, and the irreducible ones, are stated in <a href="#SecCon" class="auto internal xref">Section 8</a>.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+<p id="section-4.1-5">A KYAPay token is reusable within its validity period and audience.
+Unless a recipient knows that the issuer issues a distinct token for each request, it <span class="bcp14">MUST NOT</span> treat repeated presentation of the same token, within that period and audience, as evidence of replay.
+Nothing here prevents an issuer from issuing a distinct token for each request where that is practical; this document describes the general case, in which a token is presented more than once.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="identity-and-proof-of-possession-are-different-layers">
@@ -1664,7 +1667,7 @@ A complete proof-of-possession design uses both, bound together, as described ne
             <p id="section-4.3-2.2.1">the agent generates a key pair and provides its public key to the issuer;<a href="#section-4.3-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-4.3-2.3">
-            <p id="section-4.3-2.3.1">the issuer binds that public key into the KYA token using the JWT confirmation claim <code>cnf</code> <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span>. The token <span class="bcp14">MUST</span> carry <code>cnf.jwk</code> -- the key itself. A key identifier would satisfy <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span> only on its own terms, which hold "provided the recipient is able to obtain the identified key": a recipient meeting the agent for the first time holds no such key, and a thumbprint is a one-way hash from which none can be recovered. The issuer cannot determine when that proviso is met -- it knows neither which recipients a token will reach, nor the initiator's intent, nor the state of any interaction between initiator and target. Nor can it rely on continuity between tokens: where a target de-duplicates on <code>jti</code> to prevent replay, each token is fresh and must stand on its own. Carrying the key is therefore the only form that works in the general case. Other confirmation members <span class="bcp14">MAY</span> additionally be present; a recipient <span class="bcp14">MUST NOT</span> be required to obtain the key by any means other than reading <code>cnf.jwk</code>; and<a href="#section-4.3-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-4.3-2.3.1">the issuer binds that public key into the KYA token using the JWT confirmation claim <code>cnf</code> <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span>. The token <span class="bcp14">MUST</span> carry <code>cnf.jwk</code> -- the key itself. A key identifier would satisfy <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span> only on its own terms, which hold "provided the recipient is able to obtain the identified key": a recipient meeting the agent for the first time holds no such key, and a thumbprint is a one-way hash from which none can be recovered. The issuer cannot determine when that proviso is met -- it knows neither which recipients a token will reach, nor the initiator's intent, nor the state of any interaction between initiator and target. Nor can it rely on continuity between tokens: a recipient may meet any given token first, so each token must stand on its own. Carrying the key is therefore the only form that works in the general case. Other confirmation members <span class="bcp14">MAY</span> additionally be present; a recipient <span class="bcp14">MUST NOT</span> be required to obtain the key by any means other than reading <code>cnf.jwk</code>; and<a href="#section-4.3-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-4.3-2.4">
             <p id="section-4.3-2.4.1">the agent signs each request in place -- a signature over the request (method, path, body digest, timestamp/nonce) using <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> -- verified against the key in <code>cnf</code>, with no separate proof-of-possession token.<a href="#section-4.3-2.4.1" class="pilcrow">¶</a></p>
@@ -1672,7 +1675,7 @@ A complete proof-of-possession design uses both, bound together, as described ne
         </ol>
 <p id="section-4.3-3">This yields an unbroken chain from request to key to identity: the request is signed by a key, and that key is vouched for as the initiator's by the issuer.
 Preferring a request signed against the <code>cnf</code> key over a detached, DPoP-style proof <span>[<a href="#RFC9449" class="cite xref">RFC9449</a>]</span> keeps a single token -- the recipient validates the KYA token once (per session), caches the <code>cnf</code> key, then performs only a fast per-request signature check, instead of validating two artifacts and confirming they are bound to each other.
-When present, this binding is consumed as specified in <a href="#ProcModel" class="auto internal xref">Section 6.1</a> and closes the in-window replay and malicious-Target-reuse risks of the bearer model (<a href="#SecCon" class="auto internal xref">Section 8</a>).<a href="#section-4.3-3" class="pilcrow">¶</a></p>
+When present, this binding is consumed as specified in <a href="#ProcModel" class="auto internal xref">Section 6.1</a> and closes the malicious-Target-reuse risk of the bearer model and stops a stolen token being used on its own (<a href="#SecCon" class="auto internal xref">Section 8</a>).<a href="#section-4.3-3" class="pilcrow">¶</a></p>
 <p id="section-4.3-4">Adoption remains the constraint on when this becomes mandatory.
 Per-request signing is costly: hardware-protected keys are secure but slow, software keys are fast but exfiltratable, and post-quantum algorithms do not make signing faster.
 Defeating replay of the proof itself further requires either per-Target nonce caches or binding the signature to the request content, and other request-bound designs considered (mutual TLS <span>[<a href="#RFC8705" class="cite xref">RFC8705</a>]</span>, TLS channel binding, session-based schemes) each raise the participation bar or add Target-side state.
@@ -1763,7 +1766,7 @@ bindings for other protocols are expected to be defined by those protocols or by
 In all cases, the validation and usage rules of <a href="#SecInt" class="auto internal xref">Section 6</a> apply to the token, once received.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="authenticating-the-counterparty">
+<div id="Counterparty">
 <section id="section-5.4">
         <h3 id="name-authenticating-the-counterp">
 <a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-authenticating-the-counterp" class="section-name selfRef">Authenticating the Counterparty</a>
@@ -1892,7 +1895,7 @@ A validated token provides verified initiator identity (and, when targeting an a
 </li>
             <li class="normal" id="section-6.3.1-6.3">
               <p id="section-6.3.1-6.3.1"><strong>Replay Resistance.</strong>
-A bearer token captured within its validity window can be replayed; a bot manager bounds this with short lifetimes, audience binding, and TLS (<a href="#SecCon" class="auto internal xref">Section 8</a>). Where a token carries a proof-of-possession key (<a href="#TrustStack" class="auto internal xref">Section 4</a>), the bot manager (or the edge/CDN provider acting for the Target) <span class="bcp14">SHOULD</span> additionally verify the per-request signature <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> against that key, which removes in-window replay exposure.<a href="#section-6.3.1-6.3.1" class="pilcrow">¶</a></p>
+A bearer token captured within its validity window can be replayed; a bot manager bounds this with short lifetimes, audience binding, and TLS (<a href="#SecCon" class="auto internal xref">Section 8</a>). Where a token carries a proof-of-possession key (<a href="#TrustStack" class="auto internal xref">Section 4</a>), the bot manager (or the edge/CDN provider acting for the Target) <span class="bcp14">SHOULD</span> additionally verify the per-request signature <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> against that key, which stops a stolen token being used on its own (<a href="#Replay" class="auto internal xref">Section 8.3</a>).<a href="#section-6.3.1-6.3.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 </section>
@@ -2225,14 +2228,18 @@ recipients <span class="bcp14">SHOULD</span> require short lifetimes (for high-a
 Recipients <span class="bcp14">SHOULD</span> reject tokens whose <code>iat</code> is outside an acceptable window.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="replay-and-proof-of-possession">
+<div id="Replay">
 <section id="section-8.3">
         <h3 id="name-replay-and-proof-of-possess">
 <a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-replay-and-proof-of-possess" class="section-name selfRef">Replay and Proof of Possession</a>
         </h3>
 <p id="section-8.3-1">A bare bearer token can be replayed by anyone who captures it within its validity window.
-As deployed today (<a href="#TrustStack" class="auto internal xref">Section 4</a>), KYAPay accepts this bounded in-window risk and mitigates rather than eliminates it: recipients <span class="bcp14">MUST</span> validate the <code>aud</code> claim (and <code>tdm</code>/<code>tsi</code> where used) so that a token minted for one Target cannot be presented to another, <span class="bcp14">MUST</span> keep accepted lifetimes short, and <span class="bcp14">SHOULD</span> use the <code>jti</code> claim to detect replay to the same recipient.
-Where a token carries a proof-of-possession key (<code>cnf</code> <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span>), recipients <span class="bcp14">MUST</span> additionally verify a per-request signature <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> over that key (<a href="#ProcModel" class="auto internal xref">Section 6.1</a>), which removes the in-window replay exposure.
+As deployed today (<a href="#TrustStack" class="auto internal xref">Section 4</a>), KYAPay accepts this bounded in-window risk and mitigates rather than eliminates it: recipients <span class="bcp14">MUST</span> confirm that the token is intended for them, as described in <a href="#Counterparty" class="auto internal xref">Section 5.4</a>, so that a token minted for one Target cannot be presented to another, and <span class="bcp14">MUST</span> keep accepted lifetimes short.
+In-window replay within the token's audience is an accepted risk of the bearer model.
+Because a conforming token is presented on many requests within its lifetime, a repeated <code>jti</code> is not by itself evidence of replay, and the claim is used for correlation, audit, and issuer feedback (<a href="#IssuerFeedback" class="auto internal xref">Section 6.10</a>) rather than for replay detection.
+Where a deployment issues a distinct token for each request, a repeated <code>jti</code> does carry that meaning; this document describes the general case, in which it does not.
+Where a token carries a proof-of-possession key (<code>cnf</code> <span>[<a href="#RFC7800" class="cite xref">RFC7800</a>]</span>), recipients <span class="bcp14">MUST</span> additionally verify a per-request signature <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> over that key (<a href="#ProcModel" class="auto internal xref">Section 6.1</a>).
+This stops a stolen token from being used on its own, turning an open-ended token-theft exposure into a bounded window in which a captured signed request could be replayed verbatim; it does not prevent that verbatim replay.
 Access tokens produced by token exchange (<a href="#ATOProt" class="auto internal xref">Section 6.6</a>) <span class="bcp14">SHOULD</span> be sender-constrained (<span>[<a href="#RFC9449" class="cite xref">RFC9449</a>]</span>, <span>[<a href="#RFC8705" class="cite xref">RFC8705</a>]</span>).<a href="#section-8.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2557,6 +2564,9 @@ for their contributions to the specification.<a href="#appendix-A-2" class="pilc
 </li>
         <li class="normal" id="appendix-B-3.4">
           <p id="appendix-B-3.4.1">Made admission depend on the site's policy for the requested action, and stated that rate and abuse limits and step-up still apply to admitted requests.<a href="#appendix-B-3.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.5">
+          <p id="appendix-B-3.5.1">Stated that a token is reusable within its validity period and audience, and that a repeated <code>jti</code> is not by itself evidence of replay, and rewrote the replay considerations to match.<a href="#appendix-B-3.5.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="appendix-B-4">-01<a href="#appendix-B-4" class="pilcrow">¶</a></p>
