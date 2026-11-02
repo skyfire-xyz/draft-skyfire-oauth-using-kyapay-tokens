@@ -796,7 +796,7 @@ In particular:
 Only the information needed to facilitate the intended interaction should be placed in a token and conveyed to intermediaries and Targets.
 Issuers and senders SHOULD prefer the least revealing set of claims sufficient for the decision at hand -- for example, an assurance level or a boolean verified status rather than underlying identity documents or personally identifying verification data.
 For example, a bot manager deciding whether to admit a request to browse a catalog needs no identifying claim: `sub` and `hid.id` let it rate-limit and recognize a returning principal at that Target service, and the assurance claims in `hid` say how strongly the principal was verified.
-By default a token identifies the principal only by `hid.id` ({{I-D.skyfire-oauth-kyapay-token}}); identifying claims are added only where a Target requires them for the action at hand.
+By default, a token identifies the principal only by `hid.id` ({{I-D.skyfire-oauth-kyapay-token}}); identifying claims are added only where a Target requires them for the action at hand.
 Because KYA tokens are JWTs, selective disclosure (for example, SD-JWT {{RFC9901}}) is a forward-compatible path to revealing only the claims a given Target needs.
 
 ## Consent
