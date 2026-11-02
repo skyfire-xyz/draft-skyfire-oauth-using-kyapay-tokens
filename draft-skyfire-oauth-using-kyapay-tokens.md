@@ -420,6 +420,7 @@ On receiving a request that carries one or more KYAPay tokens, a security interm
    This check MUST precede any processing that resolves a value taken from the token, and in particular any network retrieval driven by the `iss` claim.
    Until the token has been verified, `iss` is supplied by the sender: resolving it before the issuer is known to be trusted would allow an unauthenticated request to cause an outbound fetch to an arbitrary URL of the sender's choosing.
    The trusted-issuer set is configured out of band and is not derived from the token.
+   A recipient MUST NOT retrieve key material for an issuer that is not in its configured set of trusted issuers.
 1. MUST validate each token as specified in {{I-D.skyfire-oauth-kyapay-token}}, Section 4.
    A token that fails validation MUST NOT be treated as conveying a human presence signal, and the intermediary MUST fall back to its default (token-absent) policy for that request.
 1. MUST verify the token signature against a key obtained from the issuer's JWK Set, discovered via the `iss` claim using the `/.well-known/jwks.json` mechanism ({{I-D.skyfire-oauth-kyapay-token}}).
@@ -823,6 +824,7 @@ for their contributions to the specification.
 * Made admission depend on the site's policy for the requested action, and stated that rate and abuse limits and step-up still apply to admitted requests.
 * Stated that a token is reusable within its validity period and audience, and that a repeated `jti` is not by itself evidence of replay, and rewrote the replay considerations to match.
 * Described how a recipient confirms the audience: `aud` and `tsi` where it has onboarded to the issuer, `tdm` otherwise; required `tdm` where the Target is identified by a domain name.
+* Prohibited retrieving key material for an issuer that is not trusted.
 
 -01
 
