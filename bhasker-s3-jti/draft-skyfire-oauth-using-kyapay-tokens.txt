@@ -5,10 +5,10 @@
 Web Authorization Protocol                                    A. Agarwal
 Internet-Draft                                      Skyfire Systems Inc.
 Intended status: Standards Track                             M. B. Jones
-Expires: 5 May 2027                               Self-Issued Consulting
+Expires: 6 May 2027                               Self-Issued Consulting
                                                                S. Thumma
                                                                   Akamai
-                                                         1 November 2026
+                                                         2 November 2026
 
 
                           Using KYAPay Tokens
@@ -69,7 +69,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 May 2027.
+   This Internet-Draft will expire on 6 May 2027.
 
 Copyright Notice
 
@@ -274,7 +274,11 @@ Table of Contents
       An HTTP request or protocol message issued by an agent that
       carries a valid KYAPay token attesting that the agent is acting on
       behalf of an identified, authorizing human principal (an
-      individual or an organization).
+      individual or an organization).  The principal need not be present
+      at the time of the request: the agent may be acting on an
+      instruction given earlier, or on a standing authorization that the
+      agent itself triggers, for example on a price change or on a
+      schedule.
 
    *Bot*:
       Unattended automation that is not acting on behalf of, or with the
@@ -356,8 +360,9 @@ Table of Contents
    an agent at all.  The goal is therefore agentic access to the
    existing web, not a parallel, agent-only surface that must be set up
    in advance.  This goal can only be met if security intermediaries
-   admit legitimate human-via-agent requests by default when a valid
-   token is present.
+   admit legitimate human-via-agent requests without per-site setup when
+   a valid token is present and the verified identity it carries meets
+   the site's policy for the requested action (Section 6.3).
 
 3.3.  Works with Today's Web at Zero Merchant Tech Lift
 
@@ -793,6 +798,10 @@ Table of Contents
    to determine the final disposition (admit, rate-limit, require step-
    up, or deny) rather than applying bot-blocking challenges designed
    for unattended, unattributed automation.
+
+   Per-entity rate and abuse limits (Section 6.9) continue to apply to
+   admitted requests, and a site MAY still challenge, or require step-up
+   (Section 6.5) for, sensitive actions.
 
    KYAPay tokens are well-suited to inline bot management for several
    reasons:
@@ -1549,6 +1558,13 @@ Document History
    *  Updated the Bot Managers section and introduce the concept of
       feedback loop to the agent through 401 status code in case of
       token assessment failure
+
+   *  Stated that the principal need not be present at the time of a
+      human-via-agent request.
+
+   *  Made admission depend on the site's policy for the requested
+      action, and stated that rate and abuse limits and step-up still
+      apply to admitted requests.
 
    *  Stated that a token is reusable within its validity period and
       audience, and that a repeated jti is not by itself evidence of
