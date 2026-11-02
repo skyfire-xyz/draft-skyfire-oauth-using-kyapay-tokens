@@ -192,6 +192,7 @@ This document defines the following terms:
 {:vspace}
 **Human-via-agent request**:
 : An HTTP request or protocol message issued by an agent that carries a valid KYAPay token attesting that the agent is acting on behalf of an identified, authorizing human principal (an individual or an organization).
+  The principal need not be present at the time of the request: the agent may be acting on an instruction given earlier, or on a standing authorization that the agent itself triggers, for example on a price change or on a schedule.
 
 {:vspace}
 **Bot**:
@@ -252,7 +253,7 @@ KYAPay tokens are structured to convey these identities so that this auditable, 
 Agents are useful in proportion to the breadth of the web they can act across.
 If a human must pre-configure access for an agent at each site before the agent can act, the result is indistinguishable from the workflow automation that already exists, and the principal loses the probabilistic discovery -- of new merchants, products, services, and alternatives -- that is one of the main reasons to use an agent at all.
 The goal is therefore agentic access to the existing web, not a parallel, agent-only surface that must be set up in advance.
-This goal can only be met if security intermediaries admit legitimate human-via-agent requests by default when a valid token is present.
+This goal can only be met if security intermediaries admit legitimate human-via-agent requests without per-site setup when a valid token is present and the verified identity it carries meets the site's policy for the requested action ({{BotMgr}}).
 
 ## Works with Today's Web at Zero Merchant Tech Lift
 
@@ -291,11 +292,15 @@ A bearer token establishes identity but not proof of possession: possession of t
 Today this residual, in-window risk is bounded rather than eliminated, by means that do not raise the consumption bar:
 
 * short token lifetimes (`exp`), so a captured token expires quickly;
-* audience binding (`aud`, and where used `tdm`/`tsi`), so a token minted for one Target cannot be presented to another;
+* audience binding ({{Counterparty}}), so a token minted for one Target cannot be presented to another;
 * TLS on every hop, which mitigates on-the-wire capture and man-in-the-middle; and
 * issuer-gated onboarding (KYC/KYB), which mitigates malicious agents and Targets being admitted to the network in the first place.
 
 The accepted residual threats, and the irreducible ones, are stated in {{SecCon}}.
+
+A KYAPay token is reusable within its validity period and audience.
+Unless a recipient knows that the issuer issues a distinct token for each request, it MUST NOT treat repeated presentation of the same token, within that period and audience, as evidence of replay.
+Nothing here prevents an issuer from issuing a distinct token for each request where that is practical; this document describes the general case, in which a token is presented more than once.
 
 ## Identity and Proof of Possession are Different Layers
 
@@ -321,12 +326,12 @@ When per-request signing becomes practical at scale, the planned evolution of KY
 
 1. the issuer onboards the agent as a CA would;
 1. the agent generates a key pair and provides its public key to the issuer;
-1. the issuer binds that public key into the KYA token using the JWT confirmation claim `cnf` {{RFC7800}}. The token MUST carry `cnf.jwk` -- the key itself. A key identifier would satisfy {{RFC7800}} only on its own terms, which hold "provided the recipient is able to obtain the identified key": a recipient meeting the agent for the first time holds no such key, and a thumbprint is a one-way hash from which none can be recovered. The issuer cannot determine when that proviso is met -- it knows neither which recipients a token will reach, nor the initiator's intent, nor the state of any interaction between initiator and target. Nor can it rely on continuity between tokens: where a target de-duplicates on `jti` to prevent replay, each token is fresh and must stand on its own. Carrying the key is therefore the only form that works in the general case. Other confirmation members MAY additionally be present; a recipient MUST NOT be required to obtain the key by any means other than reading `cnf.jwk`; and
+1. the issuer binds that public key into the KYA token using the JWT confirmation claim `cnf` {{RFC7800}}. The token MUST carry `cnf.jwk` -- the key itself. A key identifier would satisfy {{RFC7800}} only on its own terms, which hold "provided the recipient is able to obtain the identified key": a recipient meeting the agent for the first time holds no such key, and a thumbprint is a one-way hash from which none can be recovered. The issuer cannot determine when that proviso is met -- it knows neither which recipients a token will reach, nor the initiator's intent, nor the state of any interaction between initiator and target. Nor can it rely on continuity between tokens: a recipient may meet any given token first, so each token must stand on its own. Carrying the key is therefore the only form that works in the general case. Other confirmation members MAY additionally be present; a recipient MUST NOT be required to obtain the key by any means other than reading `cnf.jwk`; and
 1. the agent signs each request in place -- a signature over the request (method, path, body digest, timestamp/nonce) using {{RFC9421}} -- verified against the key in `cnf`, with no separate proof-of-possession token.
 
 This yields an unbroken chain from request to key to identity: the request is signed by a key, and that key is vouched for as the initiator's by the issuer.
 Preferring a request signed against the `cnf` key over a detached, DPoP-style proof {{RFC9449}} keeps a single token -- the recipient validates the KYA token once (per session), caches the `cnf` key, then performs only a fast per-request signature check, instead of validating two artifacts and confirming they are bound to each other.
-When present, this binding is consumed as specified in {{ProcModel}} and closes the in-window replay and malicious-Target-reuse risks of the bearer model ({{SecCon}}).
+When present, this binding is consumed as specified in {{ProcModel}} and closes the malicious-Target-reuse risk of the bearer model and stops a stolen token being used on its own ({{SecCon}}).
 
 Adoption remains the constraint on when this becomes mandatory.
 Per-request signing is costly: hardware-protected keys are secure but slow, software keys are fast but exfiltratable, and post-quantum algorithms do not make signing faster.
@@ -392,17 +397,20 @@ This document specifies only the HTTP header binding in {{HeaderField}};
 bindings for other protocols are expected to be defined by those protocols or by companion specifications.
 In all cases, the validation and usage rules of {{SecInt}} apply to the token, once received.
 
-## Authenticating the Counterparty
+## Authenticating the Counterparty {#Counterparty}
 
-Conveying a token securely also requires that the sending agent deliver it to the intended recipient and that the recipient be able to bind the token to itself.
-The `aud` claim, together with the optional `tdm` (target domain) and `tsi` (target service identifier) claims defined in {{I-D.skyfire-oauth-kyapay-token}}, allows a recipient to confirm that a token was minted for it and to mitigate replay to a different party ({{SecCon}}).
+The `aud` and `tsi` claims are identifiers assigned by the Token Issuer (the Identifying the Target section of {{I-D.skyfire-oauth-kyapay-token}}); their values are known to a Target that has onboarded to that issuer and are not otherwise discoverable.
+The `tdm` claim names the Target's domain, is not issuer-specific, and requires no relationship with the issuer to interpret.
+A Target that has onboarded to an issuer checks `aud` and `tsi`, and MAY also check `tdm`; a security intermediary acting for such a Target MAY be configured with that Target's `aud` and `tsi` values and check them.
+A recipient that has not onboarded, including a security intermediary acting for many Targets, SHOULD check at least that `tdm` names the domain it is protecting for that request; where `tdm` also names a host or a path, the recipient MAY check those too.
+`tdm` MUST be present in tokens whose Target is identified by a domain name.
 At the transport and discovery layers, mechanisms such as DNS domain names (with TLS server authentication), A2A agent cards {{A2A}}, and MCP server identification {{MCP}} help an agent confirm that it is communicating with the correct counterparty before presenting a token.
 
 # Using KYAPay Tokens at Security Intermediaries {#SecInt}
 
 This section is normative.
 It defines a common processing model and then describes how each kind of security intermediary uses the validated token.
-Throughout, "validate the token" means to perform the validation procedure defined in {{I-D.skyfire-oauth-kyapay-token}}, Section 4 (JWT header validation, signature and issuer validation, and validation of `exp`, `iat`, `jti`, `aud`, and `env`), plus the PAY-specific validation for `pay+jwt` and `kya-pay+jwt` tokens.
+Throughout, "validate the token" means to perform the validation procedure defined in {{I-D.skyfire-oauth-kyapay-token}}, Section 4 (JWT header validation, signature and issuer validation, and validation of `exp`, `iat`, `jti`, the audience, and `env`), plus the PAY-specific validation for `pay+jwt` and `kya-pay+jwt` tokens.
 
 ## Common Processing Model {#ProcModel}
 
@@ -413,12 +421,13 @@ On receiving a request that carries one or more KYAPay tokens, a security interm
    This check MUST precede any processing that resolves a value taken from the token, and in particular any network retrieval driven by the `iss` claim.
    Until the token has been verified, `iss` is supplied by the sender: resolving it before the issuer is known to be trusted would allow an unauthenticated request to cause an outbound fetch to an arbitrary URL of the sender's choosing.
    The trusted-issuer set is configured out of band and is not derived from the token.
+   A recipient MUST NOT retrieve key material for an issuer that is not in its configured set of trusted issuers.
 1. MUST validate each token as specified in {{I-D.skyfire-oauth-kyapay-token}}, Section 4.
    A token that fails validation MUST NOT be treated as conveying a human presence signal, and the intermediary MUST fall back to its default (token-absent) policy for that request.
 1. MUST verify the token signature against a key obtained from the issuer's JWK Set, discovered via the `iss` claim using the `/.well-known/jwks.json` mechanism ({{I-D.skyfire-oauth-kyapay-token}}).
    Because KYAPay tokens are self-contained, this verification SHOULD be performed locally, without a synchronous callout to the issuer per request;
    issuer keys SHOULD be cached and refreshed according to standard JWK Set practice.
-1. MUST confirm that the token is intended for this recipient by checking the `aud` claim (and, if used, the `tdm` and `tsi` claims) as described in {{SecCon}}.
+1. MUST confirm that the token is intended for this recipient, as described in {{Counterparty}}.
 1. MUST confirm that the `env` claim (for example, `production`) matches the environment the intermediary is operating in.
    When the token carries a proof-of-possession key (the `cnf` claim {{RFC7800}}, Section 4), MUST verify that the request is signed by that key -- over HTTP, using HTTP Message Signatures {{RFC9421}} -- and reject the request if the signature is absent or invalid.
 1. When the token carries no such key, it is a bearer token: the intermediary MUST rely on the controls in {{SecCon}} (short lifetime, audience binding, TLS, issuer-gated onboarding) and MUST NOT assume that mere presentation of the token proves the sender holds a key bound to it.
@@ -468,6 +477,8 @@ For token-bearing traffic, the identification question is settled: the bot manag
 
 Settling identification, however, does not grant automatic access. Identification is distinct from admission: classifying a request as a verified agent simply provides authenticated context. The bot manager uses the token's verified identity layer -- the human principal (`hid`), the agent platform (`apd`), and the agent instance (`aid`) -- to select and evaluate the site's configured access policy to determine the final disposition (admit, rate-limit, require step-up, or deny) rather than applying bot-blocking challenges designed for unattended, unattributed automation.
 
+Per-entity rate and abuse limits ({{BadActor}}) continue to apply to admitted requests, and a site MAY still challenge, or require step-up ({{StepUp}}) for, sensitive actions.
+
 KYAPay tokens are well-suited to inline bot management for several reasons:
 
 * **Low Latency.**
@@ -477,7 +488,7 @@ Because the token is a self-contained, signed JWT, the bot manager performs stan
 A validated token provides verified initiator identity (and, when targeting an agent, target identity), which the bot manager uses to select and evaluate the appropriate site policy rather than treating the traffic as suspected automation. By contrast, network-origin claims (such as declared source IP ranges) are unreliable as proof of origin -- addresses change and can be masked by VPNs, CGNAT, or shared pools -- so a recipient MAY use them as a weak corroborating signal only, but MUST NOT treat an IP match alone as sufficient to bypass controls nor an IP mismatch as conclusive. Short lifetimes, audience binding, and proof-of-possession ({{TrustStack}}), not IP correlation, are the recommended controls against token misuse.
 
 * **Replay Resistance.**
-A bearer token captured within its validity window can be replayed; a bot manager bounds this with short lifetimes, audience binding, and TLS ({{SecCon}}). Where a token carries a proof-of-possession key ({{TrustStack}}), the bot manager (or the edge/CDN provider acting for the Target) SHOULD additionally verify the per-request signature {{RFC9421}} against that key, which removes in-window replay exposure.
+A bearer token captured within its validity window can be replayed; a bot manager bounds this with short lifetimes, audience binding, and TLS ({{SecCon}}). Where a token carries a proof-of-possession key ({{TrustStack}}), the bot manager (or the edge/CDN provider acting for the Target) SHOULD additionally verify the per-request signature {{RFC9421}} against that key, which stops a stolen token being used on its own ({{Replay}}).
 
 ### Token present but invalid
 
@@ -694,11 +705,15 @@ The `exp` claim MUST be present;
 recipients SHOULD require short lifetimes (for high-assurance actions, on the order of a few minutes) and MUST reject tokens whose lifetime exceeds their local policy maximum.
 Recipients SHOULD reject tokens whose `iat` is outside an acceptable window.
 
-## Replay and Proof of Possession
+## Replay and Proof of Possession {#Replay}
 
 A bare bearer token can be replayed by anyone who captures it within its validity window.
-As deployed today ({{TrustStack}}), KYAPay accepts this bounded in-window risk and mitigates rather than eliminates it: recipients MUST validate the `aud` claim (and `tdm`/`tsi` where used) so that a token minted for one Target cannot be presented to another, MUST keep accepted lifetimes short, and SHOULD use the `jti` claim to detect replay to the same recipient.
-Where a token carries a proof-of-possession key (`cnf` {{RFC7800}}), recipients MUST additionally verify a per-request signature {{RFC9421}} over that key ({{ProcModel}}), which removes the in-window replay exposure.
+As deployed today ({{TrustStack}}), KYAPay accepts this bounded in-window risk and mitigates rather than eliminates it: recipients MUST confirm that the token is intended for them, as described in {{Counterparty}}, so that a token minted for one Target cannot be presented to another, and MUST keep accepted lifetimes short.
+In-window replay within the token's audience is an accepted risk of the bearer model.
+Because a conforming token is presented on many requests within its lifetime, a repeated `jti` is not by itself evidence of replay, and the claim is used for correlation, audit, and issuer feedback ({{IssuerFeedback}}) rather than for replay detection.
+Where a deployment issues a distinct token for each request, a repeated `jti` does carry that meaning; this document describes the general case, in which it does not.
+Where a token carries a proof-of-possession key (`cnf` {{RFC7800}}), recipients MUST additionally verify a per-request signature {{RFC9421}} over that key ({{ProcModel}}).
+This stops a stolen token from being used on its own, turning an open-ended token-theft exposure into a bounded window in which a captured signed request could be replayed verbatim; it does not prevent that verbatim replay.
 Access tokens produced by token exchange ({{ATOProt}}) SHOULD be sender-constrained ({{RFC9449}}, {{RFC8705}}).
 
 ## Malicious or Compromised Target Reuse
@@ -806,6 +821,11 @@ for their contributions to the specification.
 
 * Updated the traditional bot detection methods in the introduction
 * Updated the Bot Managers section and introduce the concept of feedback loop to the agent through 401 status code in case of token assessment failure
+* Stated that the principal need not be present at the time of a human-via-agent request.
+* Made admission depend on the site's policy for the requested action, and stated that rate and abuse limits and step-up still apply to admitted requests.
+* Stated that a token is reusable within its validity period and audience, and that a repeated `jti` is not by itself evidence of replay, and rewrote the replay considerations to match.
+* Described how a recipient confirms the audience: `aud` and `tsi` where it has onboarded to the issuer, `tdm` otherwise; required `tdm` where the Target is identified by a domain name.
+* Prohibited retrieving key material for an issuer that is not trusted.
 * Made BCP 225 a normative reference, and let a recipient reject a request carrying more than one token of the same `typ`.
 
 -01
