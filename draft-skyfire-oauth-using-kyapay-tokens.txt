@@ -684,6 +684,8 @@ Table of Contents
        would allow an unauthenticated request to cause an outbound fetch
        to an arbitrary URL of the sender's choosing.  The trusted-issuer
        set is configured out of band and is not derived from the token.
+       A recipient MUST NOT retrieve key material for an issuer that is
+       not in its configured set of trusted issuers.
 
    3.  MUST validate each token as specified in
        [I-D.skyfire-oauth-kyapay-token], Section 4.  A token that fails
@@ -1579,6 +1581,9 @@ Document History
    *  Described how a recipient confirms the audience: aud and tsi where
       it has onboarded to the issuer, tdm otherwise; required tdm where
       the Target is identified by a domain name.
+
+   *  Prohibited retrieving key material for an issuer that is not
+      trusted.
 
    -01
 

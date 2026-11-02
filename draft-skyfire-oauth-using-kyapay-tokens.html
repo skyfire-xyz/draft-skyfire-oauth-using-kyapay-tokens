@@ -1803,7 +1803,8 @@ Throughout, "validate the token" means to perform the validation procedure defin
             <p id="section-6.1-2.2.1"><span class="bcp14">MUST</span> confirm that the token's issuer is one the recipient trusts for the claims being relied upon (see <a href="#SecCon" class="auto internal xref">Section 8</a>).
 This check <span class="bcp14">MUST</span> precede any processing that resolves a value taken from the token, and in particular any network retrieval driven by the <code>iss</code> claim.
 Until the token has been verified, <code>iss</code> is supplied by the sender: resolving it before the issuer is known to be trusted would allow an unauthenticated request to cause an outbound fetch to an arbitrary URL of the sender's choosing.
-The trusted-issuer set is configured out of band and is not derived from the token.<a href="#section-6.1-2.2.1" class="pilcrow">¶</a></p>
+The trusted-issuer set is configured out of band and is not derived from the token.
+A recipient <span class="bcp14">MUST NOT</span> retrieve key material for an issuer that is not in its configured set of trusted issuers.<a href="#section-6.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.1-2.3">
             <p id="section-6.1-2.3.1"><span class="bcp14">MUST</span> validate each token as specified in <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.skyfire-oauth-kyapay-token</a>]</span>, Section 4.
@@ -2573,6 +2574,9 @@ for their contributions to the specification.<a href="#appendix-A-2" class="pilc
 </li>
         <li class="normal" id="appendix-B-3.6">
           <p id="appendix-B-3.6.1">Described how a recipient confirms the audience: <code>aud</code> and <code>tsi</code> where it has onboarded to the issuer, <code>tdm</code> otherwise; required <code>tdm</code> where the Target is identified by a domain name.<a href="#appendix-B-3.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.7">
+          <p id="appendix-B-3.7.1">Prohibited retrieving key material for an issuer that is not trusted.<a href="#appendix-B-3.7.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="appendix-B-4">-01<a href="#appendix-B-4" class="pilcrow">¶</a></p>
