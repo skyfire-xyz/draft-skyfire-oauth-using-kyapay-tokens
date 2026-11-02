@@ -661,7 +661,7 @@ it then hands off to the human, who completes checkout in a browser, in a later 
 In such flows, the KYA token (carried without a PAY token) still provides the human presence signal that lets a security intermediary admit the agent's discovery and cart-building activity.
 Intermediaries SHOULD accept KYA-only requests (those conveying a KYA token but no PAY token) for actions that do not themselves settle a payment, and MUST NOT treat the absence of a PAY token as a reason to classify an otherwise valid human-via-agent request as a bot.
 
-Because `hid.id` is stable for the human principal at a Target service, a Target or its fraud manager MAY link the agent's earlier work at that service to the principal's eventual purchase there, for attribution, personalization and fraud analysis.
+Because `hid.id` is stable for the human principal at a Target service, for a given issuer and agent platform, a Target or its fraud manager MAY link the agent's earlier work at that service to the principal's eventual purchase there, for attribution, personalization and fraud analysis.
 `hid.id`, `sub` and `aid.id` differ at every other Target service ({{I-D.skyfire-oauth-kyapay-token}}).
 Linking to a purchase completed outside the agent session, or on a different channel, needs an identifier available in both places, such as an email address, which a token carries only where the Target requested it and the principal authorized its disclosure.
 
