@@ -68,6 +68,7 @@ informative:
   RFC8176: # AMR values
   RFC8705: # OAuth 2.0 Mutual-TLS
   RFC9449: # DPoP
+  RFC9111: # HTTP Caching
   RFC9901: # SD-JWT
   I-D.skyfire-oauth-amr-values:
   I-D.skyfire-oauth-id-verification:
@@ -263,6 +264,8 @@ A key property of a website (and, similarly, of a merchant-controlled MCP {{MCP}
 agents driven by large language models (LLMs) can frequently learn to use these interfaces automatically.
 A protocol for delivering agent identity and payment credentials should therefore work with today's web without requiring merchants to build new APIs.
 KYAPay meets this by conveying credentials in the HTTP request itself ({{ConveyingRequests}}), which requires no change to how a merchant's site is built.
+This holds where the party attaching the token controls the header fields of the request that reaches the Target.
+Where it does not, the token is conveyed by another binding ({{OtherInterfaces}}) or the interaction does not use this header field.
 
 ## One Source of Truth Across All Layers of Defense
 
@@ -410,6 +413,12 @@ A token MUST NOT be sent over a non-TLS-protected connection.
 When the token carries a proof-of-possession key ({{TrustStack}}), it SHOULD be accompanied by a request Message Signature {{RFC9421}} over that key;
 otherwise it is a bearer token, subject to the controls and accepted risks in {{SecCon}}.
 
+A CORS preflight request does not carry the `KYAPay-Token` field: the user agent sends it to ask whether the field may be sent.
+A recipient MUST NOT apply its token-absent policy to a preflight request.
+
+Where a response depends on the `KYAPay-Token` field, the response MUST include `Vary: KYAPay-Token` and MUST be marked so that shared caches do not store it, for example with `Cache-Control: private`.
+The protection in {{Section 3.5 of RFC9111}} applies only to requests that carry the `Authorization` field.
+
 ## Token Size {#TokenSize}
 
 A recipient MUST accept a `KYAPay-Token` field value of at least 6144 octets. The
@@ -422,7 +431,7 @@ signature, 6144 octets fits a token whose claims total 4096 octets of JSON, the
 limit {{I-D.skyfire-oauth-kyapay-token}} asks issuers to observe. It also stays
 within common origin-server limits for a single header field.
 
-## Conveying Tokens over Other Interfaces
+## Conveying Tokens over Other Interfaces {#OtherInterfaces}
 
 Beyond HTTP requests to websites and APIs, agents interact through a growing set of interfaces and protocols, including agent-to-tool interactions such as MCP {{MCP}}, agent-to-agent interactions such as A2A {{A2A}}, agent-to-API interactions (for example, OpenAPI descriptions converted into locally callable tools), and emerging protocols such as Universal Commerce Protocol {{UCP}} and Verifiable Intent {{VINTENT}}.
 KYAPay is designed so that the same self-contained token can be conveyed across any of these interfaces -- as an HTTP header field, a message field, or a tool argument -- to deliver verified identity and payment credentials to the receiving service, API, or agent.
@@ -439,6 +448,24 @@ A Target that has onboarded to an issuer checks `aud` and `tsi`, and MAY also ch
 A recipient that has not onboarded, including a security intermediary acting for many Targets, SHOULD check at least that `tdm` names the domain it is protecting for that request; where `tdm` also names a host or a path, the recipient MAY check those too.
 `tdm` MUST be present in tokens whose Target is identified by a domain name.
 At the transport and discovery layers, mechanisms such as DNS domain names (with TLS server authentication), A2A agent cards {{A2A}}, and MCP server identification {{MCP}} help an agent confirm that it is communicating with the correct counterparty before presenting a token.
+
+## Attaching Tokens to Requests {#Attaching}
+
+How an agent attaches a token to a request is an implementation matter, for the reasons given in {{TokCreat}}.
+Any kind of request may carry a `KYAPay-Token` field; whether it does, and which token it carries, depends on where the request is sent:
+
+* A request to the Target carries the token requested for that Target.
+
+* A Target may rely on other hosts, such as its own hosts in other domains or vendors acting on its behalf.
+  A request to such a host carries a token that names the Target in its audience claims ({{Counterparty}}) and carries the claims that apply to that host, which may include payment claims.
+  Where the claims for the host match those of the Target's token, the agent MAY send the Target's token.
+
+* A request to any other host SHOULD NOT carry a token.
+
+This applies however the token is attached. An agent that adds the field below the page, for example by browser-level header injection, applies these rules to each request according to its destination, because a page also sends requests to hosts that are neither the Target nor acting on its behalf.
+
+The Target determines which hosts act on its behalf and which claims each receives.
+Until a mechanism exists for the Target to declare this, an agent learns it by configuration or from an arrangement with the Target.
 
 # Using KYAPay Tokens at Security Intermediaries {#SecInt}
 
@@ -895,6 +922,7 @@ Bhasker Allam also wrote the text on which {{RuntimeExposure}} is based.
 * Made BCP 225 a normative reference, and let a recipient reject a request carrying more than one token of the same `typ`.
 * Added Token Exposure in the Agent Runtime to the Security Considerations.
 * Added Request Signatures for Proof of Possession: the covered components, and verification at the first hop.
+* Added Attaching Tokens to Requests, scoped the zero-tech-lift principle to agents that control a request's header fields, and added CORS preflight and caching requirements.
 
 -01
 
