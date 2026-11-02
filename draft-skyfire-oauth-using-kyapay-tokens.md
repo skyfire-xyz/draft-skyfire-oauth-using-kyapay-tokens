@@ -192,6 +192,7 @@ This document defines the following terms:
 {:vspace}
 **Human-via-agent request**:
 : An HTTP request or protocol message issued by an agent that carries a valid KYAPay token attesting that the agent is acting on behalf of an identified, authorizing human principal (an individual or an organization).
+  The principal need not be present at the time of the request: the agent may be acting on an instruction given earlier, or on a standing authorization that the agent itself triggers, for example on a price change or on a schedule.
 
 {:vspace}
 **Bot**:
@@ -807,6 +808,7 @@ for their contributions to the specification.
 
 * Updated the traditional bot detection methods in the introduction
 * Updated the Bot Managers section and introduce the concept of feedback loop to the agent through 401 status code in case of token assessment failure
+* Stated that the principal need not be present at the time of a human-via-agent request.
 * Made admission depend on the site's policy for the requested action, and stated that rate and abuse limits and step-up still apply to admitted requests.
 
 -01
