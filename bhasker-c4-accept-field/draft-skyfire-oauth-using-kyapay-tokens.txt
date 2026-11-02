@@ -5,10 +5,10 @@
 Web Authorization Protocol                                    A. Agarwal
 Internet-Draft                                      Skyfire Systems Inc.
 Intended status: Standards Track                             M. B. Jones
-Expires: 5 May 2027                               Self-Issued Consulting
+Expires: 6 May 2027                               Self-Issued Consulting
                                                                S. Thumma
                                                                   Akamai
-                                                         1 November 2026
+                                                         2 November 2026
 
 
                           Using KYAPay Tokens
@@ -69,7 +69,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 May 2027.
+   This Internet-Draft will expire on 6 May 2027.
 
 Copyright Notice
 
@@ -899,7 +899,7 @@ Table of Contents
    *Token expired.* Because tokens have a short validity window, a bot
    manager may occasionally detect a token that expires during the
    validation process.  The agent can obtain a new token from one of the
-   listed issuers and retry the request:
+   listed issuers and retry the request.
 
    NOTE: '\' line wrapping per RFC 8792
 
@@ -923,8 +923,8 @@ Table of Contents
    (KYA) token.  Consequently, bot managers utilizing advanced detection
    methods may misclassify this agentic traffic as malicious and block
    it.  To prevent a degraded user experience, which can lead to lost
-   business opportunities for the host website—bot managers should issue
-   a custom challenge response instead of an outright block.  This
+   business opportunities for the host website, bot managers should
+   issue a custom challenge response instead of an outright block.  This
    proactive approach gently encourages developers to adopt and
    implement the KYA standard.
 
@@ -1013,7 +1013,7 @@ Table of Contents
    sent.  If it sent no token, or a token that was refused, it can
    obtain a new token and retry.  If the token lacked something the
    recipient requires, obtaining it may involve the human principal, for
-   example to agree to share an attribute or to complete further
+   example, to agree to share an attribute or to complete further
    verification with the issuer, which can take minutes to days.
 
    The same requirements can also be published in advance, so that an
@@ -1400,7 +1400,7 @@ Table of Contents
       with initiators out of band.
 
    *  Requirements that differ by principal, by account, or by the
-      outcome of a risk assessment can reveal those facts, for example
+      outcome of a risk assessment can reveal those facts, for example,
       which accounts are of high value or that a request has been
       flagged (Section 9 of [RFC9470] describes the same risk for
       authentication requirements).
