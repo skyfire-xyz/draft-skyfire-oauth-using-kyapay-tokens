@@ -68,6 +68,9 @@ informative:
   RFC6749: # OAuth 2.0
   RFC8176: # AMR values
   RFC8705: # OAuth 2.0 Mutual-TLS
+  RFC8792: # Line wrapping in examples
+  RFC9457: # Problem Details
+  RFC9470: # OAuth 2.0 Step Up Authentication Challenge
   RFC9449: # DPoP
   RFC9111: # HTTP Caching
   RFC9901: # SD-JWT
@@ -424,6 +427,10 @@ A recipient MUST NOT apply its token-absent policy to a preflight request.
 Where a response depends on the `KYAPay-Token` field, the response MUST include `Vary: KYAPay-Token` and MUST be marked so that shared caches do not store it, for example with `Cache-Control: private`.
 The protection in {{Section 3.5 of RFC9111}} applies only to requests that carry the `Authorization` field.
 
+KYAPay tokens are carried in a dedicated header field rather than in `Authorization`.
+A Target commonly uses `Authorization` for its own authentication; a KYAPay token is not a credential for access to the Target's resources; and the same token is carried over transports other than HTTP ({{OtherInterfaces}}), where `Authorization` has no meaning.
+For the same reasons, a recipient states its requirements in the `Accept-KYAPay-Token` response field ({{AcceptField}}) rather than in a `WWW-Authenticate` challenge.
+
 ## Token Size {#TokenSize}
 
 A recipient MUST accept a `KYAPay-Token` field value of at least 6144 octets. The
@@ -472,6 +479,35 @@ This applies however the token is attached. An agent that adds the field below t
 The Target determines which hosts act on its behalf and which claims each receives.
 Until a mechanism exists for the Target to declare this, an agent learns it by configuration or from an arrangement with the Target.
 
+## The Accept-KYAPay-Token Response Field {#AcceptField}
+
+`Accept-KYAPay-Token` is a Dictionary Structured Field ({{Section 3.2 of RFC9651}}) that a recipient sends in a response to state what a request needs to carry for the recipient to accept it.
+Each member states one requirement.
+The member's key is a label chosen by the recipient.
+Its value is an Inner List of Strings, each naming a claim, using the claim names of {{I-D.skyfire-oauth-kyapay-token}} with a period between a claim and its sub-claim (for example, "hid.email").
+
+Parameters on a member qualify the requirement.
+Uses of KYAPay vary too widely for this document to define a complete set, so recipients define the parameters and values they need.
+Three that are commonly useful are:
+
+* `purpose`: a Token saying why the recipient needs the claims, which an agent can show to the human principal when asking for consent;
+
+* `optional`: a Boolean; when true, the recipient would like the claims but does not require them; and
+
+* `issuers`: a String listing the issuers whose tokens the recipient accepts for this requirement, each as the value it uses in the `iss` claim, separated by single spaces.
+
+For example (with line wrapping per {{RFC8792}}):
+
+    NOTE: '\' line wrapping per RFC 8792
+
+    Accept-KYAPay-Token: checkout=("hid.email");purpose=checkout, \
+      fraud=("hid.phone_number");purpose=fraud_prevention;optional
+
+A recipient that requires payment names payment claims in the same way, for example `pay=("amt" "cur");purpose=checkout`.
+
+An agent MUST ignore parameters it does not recognize.
+A recipient that responds to cross-origin requests MUST list `Accept-KYAPay-Token` in `Access-Control-Expose-Headers`, so that a browser-based agent can read it.
+
 # Using KYAPay Tokens at Security Intermediaries {#SecInt}
 
 This section is normative.
@@ -480,7 +516,10 @@ Throughout, "validate the token" means to perform the validation procedure defin
 
 ## Common Processing Model {#ProcModel}
 
-On receiving a request that carries one or more KYAPay tokens, a security intermediary:
+A recipient first decides, from its own policy for the resource and action requested, whether it uses KYAPay tokens for that request.
+A recipient that does not MAY ignore the `KYAPay-Token` field.
+A recipient that does, on receiving a request that carries one or more KYAPay tokens, processes the tokens of the types it accepts ({{I-D.skyfire-oauth-kyapay-token}}) as follows, and sets aside tokens of other types ({{I-D.skyfire-oauth-kyapay-token}}, Section 4).
+A security intermediary:
 
 1. MUST extract each token as described in {{ConveyingRequests}}.
 1. MUST confirm that the token's issuer is one the recipient trusts for the claims being relied upon (see {{SecCon}}).
@@ -489,7 +528,8 @@ On receiving a request that carries one or more KYAPay tokens, a security interm
    The trusted-issuer set is configured out of band and is not derived from the token.
    A recipient MUST NOT retrieve key material for an issuer that is not in its configured set of trusted issuers.
 1. MUST validate each token as specified in {{I-D.skyfire-oauth-kyapay-token}}, Section 4.
-   A token that fails validation MUST NOT be treated as conveying a human presence signal, and the intermediary MUST fall back to its default (token-absent) policy for that request.
+   A token that fails validation MUST NOT be treated as conveying a human presence signal, and the intermediary MUST decline what it governs for that request, rather than applying its policy for requests that carry no token: a bot manager blocks the request, a fraud manager declines the transaction, or, where it inspects the token only after the action, handles the failure as it handles any other fraud finding on a completed transaction, an ATO protector blocks the sign-in, a CIAM system refuses the account action or token exchange, and a payment service does not proceed with the payment.
+   Where the decline is returned to the agent in an HTTP response, that response is as described in {{StepUp}}.
 1. MUST verify the token signature against a key obtained from the issuer's JWK Set, discovered via the `iss` claim using the `/.well-known/jwks.json` mechanism ({{I-D.skyfire-oauth-kyapay-token}}).
    Because KYAPay tokens are self-contained, this verification SHOULD be performed locally, without a synchronous callout to the issuer per request;
    issuer keys SHOULD be cached and refreshed according to standard JWK Set practice.
@@ -541,7 +581,7 @@ A bot manager sits inline in the request path to make per-request admission deci
 
 KYAPay tokens transform this detection model into a self-identification model. By presenting a valid KYA token, an agent explicitly identifies itself as automated up front. The bot manager verifies the token -- checking the cryptographic signature against the issuer's published keys, issuer trust, validity window, and audience -- and classifies the request as a verified agent.
 
-For token-bearing traffic, the identification question is settled: the bot manager does not need to execute its behavioral or fingerprinting detection heuristics to prove the request is automated. Untokened or unverifiable requests fall back to the standard detection pipeline.
+For token-bearing traffic, the identification question is settled: the bot manager does not need to execute its behavioral or fingerprinting detection heuristics to prove the request is automated. Requests that carry no token fall back to the standard detection pipeline; a request whose token fails validation is declined ({{ProcModel}}).
 
 Settling identification, however, does not grant automatic access. Identification is distinct from admission: classifying a request as a verified agent simply provides authenticated context. The bot manager uses the token's verified identity layer -- the human principal (`hid`), the agent platform (`apd`), and the agent instance (`aid`) -- to select and evaluate the site's configured access policy to determine the final disposition (admit, rate-limit, require step-up, or deny) rather than applying bot-blocking challenges designed for unattended, unattributed automation.
 
@@ -560,29 +600,36 @@ A bearer token captured within its validity window can be replayed; a bot manage
 
 ### Token present but invalid
 
-The error responses in this section and the next are examples for discussion only.
-The status code and the syntax for reporting these errors have not been decided.
-
 In some cases, a KYA token may be present in the request but the validation process may reveal some anomalies.
+The bot manager then responds as described in {{StepUp}}, with 403 (Forbidden), and can include the `Accept-KYAPay-Token` field stating what a request needs in order to succeed.
 
-* **Token expired**
-Because tokens have a short validity window, a bot manager may occasionally detect a token that expires during the validation process. In this scenario, the bot manager must return an HTTP 401 Unauthorized response. This response must include a WWW-Authenticate header specifying the reason for the authorization failure, along with a space-separated list of authorized token issuers where a valid token can be requested.
+In the examples in this section and the next, the `issuers` parameter ({{AcceptField}}) lists the issuers from which the bot manager accepts tokens, and a problem details body {{RFC9457}} gives the reason.
+This document does not define those problem types; they are examples for discussion only.
 
-	`WWW-Authenticate: KYAPay error="expired_token", error_description="Retrieve a new token a KYA Token issuer", issuer="https://issuer.example.com https://iss.example.org"`
+**Token expired.**
+Because tokens have a short validity window, a bot manager may occasionally detect a token that expires during the validation process.
+The agent can obtain a new token from one of the listed issuers and retry the request.
 
-* **Token invalid**
-Some anomalies may be detected when validating the token as described in section 6.1 and 6.2. The bot manager should return a HTTP 401 - Unauthorized status code including a WWW-Authenticate header in the response with the reason for the unauthorized access and a space-separated list of authorized token issuers where a valid token can be requested.
+    NOTE: '\' line wrapping per RFC 8792
 
-	`WWW-Authenticate: KYAPay error="invalid_token", error_description="A valid KYA token is required", issuer="https://issuer.example.com https://iss.example.org"`
+    HTTP/1.1 403 Forbidden
+    Content-Type: application/problem+json
+    Accept-KYAPay-Token: admit=("hid" "apd" "aid"); \
+      issuers="https://issuer.example.com https://iss.example.org"
+
+    {"type": "https://bot-manager.example/problems/expired-token"}
+
+**Token invalid.**
+Some anomalies may be detected when validating the token as described in {{ProcModel}} and {{HumanPresence}}.
+The response has the same form, with a different problem type:
+
+    {"type": "https://bot-manager.example/problems/invalid-token"}
 
 ### Token not present
-Organizations and individuals developing AI agents may be unaware of the requirement to identify their traffic using a Know Your Agent (KYA) token. Consequently, bot managers utilizing advanced detection methods may misclassify this agentic traffic as malicious and block it. To prevent a degraded user experience, which can lead to lost business opportunities for the host website—bot managers should issue a custom challenge response instead of an outright block. This proactive approach gently encourages developers to adopt and implement the KYA standard.
+Organizations and individuals developing AI agents may be unaware of the requirement to identify their traffic using a Know Your Agent (KYA) token. Consequently, bot managers utilizing advanced detection methods may misclassify this agentic traffic as malicious and block it. To prevent a degraded user experience, which can lead to lost business opportunities for the host website, bot managers should issue a custom challenge response instead of an outright block. This proactive approach gently encourages developers to adopt and implement the KYA standard.
 
-* When a bot manager detects advanced automation that lacks a Know Your Agent (KYA) token or other standard forms of identification, the detection engine should return an HTTP 401 Unauthorized response including a WWW-Authenticate header in the response with the reason for the unauthorized access and a space-separated list of authorized token issuers where a valid token can be requested.
-
-	`WWW-Authenticate: KYAPay error="missing_token", error_description="A valid KYA token is required", issuer="https://issuer.example.com https://iss.example.org"`
-
-* After the agent acquires a valid KYA token and reissues the request, the transaction can complete successfully.
+When a bot manager detects advanced automation that lacks a Know Your Agent (KYA) token or other standard forms of identification, it responds in the same way, with the problem type `https://bot-manager.example/problems/missing-token`.
+After the agent acquires a valid KYA token and reissues the request, the transaction can complete successfully.
 
 This light challenge is designed to help with KYA standard adoption and improve agentic traffic acceptance with merchants and increase agent autonomy in successfully completing tasks on behalf of their user principal.
 
@@ -605,21 +652,29 @@ claims where present, to weight how the principal was authenticated and verified
 A fraud manager need not sit inline in the request path.
 In practice the token is made available to it either inline (the Target forwards the received token to its fraud manager) or out of band (for example, script running on the Target's page captures the `KYAPay-Token` value and sends it to the fraud manager before the request reaches the Target's application).
 The same token MAY be inspected before the action, after it, or both.
+A recipient that inspects the token after the action evaluates its time-based claims, such as `exp`, against the time it received the request, as recorded by the recipient and not as supplied by the sender.
 In all of these arrangements, the token issuer is not in the transaction path;
 the fraud manager verifies the self-contained token locally by JWKS, as described in {{ProcModel}}.
 The fraud manager MAY continue to apply its existing behavioral and device models;
 the token supplements, and does not replace, those signals.
 
-## Step-Up Authentication {#StepUp}
+## Responding When a Token Falls Short {#StepUp}
 
-Not all actions carry the same risk;
-viewing a loyalty balance is far less sensitive than making a large payment.
-A KYAPay token attests the assurance established at the time of issuance, which may be insufficient for a high-value action.
-A recipient SHOULD be able to require a higher assurance level for sensitive actions and to signal that requirement so that a fresh token can be obtained after additional verification of the human principal (for example, a step-up authentication such as a push-notification approval, a one-time code, or a re-run of identity verification).
+A recipient can decline a request because it carries no KYAPay token, because the token fails validation ({{ProcModel}}), or because the token is valid but does not carry what the action requires: for example identity claims, a higher assurance level for a sensitive action, or a payment token.
+Not all actions carry the same risk; viewing a loyalty balance is far less sensitive than making a large payment, and a token attests only the assurance established when it was issued.
 
-This document does not define a wire mechanism for a Target to request step-up out of band from an issuer;
-that is an open item (see {{SecCon}}).
-Until such a mechanism is standardized, recipients SHOULD express assurance requirements as local policy over the assurance signals in {{HumanPresence}} and decline actions whose required assurance is not met.
+Where the decline is returned to the agent in an HTTP response, that response is 403 (Forbidden), or 402 (Payment Required) where what is missing or insufficient is payment, and MAY include the `Accept-KYAPay-Token` field ({{AcceptField}}) stating what a request needs in order to succeed ({{DisclosingRequirements}}).
+Where the request is to an endpoint whose protocol specifies its own error responses, the recipient instead responds as that protocol specifies, and MAY include the `Accept-KYAPay-Token` field; for example, an OAuth 2.0 authorization server that declines a token exchange responds as specified in {{Section 2.2.2 of RFC8693}}.
+Over other interfaces ({{OtherInterfaces}}), how a decline is signaled is left to the binding for that interface.
+A recipient SHOULD NOT use 401 (Unauthorized) for these cases: that status requires a `WWW-Authenticate` challenge ({{Section 15.5.2 of RFC9110}}), and a KYAPay token is not an `Authorization` credential.
+A recipient MAY describe the reason in a problem details body {{RFC9457}} ({{DisclosingRequirements}}).
+
+An agent that receives such a response can compare it with what it sent.
+If it sent no token, or a token that was refused, it can obtain a new token and retry.
+If the token lacked something the recipient requires, obtaining it may involve the human principal, for example, to agree to share an attribute or to complete further verification with the issuer, which can take minutes to days.
+
+The same requirements can also be published in advance, so that an agent obtains a suitable token the first time.
+This document does not define how.
 
 ## Account-Takeover Protectors {#ATOProt}
 
@@ -851,6 +906,22 @@ Recipients SHOULD treat high-value actions as warranting step-up ({{StepUp}}) ra
 If an issuer or platform rotates a signing key, tokens signed with the old key may fail validation prematurely.
 Issuers SHOULD retain superseded verification keys in their JWK Set for at least the maximum token lifetime after rotation.
 
+## Disclosing Requirements {#DisclosingRequirements}
+
+The `Accept-KYAPay-Token` field ({{AcceptField}}) and any problem details a recipient returns ({{StepUp}}) tell the sender what the recipient requires.
+That helps a legitimate agent obtain a suitable token, and it also reaches anyone else who sends a request.
+How much to state is a decision for the recipient, in light of its own risk:
+
+* It can omit the field, state only some of its requirements, or leave out the `issuers` parameter, which names the issuers it accepts.
+
+* It can instead publish its requirements in advance, or agree them with initiators out of band.
+
+* Requirements that differ by principal, by account, or by the outcome of a risk assessment can reveal those facts, for example, which accounts are of high value or that a request has been flagged ({{Section 9 of RFC9470}} describes the same risk for authentication requirements).
+
+* Saying which validation check a token failed can help an attacker probe the recipient; a generic reason avoids this ({{Section 5 of RFC9457}}).
+
+Stating requirements does not weaken the token itself: a request still succeeds only with a token signed by an issuer the recipient trusts.
+
 # Privacy Considerations {#PrivCon}
 
 The privacy considerations of {{I-D.skyfire-oauth-kyapay-token}} apply.
@@ -877,13 +948,19 @@ They MUST treat `KYAPay-Token` values and their decoded contents as sensitive pe
 
 ## HTTP Field Name Registration
 
-IANA is requested to register the following entry in the "Hypertext Transfer Protocol (HTTP) Field Name" registry established by {{RFC9110}}:
+IANA is requested to register the following entries in the "Hypertext Transfer Protocol (HTTP) Field Name" registry established by {{RFC9110}}:
 
 * Field Name: KYAPay-Token
 * Status: permanent
 * Structured Type: List
 * Reference: {{HeaderField}} of this document
 * Comments: Carries one or more KYAPay tokens in an HTTP request
+^
+* Field Name: Accept-KYAPay-Token
+* Status: permanent
+* Structured Type: Dictionary
+* Reference: {{AcceptField}} of this document
+* Comments: States what a request must carry for a KYAPay recipient to accept it
 
 ## JWT and Media Type Registrations
 
@@ -918,7 +995,7 @@ Bhasker Allam also wrote the text on which {{RuntimeExposure}} is based.
 -02
 
 * Updated the traditional bot detection methods in the introduction
-* Updated the Bot Managers section and introduce the concept of feedback loop to the agent through 401 status code in case of token assessment failure
+* Updated the Bot Managers section and introduce the concept of feedback loop to the agent through an error response in case of token assessment failure
 * Stated that the principal need not be present at the time of a human-via-agent request.
 * Made admission depend on the site's policy for the requested action, and stated that rate and abuse limits and step-up still apply to admitted requests.
 * Stated that a token is reusable within its validity period and audience, and that a repeated `jti` is not by itself evidence of replay, and rewrote the replay considerations to match.
@@ -930,6 +1007,7 @@ Bhasker Allam also wrote the text on which {{RuntimeExposure}} is based.
 * Added Attaching Tokens to Requests, scoped the zero-tech-lift principle to agents that control a request's header fields, and added CORS preflight and caching requirements.
 * Described retaining a token for audit or dispute resolution.
 * Defined `KYAPay-Token` as a List of Tokens, replacing the ABNF, and required a recipient to reject a field that fails to parse.
+* Added the `Accept-KYAPay-Token` response field, which a recipient MAY send, replaced Step-Up Authentication with Responding When a Token Falls Short (over HTTP, 403, or 402 for payment, unless the protocol in use specifies its own errors; not 401), changed the Bot Managers error examples to match, made a recipient decide from its own policy whether it uses tokens for a request and decline, within its role, a request whose token fails validation, rather than treat it as carrying no token, and added Disclosing Requirements.
 
 -01
 
