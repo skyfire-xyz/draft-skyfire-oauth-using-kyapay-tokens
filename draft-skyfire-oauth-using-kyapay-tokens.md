@@ -346,7 +346,7 @@ The `KYAPay-Token` header field is an HTTP request header field whose value is a
 HTTP field names are case-insensitive {{RFC9110}}.
 
 `KYAPay-Token` is a List Structured Field ({{Section 3.1 of RFC9651}}).
-Each member is a Token ({{Section 3.3.4 of RFC9651}}) whose value is a JWT in compact serialization, with no parameters.
+Each member is a Token ({{Section 3.3.4 of RFC9651}}) whose value is a JWT, with no parameters.
 A compact JWT consists only of base64url characters and periods, and it begins with the encoding of a JSON object, so its first character is a letter; it is therefore a valid Token as it stands.
 For example:
 
