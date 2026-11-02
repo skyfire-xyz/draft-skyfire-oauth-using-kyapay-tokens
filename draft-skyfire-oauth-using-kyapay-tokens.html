@@ -1320,16 +1320,19 @@ the token itself is the interoperability contract.<a href="#section-abstract-1" 
                 <p id="section-toc.1-1.8.2.5.1"><a href="#section-8.5" class="auto internal xref">8.5</a>.  <a href="#name-compromised-agent-host-irre" class="internal xref">Compromised Agent Host (Irreducible)</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.6">
-                <p id="section-toc.1-1.8.2.6.1"><a href="#section-8.6" class="auto internal xref">8.6</a>.  <a href="#name-issuer-trust" class="internal xref">Issuer Trust</a></p>
+                <p id="section-toc.1-1.8.2.6.1"><a href="#section-8.6" class="auto internal xref">8.6</a>.  <a href="#name-token-exposure-in-the-agent" class="internal xref">Token Exposure in the Agent Runtime</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.7">
-                <p id="section-toc.1-1.8.2.7.1"><a href="#section-8.7" class="auto internal xref">8.7</a>.  <a href="#name-revocation" class="internal xref">Revocation</a></p>
+                <p id="section-toc.1-1.8.2.7.1"><a href="#section-8.7" class="auto internal xref">8.7</a>.  <a href="#name-issuer-trust" class="internal xref">Issuer Trust</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.8">
-                <p id="section-toc.1-1.8.2.8.1"><a href="#section-8.8" class="auto internal xref">8.8</a>.  <a href="#name-continuity-of-human-control" class="internal xref">Continuity of Human Control</a></p>
+                <p id="section-toc.1-1.8.2.8.1"><a href="#section-8.8" class="auto internal xref">8.8</a>.  <a href="#name-revocation" class="internal xref">Revocation</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.9">
-                <p id="section-toc.1-1.8.2.9.1"><a href="#section-8.9" class="auto internal xref">8.9</a>.  <a href="#name-key-management" class="internal xref">Key Management</a></p>
+                <p id="section-toc.1-1.8.2.9.1"><a href="#section-8.9" class="auto internal xref">8.9</a>.  <a href="#name-continuity-of-human-control" class="internal xref">Continuity of Human Control</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.10">
+                <p id="section-toc.1-1.8.2.10.1"><a href="#section-8.10" class="auto internal xref">8.10</a>. <a href="#name-key-management" class="internal xref">Key Management</a></p>
 </li>
             </ul>
 </li>
@@ -1596,7 +1599,7 @@ As one illustration, a merchant that recognizes a KYAPay-bearing request <span c
       </h2>
 <p id="section-4-1">This section is informative.
 It situates KYAPay tokens among the other mechanisms a recipient encounters and, importantly, distinguishes what is deployed today from the planned evolution, so that the consumption requirements in <a href="#SecInt" class="auto internal xref">Section 6</a> are read against the correct baseline.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<div id="kya-is-an-issuer-signed-bearer-token-today">
+<div id="Bearer">
 <section id="section-4.1">
         <h3 id="name-kya-is-an-issuer-signed-bea">
 <a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-kya-is-an-issuer-signed-bea" class="section-name selfRef">KYA is an Issuer-Signed Bearer Token Today</a>
@@ -1653,7 +1656,7 @@ request signing supplies authenticity and possession, while KYA supplies identit
 A complete proof-of-possession design uses both, bound together, as described next.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="the-proof-of-possession-path-planned-evolution">
+<div id="PoPPath">
 <section id="section-4.3">
         <h3 id="name-the-proof-of-possession-pat">
 <a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-the-proof-of-possession-pat" class="section-name selfRef">The Proof-of-Possession Path (Planned Evolution)</a>
@@ -2271,45 +2274,78 @@ Proof of possession does not prevent this: the malware's requests convey valid b
 This risk is bounded not by the token bindings but by short token lifetimes -- so anything signed during a compromise expires quickly once the malware is evicted -- together with host-level controls such as attestation, anomaly detection, and hygiene.<a href="#section-8.5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="issuer-trust">
+<div id="RuntimeExposure">
 <section id="section-8.6">
-        <h3 id="name-issuer-trust">
-<a href="#section-8.6" class="section-number selfRef">8.6. </a><a href="#name-issuer-trust" class="section-name selfRef">Issuer Trust</a>
+        <h3 id="name-token-exposure-in-the-agent">
+<a href="#section-8.6" class="section-number selfRef">8.6. </a><a href="#name-token-exposure-in-the-agent" class="section-name selfRef">Token Exposure in the Agent Runtime</a>
         </h3>
-<p id="section-8.6-1">A token is only as trustworthy as its issuer and the verifiers it cites.
+<p id="section-8.6-1">Agents driven by language models process untrusted content and record their activity in ways that conventional HTTP clients do not.
+A KYAPay token can therefore leave the agent through normal operation, without the agent host being compromised.
+Examples include:<a href="#section-8.6-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8.6-2.1">
+            <p id="section-8.6-2.1.1">the token appearing in model context, conversation transcripts, or tool-call inputs and outputs that are logged, retained, or sent to a model provider;<a href="#section-8.6-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.6-2.2">
+            <p id="section-8.6-2.2.1">agent tracing, observability, or debugging systems that record outbound request headers;<a href="#section-8.6-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.6-2.3">
+            <p id="section-8.6-2.3.1">prompt injection, where content retrieved from a website or tool instructs the agent to reveal the token or to include it in a request to a party other than the intended Target.<a href="#section-8.6-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-8.6-3">For a bearer token (<a href="#Bearer" class="auto internal xref">Section 4.1</a>), anyone who obtains a leaked token can present it at the Target it was minted for until it expires.
+Audience binding (<a href="#Counterparty" class="auto internal xref">Section 5.4</a>) does not help if the attacker presents the token at that Target.<a href="#section-8.6-3" class="pilcrow">¶</a></p>
+<p id="section-8.6-4">Agent developers and KYAPay Token Issuers <span class="bcp14">SHOULD</span> mint and attach tokens in deterministic components (<a href="#NonPrescCreat" class="auto internal xref">Section 7.1</a>) whose outputs are not placed in model context.
+Agents <span class="bcp14">SHOULD</span> attach a token only to requests sent to the Target for which the token was requested; where the token carries <code>tdm</code>, that means a destination within the domain that <code>tdm</code> names.
+The component that attaches a token <span class="bcp14">MUST</span> make that decision without relying on model output.<a href="#section-8.6-4" class="pilcrow">¶</a></p>
+<p id="section-8.6-5">Agent runtimes <span class="bcp14">MUST NOT</span> write KYAPay token values to logs, traces, or observability exports.<a href="#section-8.6-5" class="pilcrow">¶</a></p>
+<p id="section-8.6-6">Agents <span class="bcp14">SHOULD</span> request a new token for each Target and task rather than reusing one broadly, and <span class="bcp14">SHOULD</span> request the shortest lifetime that fits the task.
+Proof of possession (<a href="#PoPPath" class="auto internal xref">Section 4.3</a>) reduces this exposure only if the private key is also kept out of model context.<a href="#section-8.6-6" class="pilcrow">¶</a></p>
+<p id="section-8.6-7">Some architectures place a token in model context unavoidably.
+Where an agent obtains a token by invoking a tool, the tool result is returned to the model, and any retained transcript of that session therefore contains the token.
+A deployment in that position <span class="bcp14">SHOULD</span> treat the token as disclosed to every party with access to that context, including the model provider.
+For such a deployment, per-Target, short-lived tokens are the main mitigation, together with proof of possession where the private key is held outside model context.<a href="#section-8.6-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="issuer-trust">
+<section id="section-8.7">
+        <h3 id="name-issuer-trust">
+<a href="#section-8.7" class="section-number selfRef">8.7. </a><a href="#name-issuer-trust" class="section-name selfRef">Issuer Trust</a>
+        </h3>
+<p id="section-8.7-1">A token is only as trustworthy as its issuer and the verifiers it cites.
 The system is federated: many issuers are possible, and a recipient <span class="bcp14">MUST</span> maintain an explicit set of trusted issuers and the claims and assurance levels it will accept from each.
 Establishing this trust at scale is an open problem analogous to the Certificate Authority model (audits, a maintained issuer list, a removal mechanism, and possibly transparency logs);
 this document does not define such a framework, and deployments should not assume one exists.
-Until it does, trust is established out of band (for example, configured relationships with well-known issuers).<a href="#section-8.6-1" class="pilcrow">¶</a></p>
+Until it does, trust is established out of band (for example, configured relationships with well-known issuers).<a href="#section-8.7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="revocation">
-<section id="section-8.7">
+<section id="section-8.8">
         <h3 id="name-revocation">
-<a href="#section-8.7" class="section-number selfRef">8.7. </a><a href="#name-revocation" class="section-name selfRef">Revocation</a>
+<a href="#section-8.8" class="section-number selfRef">8.8. </a><a href="#name-revocation" class="section-name selfRef">Revocation</a>
         </h3>
-<p id="section-8.7-1">An agent whose platform is deregistered, or a human whose identity verification is revoked, may still hold unexpired tokens.
+<p id="section-8.8-1">An agent whose platform is deregistered, or a human whose identity verification is revoked, may still hold unexpired tokens.
 This specification does not define a revocation mechanism.
-Recipients <span class="bcp14">SHOULD</span> keep accepted lifetimes short to bound exposure, and <span class="bcp14">SHOULD</span> consult an issuer's live-status or revocation endpoint, where one is offered, for high-assurance or high-value actions.<a href="#section-8.7-1" class="pilcrow">¶</a></p>
+Recipients <span class="bcp14">SHOULD</span> keep accepted lifetimes short to bound exposure, and <span class="bcp14">SHOULD</span> consult an issuer's live-status or revocation endpoint, where one is offered, for high-assurance or high-value actions.<a href="#section-8.8-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="continuity-of-human-control">
-<section id="section-8.8">
+<section id="section-8.9">
         <h3 id="name-continuity-of-human-control">
-<a href="#section-8.8" class="section-number selfRef">8.8. </a><a href="#name-continuity-of-human-control" class="section-name selfRef">Continuity of Human Control</a>
+<a href="#section-8.9" class="section-number selfRef">8.9. </a><a href="#name-continuity-of-human-control" class="section-name selfRef">Continuity of Human Control</a>
         </h3>
-<p id="section-8.8-1">A valid token attests that the human principal authorized the agent at the time of issuance.
+<p id="section-8.9-1">A valid token attests that the human principal authorized the agent at the time of issuance.
 It does not prove the human remains in control -- for example, if the agent is later prompt-injected, or if credentials are exfiltrated from the agent or its host.
-Recipients <span class="bcp14">SHOULD</span> treat high-value actions as warranting step-up (<a href="#StepUp" class="auto internal xref">Section 6.5</a>) rather than relying solely on a previously issued token.<a href="#section-8.8-1" class="pilcrow">¶</a></p>
+Recipients <span class="bcp14">SHOULD</span> treat high-value actions as warranting step-up (<a href="#StepUp" class="auto internal xref">Section 6.5</a>) rather than relying solely on a previously issued token.<a href="#section-8.9-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="key-management">
-<section id="section-8.9">
+<section id="section-8.10">
         <h3 id="name-key-management">
-<a href="#section-8.9" class="section-number selfRef">8.9. </a><a href="#name-key-management" class="section-name selfRef">Key Management</a>
+<a href="#section-8.10" class="section-number selfRef">8.10. </a><a href="#name-key-management" class="section-name selfRef">Key Management</a>
         </h3>
-<p id="section-8.9-1">If an issuer or platform rotates a signing key, tokens signed with the old key may fail validation prematurely.
-Issuers <span class="bcp14">SHOULD</span> retain superseded verification keys in their JWK Set for at least the maximum token lifetime after rotation.<a href="#section-8.9-1" class="pilcrow">¶</a></p>
+<p id="section-8.10-1">If an issuer or platform rotates a signing key, tokens signed with the old key may fail validation prematurely.
+Issuers <span class="bcp14">SHOULD</span> retain superseded verification keys in their JWK Set for at least the maximum token lifetime after rotation.<a href="#section-8.10-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2549,7 +2585,8 @@ Bhasker Allam,
 Jean Diaconu,
 and
 David Senecal
-for their contributions to the specification.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+for their contributions to the specification.
+Bhasker Allam also wrote the text on which <a href="#RuntimeExposure" class="auto internal xref">Section 8.6</a> is based.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="document-history">
@@ -2583,6 +2620,9 @@ for their contributions to the specification.<a href="#appendix-A-2" class="pilc
 </li>
         <li class="normal" id="appendix-B-3.8">
           <p id="appendix-B-3.8.1">Made BCP 225 a normative reference, and let a recipient reject a request carrying more than one token of the same <code>typ</code>.<a href="#appendix-B-3.8.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.9">
+          <p id="appendix-B-3.9.1">Added Token Exposure in the Agent Runtime to the Security Considerations.<a href="#appendix-B-3.9.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="appendix-B-4">-01<a href="#appendix-B-4" class="pilcrow">¶</a></p>

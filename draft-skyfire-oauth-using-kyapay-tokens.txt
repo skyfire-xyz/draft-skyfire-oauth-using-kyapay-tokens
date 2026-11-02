@@ -131,10 +131,11 @@ Table of Contents
      8.3.  Replay and Proof of Possession
      8.4.  Malicious or Compromised Target Reuse
      8.5.  Compromised Agent Host (Irreducible)
-     8.6.  Issuer Trust
-     8.7.  Revocation
-     8.8.  Continuity of Human Control
-     8.9.  Key Management
+     8.6.  Token Exposure in the Agent Runtime
+     8.7.  Issuer Trust
+     8.8.  Revocation
+     8.9.  Continuity of Human Control
+     8.10. Key Management
    9.  Privacy Considerations
      9.1.  Minimal Disclosure
      9.2.  Consent
@@ -1294,7 +1295,56 @@ Table of Contents
    malware is evicted -- together with host-level controls such as
    attestation, anomaly detection, and hygiene.
 
-8.6.  Issuer Trust
+8.6.  Token Exposure in the Agent Runtime
+
+   Agents driven by language models process untrusted content and record
+   their activity in ways that conventional HTTP clients do not.  A
+   KYAPay token can therefore leave the agent through normal operation,
+   without the agent host being compromised.  Examples include:
+
+   *  the token appearing in model context, conversation transcripts, or
+      tool-call inputs and outputs that are logged, retained, or sent to
+      a model provider;
+
+   *  agent tracing, observability, or debugging systems that record
+      outbound request headers;
+
+   *  prompt injection, where content retrieved from a website or tool
+      instructs the agent to reveal the token or to include it in a
+      request to a party other than the intended Target.
+
+   For a bearer token (Section 4.1), anyone who obtains a leaked token
+   can present it at the Target it was minted for until it expires.
+   Audience binding (Section 5.4) does not help if the attacker presents
+   the token at that Target.
+
+   Agent developers and KYAPay Token Issuers SHOULD mint and attach
+   tokens in deterministic components (Section 7.1) whose outputs are
+   not placed in model context.  Agents SHOULD attach a token only to
+   requests sent to the Target for which the token was requested; where
+   the token carries tdm, that means a destination within the domain
+   that tdm names.  The component that attaches a token MUST make that
+   decision without relying on model output.
+
+   Agent runtimes MUST NOT write KYAPay token values to logs, traces, or
+   observability exports.
+
+   Agents SHOULD request a new token for each Target and task rather
+   than reusing one broadly, and SHOULD request the shortest lifetime
+   that fits the task.  Proof of possession (Section 4.3) reduces this
+   exposure only if the private key is also kept out of model context.
+
+   Some architectures place a token in model context unavoidably.  Where
+   an agent obtains a token by invoking a tool, the tool result is
+   returned to the model, and any retained transcript of that session
+   therefore contains the token.  A deployment in that position SHOULD
+   treat the token as disclosed to every party with access to that
+   context, including the model provider.  For such a deployment, per-
+   Target, short-lived tokens are the main mitigation, together with
+   proof of possession where the private key is held outside model
+   context.
+
+8.7.  Issuer Trust
 
    A token is only as trustworthy as its issuer and the verifiers it
    cites.  The system is federated: many issuers are possible, and a
@@ -1307,7 +1357,7 @@ Table of Contents
    exists.  Until it does, trust is established out of band (for
    example, configured relationships with well-known issuers).
 
-8.7.  Revocation
+8.8.  Revocation
 
    An agent whose platform is deregistered, or a human whose identity
    verification is revoked, may still hold unexpired tokens.  This
@@ -1316,7 +1366,7 @@ Table of Contents
    consult an issuer's live-status or revocation endpoint, where one is
    offered, for high-assurance or high-value actions.
 
-8.8.  Continuity of Human Control
+8.9.  Continuity of Human Control
 
    A valid token attests that the human principal authorized the agent
    at the time of issuance.  It does not prove the human remains in
@@ -1325,7 +1375,7 @@ Table of Contents
    SHOULD treat high-value actions as warranting step-up (Section 6.5)
    rather than relying solely on a previously issued token.
 
-8.9.  Key Management
+8.10.  Key Management
 
    If an issuer or platform rotates a signing key, tokens signed with
    the old key may fail validation prematurely.  Issuers SHOULD retain
@@ -1556,7 +1606,8 @@ Acknowledgments
    described here.
 
    We would like to thank Bhasker Allam, Jean Diaconu, and David Senecal
-   for their contributions to the specification.
+   for their contributions to the specification.  Bhasker Allam also
+   wrote the text on which Section 8.6 is based.
 
 Document History
 
@@ -1590,6 +1641,9 @@ Document History
 
    *  Made BCP 225 a normative reference, and let a recipient reject a
       request carrying more than one token of the same typ.
+
+   *  Added Token Exposure in the Agent Runtime to the Security
+      Considerations.
 
    -01
 
