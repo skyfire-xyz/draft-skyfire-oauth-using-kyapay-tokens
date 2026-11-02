@@ -102,6 +102,7 @@ Table of Contents
      4.1.  KYA is an Issuer-Signed Bearer Token Today
      4.2.  Identity and Proof of Possession are Different Layers
      4.3.  The Proof-of-Possession Path (Planned Evolution)
+     4.4.  Request Signatures for Proof of Possession
    5.  Conveying KYAPay Tokens in Requests
      5.1.  The KYAPay-Token HTTP Header Field
      5.2.  Token Size
@@ -481,6 +482,21 @@ Table of Contents
    A complete proof-of-possession design uses both, bound together, as
    described next.
 
+   A KYA token is verified the same way however a request is routed,
+   because it is a self-contained JWT and not a signature over the
+   request.  A signature over the request is different: it can be
+   verified only where the request still has the form the agent signed.
+   Requests are routinely rewritten on the way to an origin.  CDNs, load
+   balancers, API gateways and edge workers add or strip path prefixes,
+   route to internal host names and normalize URIs, and sites
+   deliberately keep their external and internal URLs separate so as not
+   to expose their internal architecture.  A design in which every
+   recipient verified a signature over the request would fail at each
+   such hop, or need special handling there.  This is why KYA is a
+   bearer token by default (Section 4.1), and why, where proof of
+   possession is used, the request signature is verified at the first
+   hop (Section 4.4).
+
 4.3.  The Proof-of-Possession Path (Planned Evolution)
 
    When per-request signing becomes practical at scale, the planned
@@ -509,10 +525,10 @@ Table of Contents
        MUST NOT be required to obtain the key by any means other than
        reading cnf.jwk; and
 
-   4.  the agent signs each request in place -- a signature over the
-       request (method, path, body digest, timestamp/nonce) using
-       [RFC9421] -- verified against the key in cnf, with no separate
-       proof-of-possession token.
+   4.  the agent signs each request in place using [RFC9421], covering
+       the components listed in Section 4.4, and the signature is
+       verified against the key in cnf, with no separate proof-of-
+       possession token.
 
    This yields an unbroken chain from request to key to identity: the
    request is signed by a key, and that key is vouched for as the
@@ -529,16 +545,65 @@ Table of Contents
    Adoption remains the constraint on when this becomes mandatory.  Per-
    request signing is costly: hardware-protected keys are secure but
    slow, software keys are fast but exfiltratable, and post-quantum
-   algorithms do not make signing faster.  Defeating replay of the proof
-   itself further requires either per-Target nonce caches or binding the
-   signature to the request content, and other request-bound designs
-   considered (mutual TLS [RFC8705], TLS channel binding, session-based
-   schemes) each raise the participation bar or add Target-side state.
-   Until fast, secure signing and a workable anti-replay approach exist
-   that keep the Target's job about as simple as verifying a JWT, KYA
-   remains a bearer token by default and proof of possession is an
-   optional, forward-compatible upgrade rather than a precondition for
-   participation.
+   algorithms do not make signing faster.  Binding the signature to the
+   request (Section 4.4) stops a captured signature from being altered
+   or presented with a different request; an identical request can still
+   be resent until the signature expires, and this document does not
+   rely on per-Target nonce caches to prevent that (Section 8.3).  Other
+   request-bound designs considered (mutual TLS [RFC8705], TLS channel
+   binding, session-based schemes) each raise the participation bar or
+   add Target-side state.  Until fast, secure signing and a workable
+   anti-replay approach exist that keep the Target's job about as simple
+   as verifying a JWT, KYA remains a bearer token by default and proof
+   of possession is an optional, forward-compatible upgrade rather than
+   a precondition for participation.
+
+4.4.  Request Signatures for Proof of Possession
+
+   Where a token carries a proof-of-possession key (Section 4.3), the
+   agent signs each request with that key using HTTP Message Signatures
+   [RFC9421].  The signature MUST cover:
+
+   *  the @method derived component;
+
+   *  the @target-uri derived component;
+
+   *  the KYAPay-Token header field, so that a signature cannot be
+      presented with a different token; and
+
+   *  the Content-Digest header field [RFC9530], whenever the request
+      has content.
+
+   The signature MUST carry the created and expires parameters.
+
+   Proof of possession is optional.  A token that carries no proof-of-
+   possession key is a bearer token (Section 4.1), and nothing in this
+   section applies to it.
+
+   A covered component has to hold the same value when the signature is
+   verified as when it was created, and a hop that rewrites a request
+   changes the components that say where it is going.  The signature is
+   therefore verified by the first recipient to receive the request as
+   the agent sent it, before any rewriting, which is usually the CDN,
+   bot manager, or edge worker in front of the Target.  The first
+   recipient that rewrites a request MUST verify the signature before
+   rewriting it.  The recipient that verifies the signature MUST NOT
+   forward a request whose signature is absent or invalid; it rejects
+   the request (Section 6.1).  Where the signature covers Content-
+   Digest, the field MUST be checked against the content [RFC9530]
+   before the request is acted on, by the recipient that verifies the
+   signature or by a recipient behind it that receives both the content
+   and the signed Content-Digest value unchanged; a mismatch, or a
+   digest that cannot be checked, MUST be treated as an invalid
+   signature.  A recipient behind that hop MAY rely on it instead of
+   verifying the signature itself, but only where the deployment ensures
+   that requests cannot reach it without passing through that hop.  It
+   still validates the token as described in Section 6.1.
+
+   The other elements that Section 1.4 of [RFC9421] requires a profile
+   to specify, including the source of the verification key, the keyid
+   and tag parameters, and error responses, are expected to be specified
+   in a future revision of this document.
 
 5.  Conveying KYAPay Tokens in Requests
 
@@ -709,19 +774,23 @@ Table of Contents
        described in Section 5.4.
 
    6.  MUST confirm that the env claim (for example, production) matches
-       the environment the intermediary is operating in.  When the token
-       carries a proof-of-possession key (the cnf claim [RFC7800],
-       Section 4), MUST verify that the request is signed by that key --
-       over HTTP, using HTTP Message Signatures [RFC9421] -- and reject
-       the request if the signature is absent or invalid.
+       the environment the intermediary is operating in.
 
-   7.  When the token carries no such key, it is a bearer token: the
+   7.  When the token carries a proof-of-possession key (the cnf claim
+       [RFC7800], Section 4.3), MUST verify that the request is signed
+       by that key as described in Section 4.4, and MUST reject the
+       request, and not forward it, if the signature is absent or
+       invalid.  An intermediary behind a hop that has already done so
+       MAY rely on that hop instead, as Section 4.4 describes.  When the
+       token carries no such key, this step does not apply.
+
+   8.  When the token carries no such key, it is a bearer token: the
        intermediary MUST rely on the controls in Section 8 (short
        lifetime, audience binding, TLS, issuer-gated onboarding) and
        MUST NOT assume that mere presentation of the token proves the
        sender holds a key bound to it.
 
-   8.  SHOULD use the token's claims to inform its decision, as
+   9.  SHOULD use the token's claims to inform its decision, as
        described in the following subsections, only after successful
        validation.
 
@@ -840,10 +909,11 @@ Table of Contents
    *  *Replay Resistance.* A bearer token captured within its validity
       window can be replayed; a bot manager bounds this with short
       lifetimes, audience binding, and TLS (Section 8).  Where a token
-      carries a proof-of-possession key (Section 4), the bot manager (or
-      the edge/CDN provider acting for the Target) SHOULD additionally
-      verify the per-request signature [RFC9421] against that key, which
-      stops a stolen token being used on its own (Section 8.3).
+      carries a proof-of-possession key (Section 4.3), the per-request
+      signature is verified at the first hop, before any rewriting,
+      which is usually the bot manager or the edge/CDN provider acting
+      for the Target (Section 4.4); this stops a stolen token being used
+      on its own (Section 8.3).
 
 6.3.2.  Token present but invalid
 
@@ -1267,7 +1337,7 @@ Table of Contents
    repeated jti does carry that meaning; this document describes the
    general case, in which it does not.  Where a token carries a proof-
    of-possession key (cnf [RFC7800]), recipients MUST additionally
-   verify a per-request signature [RFC9421] over that key (Section 6.1).
+   verify a per-request signature [RFC9421] over that key (Section 4.4).
    This stops a stolen token from being used on its own, turning an
    open-ended token-theft exposure into a bounded window in which a
    captured signed request could be replayed verbatim; it does not
@@ -1504,6 +1574,10 @@ Table of Contents
               Message Signatures", RFC 9421, DOI 10.17487/RFC9421,
               February 2024, <https://www.rfc-editor.org/rfc/rfc9421>.
 
+   [RFC9530]  Polli, R. and L. Pardue, "Digest Fields", RFC 9530,
+              DOI 10.17487/RFC9530, February 2024,
+              <https://www.rfc-editor.org/rfc/rfc9530>.
+
 11.2.  Informative References
 
    [A2A]      A2A Project, "Agent2Agent (A2A) Protocol Specification",
@@ -1644,6 +1718,9 @@ Document History
 
    *  Added Token Exposure in the Agent Runtime to the Security
       Considerations.
+
+   *  Added Request Signatures for Proof of Possession: the covered
+      components, and verification at the first hop.
 
    -01
 
