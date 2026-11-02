@@ -108,6 +108,7 @@ Table of Contents
      5.2.  Token Size
      5.3.  Conveying Tokens over Other Interfaces
      5.4.  Authenticating the Counterparty
+     5.5.  Attaching Tokens to Requests
    6.  Using KYAPay Tokens at Security Intermediaries
      6.1.  Common Processing Model
      6.2.  Determining Human Presence and Assurance
@@ -379,7 +380,11 @@ Table of Contents
    credentials should therefore work with today's web without requiring
    merchants to build new APIs.  KYAPay meets this by conveying
    credentials in the HTTP request itself (Section 5), which requires no
-   change to how a merchant's site is built.
+   change to how a merchant's site is built.  This holds where the party
+   attaching the token controls the header fields of the request that
+   reaches the Target.  Where it does not, the token is conveyed by
+   another binding (Section 5.3) or the interaction does not use this
+   header field.
 
 3.4.  One Source of Truth Across All Layers of Defense
 
@@ -669,6 +674,17 @@ Table of Contents
    otherwise it is a bearer token, subject to the controls and accepted
    risks in Section 8.
 
+   A CORS preflight request does not carry the KYAPay-Token field: the
+   user agent sends it to ask whether the field may be sent.  A
+   recipient MUST NOT apply its token-absent policy to a preflight
+   request.
+
+   Where a response depends on the KYAPay-Token field, the response MUST
+   include Vary: KYAPay-Token and MUST be marked so that shared caches
+   do not store it, for example with Cache-Control: private.  The
+   protection in Section 3.5 of [RFC9111] applies only to requests that
+   carry the Authorization field.
+
 5.2.  Token Size
 
    A recipient MUST accept a KYAPay-Token field value of at least 6144
@@ -726,6 +742,37 @@ Table of Contents
    server authentication), A2A agent cards [A2A], and MCP server
    identification [MCP] help an agent confirm that it is communicating
    with the correct counterparty before presenting a token.
+
+5.5.  Attaching Tokens to Requests
+
+   How an agent attaches a token to a request is an implementation
+   matter, for the reasons given in Section 7.  Any kind of request may
+   carry a KYAPay-Token field; whether it does, and which token it
+   carries, depends on where the request is sent:
+
+   *  A request to the Target carries the token requested for that
+      Target.
+
+   *  A Target may rely on other hosts, such as its own hosts in other
+      domains or vendors acting on its behalf.  A request to such a host
+      carries a token that names the Target in its audience claims
+      (Section 5.4) and carries the claims that apply to that host,
+      which may include payment claims.  Where the claims for the host
+      match those of the Target's token, the agent MAY send the Target's
+      token.
+
+   *  A request to any other host SHOULD NOT carry a token.
+
+   This applies however the token is attached.  An agent that adds the
+   field below the page, for example by browser-level header injection,
+   applies these rules to each request according to its destination,
+   because a page also sends requests to hosts that are neither the
+   Target nor acting on its behalf.
+
+   The Target determines which hosts act on its behalf and which claims
+   each receives.  Until a mechanism exists for the Target to declare
+   this, an agent learns it by configuration or from an arrangement with
+   the Target.
 
 6.  Using KYAPay Tokens at Security Intermediaries
 
@@ -1647,6 +1694,11 @@ Table of Contents
               DOI 10.17487/RFC8705, February 2020,
               <https://www.rfc-editor.org/rfc/rfc8705>.
 
+   [RFC9111]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+              Ed., "HTTP Caching", STD 98, RFC 9111,
+              DOI 10.17487/RFC9111, June 2022,
+              <https://www.rfc-editor.org/rfc/rfc9111>.
+
    [RFC9449]  Fett, D., Campbell, B., Bradley, J., Lodderstedt, T.,
               Jones, M., and D. Waite, "OAuth 2.0 Demonstrating Proof of
               Possession (DPoP)", RFC 9449, DOI 10.17487/RFC9449,
@@ -1721,6 +1773,10 @@ Document History
 
    *  Added Request Signatures for Proof of Possession: the covered
       components, and verification at the first hop.
+
+   *  Added Attaching Tokens to Requests, scoped the zero-tech-lift
+      principle to agents that control a request's header fields, and
+      added CORS preflight and caching requirements.
 
    -01
 

@@ -1242,6 +1242,9 @@ the token itself is the interoperability contract.<a href="#section-abstract-1" 
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
                 <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-authenticating-the-counterp" class="internal xref">Authenticating the Counterparty</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5">
+                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="auto internal xref">5.5</a>.  <a href="#name-attaching-tokens-to-request" class="internal xref">Attaching Tokens to Requests</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
@@ -1570,7 +1573,9 @@ This goal can only be met if security intermediaries admit legitimate human-via-
 A key property of a website (and, similarly, of a merchant-controlled MCP <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> server) is that the merchant controls its own interface and is not locked into an API schema that must be carefully versioned;
 agents driven by large language models (LLMs) can frequently learn to use these interfaces automatically.
 A protocol for delivering agent identity and payment credentials should therefore work with today's web without requiring merchants to build new APIs.
-KYAPay meets this by conveying credentials in the HTTP request itself (<a href="#ConveyingRequests" class="auto internal xref">Section 5</a>), which requires no change to how a merchant's site is built.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+KYAPay meets this by conveying credentials in the HTTP request itself (<a href="#ConveyingRequests" class="auto internal xref">Section 5</a>), which requires no change to how a merchant's site is built.
+This holds where the party attaching the token controls the header fields of the request that reaches the Target.
+Where it does not, the token is conveyed by another binding (<a href="#OtherInterfaces" class="auto internal xref">Section 5.3</a>) or the interaction does not use this header field.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="one-source-of-truth-across-all-layers-of-defense">
@@ -1785,6 +1790,10 @@ it <span class="bcp14">MUST NOT</span> be cached in a way that would allow it to
 A token <span class="bcp14">MUST NOT</span> be sent over a non-TLS-protected connection.
 When the token carries a proof-of-possession key (<a href="#TrustStack" class="auto internal xref">Section 4</a>), it <span class="bcp14">SHOULD</span> be accompanied by a request Message Signature <span>[<a href="#RFC9421" class="cite xref">RFC9421</a>]</span> over that key;
 otherwise it is a bearer token, subject to the controls and accepted risks in <a href="#SecCon" class="auto internal xref">Section 8</a>.<a href="#section-5.1-10" class="pilcrow">¶</a></p>
+<p id="section-5.1-11">A CORS preflight request does not carry the <code>KYAPay-Token</code> field: the user agent sends it to ask whether the field may be sent.
+A recipient <span class="bcp14">MUST NOT</span> apply its token-absent policy to a preflight request.<a href="#section-5.1-11" class="pilcrow">¶</a></p>
+<p id="section-5.1-12">Where a response depends on the <code>KYAPay-Token</code> field, the response <span class="bcp14">MUST</span> include <code>Vary: KYAPay-Token</code> and <span class="bcp14">MUST</span> be marked so that shared caches do not store it, for example with <code>Cache-Control: private</code>.
+The protection in <span><a href="https://rfc-editor.org/rfc/rfc9111#section-3.5" class="relref">Section 3.5</a> of [<a href="#RFC9111" class="cite xref">RFC9111</a>]</span> applies only to requests that carry the <code>Authorization</code> field.<a href="#section-5.1-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="TokenSize">
@@ -1803,7 +1812,7 @@ limit <span>[<a href="#I-D.skyfire-oauth-kyapay-token" class="cite xref">I-D.sky
 within common origin-server limits for a single header field.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="conveying-tokens-over-other-interfaces">
+<div id="OtherInterfaces">
 <section id="section-5.3">
         <h3 id="name-conveying-tokens-over-other">
 <a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-conveying-tokens-over-other" class="section-name selfRef">Conveying Tokens over Other Interfaces</a>
@@ -1827,6 +1836,31 @@ A Target that has onboarded to an issuer checks <code>aud</code> and <code>tsi</
 A recipient that has not onboarded, including a security intermediary acting for many Targets, <span class="bcp14">SHOULD</span> check at least that <code>tdm</code> names the domain it is protecting for that request; where <code>tdm</code> also names a host or a path, the recipient <span class="bcp14">MAY</span> check those too.
 <code>tdm</code> <span class="bcp14">MUST</span> be present in tokens whose Target is identified by a domain name.
 At the transport and discovery layers, mechanisms such as DNS domain names (with TLS server authentication), A2A agent cards <span>[<a href="#A2A" class="cite xref">A2A</a>]</span>, and MCP server identification <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> help an agent confirm that it is communicating with the correct counterparty before presenting a token.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="Attaching">
+<section id="section-5.5">
+        <h3 id="name-attaching-tokens-to-request">
+<a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-attaching-tokens-to-request" class="section-name selfRef">Attaching Tokens to Requests</a>
+        </h3>
+<p id="section-5.5-1">How an agent attaches a token to a request is an implementation matter, for the reasons given in <a href="#TokCreat" class="auto internal xref">Section 7</a>.
+Any kind of request may carry a <code>KYAPay-Token</code> field; whether it does, and which token it carries, depends on where the request is sent:<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.5-2.1">
+            <p id="section-5.5-2.1.1">A request to the Target carries the token requested for that Target.<a href="#section-5.5-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.5-2.2">
+            <p id="section-5.5-2.2.1">A Target may rely on other hosts, such as its own hosts in other domains or vendors acting on its behalf.
+A request to such a host carries a token that names the Target in its audience claims (<a href="#Counterparty" class="auto internal xref">Section 5.4</a>) and carries the claims that apply to that host, which may include payment claims.
+Where the claims for the host match those of the Target's token, the agent <span class="bcp14">MAY</span> send the Target's token.<a href="#section-5.5-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-5.5-2.3">
+            <p id="section-5.5-2.3.1">A request to any other host <span class="bcp14">SHOULD NOT</span> carry a token.<a href="#section-5.5-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-5.5-3">This applies however the token is attached. An agent that adds the field below the page, for example by browser-level header injection, applies these rules to each request according to its destination, because a page also sends requests to hosts that are neither the Target nor acting on its behalf.<a href="#section-5.5-3" class="pilcrow">¶</a></p>
+<p id="section-5.5-4">The Target determines which hosts act on its behalf and which claims each receives.
+Until a mechanism exists for the Target to declare this, an agent learns it by configuration or from an arrangement with the Target.<a href="#section-5.5-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2601,6 +2635,10 @@ The <code>amr</code> extensions and the <code>ivm</code> and <code>aml</code> cl
         <dd>
 <span class="refAuthor">Campbell, B.</span>, <span class="refAuthor">Bradley, J.</span>, <span class="refAuthor">Sakimura, N.</span>, and <span class="refAuthor">T. Lodderstedt</span>, <span class="refTitle">"OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens"</span>, <span class="seriesInfo">RFC 8705</span>, <span class="seriesInfo">DOI 10.17487/RFC8705</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8705">https://www.rfc-editor.org/rfc/rfc8705</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC9111">[RFC9111]</dt>
+        <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP Caching"</span>, <span class="seriesInfo">STD 98</span>, <span class="seriesInfo">RFC 9111</span>, <span class="seriesInfo">DOI 10.17487/RFC9111</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9111">https://www.rfc-editor.org/rfc/rfc9111</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC9449">[RFC9449]</dt>
         <dd>
 <span class="refAuthor">Fett, D.</span>, <span class="refAuthor">Campbell, B.</span>, <span class="refAuthor">Bradley, J.</span>, <span class="refAuthor">Lodderstedt, T.</span>, <span class="refAuthor">Jones, M.</span>, and <span class="refAuthor">D. Waite</span>, <span class="refTitle">"OAuth 2.0 Demonstrating Proof of Possession (DPoP)"</span>, <span class="seriesInfo">RFC 9449</span>, <span class="seriesInfo">DOI 10.17487/RFC9449</span>, <time datetime="2023-09" class="refDate">September 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9449">https://www.rfc-editor.org/rfc/rfc9449</a>&gt;</span>. </dd>
@@ -2678,6 +2716,9 @@ Bhasker Allam also wrote the text on which <a href="#RuntimeExposure" class="aut
 </li>
         <li class="normal" id="appendix-B-3.10">
           <p id="appendix-B-3.10.1">Added Request Signatures for Proof of Possession: the covered components, and verification at the first hop.<a href="#appendix-B-3.10.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.11">
+          <p id="appendix-B-3.11.1">Added Attaching Tokens to Requests, scoped the zero-tech-lift principle to agents that control a request's header fields, and added CORS preflight and caching requirements.<a href="#appendix-B-3.11.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="appendix-B-4">-01<a href="#appendix-B-4" class="pilcrow">¶</a></p>
