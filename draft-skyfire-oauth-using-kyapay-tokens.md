@@ -770,7 +770,7 @@ In such flows, the KYA token (carried without a PAY token) still provides the hu
 Intermediaries SHOULD accept KYA-only requests (those conveying a KYA token but no PAY token) for actions that do not themselves settle a payment, and MUST NOT treat the absence of a PAY token as a reason to classify an otherwise valid human-via-agent request as a bot.
 
 Because `hid.id` is stable for the human principal at a Target service, for a given issuer and agent platform, a Target or its fraud manager MAY link the agent's earlier work at that service to the principal's eventual purchase there, for attribution, personalization and fraud analysis.
-`hid.id`, `sub` and `aid.id` differ at every other Target service ({{I-D.skyfire-oauth-kyapay-token}}).
+`hid.id`, `sub` and `aid.id` differ at every other Target ({{I-D.skyfire-oauth-kyapay-token}}).
 Linking to a purchase completed outside the agent session, or on a different channel, needs an identifier available in both places, such as an email address, which a token carries only where the Target requested it and the principal authorized its disclosure.
 
 # Token Creation Considerations {#TokCreat}
@@ -1014,6 +1014,11 @@ Bhasker Allam also wrote the text on which {{RuntimeExposure}} is based.
 {: numbered="false"}
 
 [[ to be removed by the RFC Editor before publication as an RFC ]]
+
+-03
+
+* Aligned with KYAPay Token: `hid.id`, `sub` and `aid.id` differ at every other
+  Target.
 
 -02
 
