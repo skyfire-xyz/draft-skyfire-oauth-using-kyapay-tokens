@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-05T00:03:23.456876+00:00",
+  "timestamp": "2026-11-08T00:03:49.162861+00:00",
   "repo": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
   "labels": [
     {
@@ -143,6 +143,38 @@
           "updatedAt": "2026-11-03T04:50:03Z"
         }
       ]
+    },
+    {
+      "number": 23,
+      "id": "I_kwDOTVjRsc8AAAABc4wPZA",
+      "title": "Point to the token draft's rule for associating separate KYA and PAY tokens in one request",
+      "url": "https://github.com/skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens/issues/23",
+      "state": "OPEN",
+      "author": "skyfire-ankit",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "From Jean Diaconu's review on the OAuth list (item 6.1 on this draft), quoted in Mike's 18 Sep reply:\nhttps://mailarchive.ietf.org/arch/msg/oauth/bm-_66XQuuXwnb6cazc3VxaMtZQ\n\n> 6.1 Maybe some precisions if there needs to be correlation between the tokens (like KYA and PAY)\n\nIn follow-up, Jean clarified that he meant a request carrying separate KYA and PAY tokens, which \"The KYAPay-Token HTTP Header Field\" allows: how does a recipient know the two belong together?\n\nThe token draft answers this since -03 (\"Common Token Claims\", `sub`): tokens of different types issued by the same issuer for the same initiator at the same Target service carry the same `sub`, and a recipient MUST treat a PAY token and a KYA token as referring to the same initiator only when both the `iss` and the `sub` values are equal. This draft's header field section does not point to that rule.\n\nOptions:\n\n1. Add one sentence to \"The KYAPay-Token HTTP Header Field\" pointing a recipient of separate KYA and PAY tokens to the token draft's `iss` and `sub` rule.\n2. Close this issue as answered by the token draft.\n",
+      "createdAt": "2026-11-05T23:28:34Z",
+      "updatedAt": "2026-11-05T23:28:34Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 24,
+      "id": "I_kwDOTVjRsc8AAAABc5ED8Q",
+      "title": "Let Accept-KYAPay-Token ask for a recent human confirmation",
+      "url": "https://github.com/skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens/issues/24",
+      "state": "OPEN",
+      "author": "skyfire-ankit",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "From Jean Diaconu's review on the OAuth list, quoted in Mike's 18 Sep reply:\nhttps://mailarchive.ietf.org/arch/msg/oauth/bm-_66XQuuXwnb6cazc3VxaMtZQ\n\n> It feels that more or less we're good a proving provenance/delegation. Is it pertinent, at least for the most sensitive operations, to also include a HIL ?\n\nMike replied that a human in the loop is sometimes important, that the KYAPay flows accommodate it, and that the text likely belongs in this draft.\n\nA recipient can already decline a sensitive action (\"Responding When a Token Falls Short\") and use `Accept-KYAPay-Token` to say what it needs. What it cannot say in a way agents understand:\n\n1. That the human principal must have authenticated or confirmed recently. `Accept-KYAPay-Token` names claims and defines only the `purpose`, `optional` and `issuers` parameters.\n2. Which authentication methods it requires.\n\nThe token also cannot show when the human last authenticated: it carries `hid.amr` but no `auth_time`. Rob Zagarella raised the same point for action-scoped tokens in his implementer review (item 4 on amr-values, 16 Sep):\nhttps://mailarchive.ietf.org/arch/msg/oauth/Px1NpSn3OV3Dr6sJAiUM_Ar1rOs\n\nRFC 9470 addresses the same need for OAuth access tokens with `max_age` and `acr_values`.\n\nProposal:\n\n- Token draft: add `auth_time` to `hid`, the time the human principal last authenticated or confirmed.\n- This draft: define two `Accept-KYAPay-Token` parameters, modeled on RFC 9470:\n  - `max_age`: the maximum number of seconds since `hid.auth_time`;\n  - `amr`: authentication method values the recipient requires, separated by single spaces.\n- This draft: describe the flow under \"Determining Human Presence and Assurance\": the recipient declines, the agent returns to the human principal and the issuer, and retries with a new token.\n- The discovery document reuses the same parameters.\n",
+      "createdAt": "2026-11-05T23:56:13Z",
+      "updatedAt": "2026-11-05T23:56:13Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -2687,6 +2719,59 @@
           "body": "<!-- ccr-overview-v2 -->\n\n### \ud83d\udfe2 Approval recommended\n\nThere are no active review issues with the account-binding and claim-disclosure updates.\n\n**No open issues** \ud83c\udf89\n\n<sub>Review effort: Balanced</sub>",
           "createdAt": "2026-11-02T05:46:01Z",
           "updatedAt": "2026-11-02T05:46:01Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 25,
+      "id": "PR_kwDOTVjRsc8AAAABNO5SDw",
+      "title": "Align with KYAPay Token: identifiers differ at every other Target",
+      "url": "https://github.com/skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens/pull/25",
+      "state": "OPEN",
+      "author": "skyfire-ankit",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Companion to token PR https://github.com/skyfire-xyz/draft-skyfire-oauth-kyapay-token/pull/69. The Using draft restated that `hid.id`, `sub` and `aid.id` differ at every other Target service; this changes it to every other Target, to match. Adds a -03 Document History entry.",
+      "createdAt": "2026-11-06T04:40:40Z",
+      "updatedAt": "2026-11-07T19:21:55Z",
+      "baseRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
+      "baseRefName": "main",
+      "baseRefOid": "3a9d86c4f34077d8f01abfbfb0847dadba6bf08f",
+      "headRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
+      "headRefName": "pairwise-per-target",
+      "headRefOid": "653977272f3b93e3dd0cfac7015287d007762cdf",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABWXVhmw",
+          "commit": {
+            "abbreviatedOid": "6539772"
+          },
+          "author": "copilot-pull-request-reviewer",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "<!-- ccr-overview-v2 -->\n\n### \ud83d\udfe2 Approval recommended\n\nNo active review issues are reported for the identifier-scoping wording update and accompanying Document History entry.\n\n**No open issues** \ud83c\udf89\n\n<details>\n<summary><strong>What changed in this PR</strong></summary>\n\nAligns the Using KYAPay Tokens draft with the companion token PR\u2019s wording about identifier separation across Targets.\n\n**Changes:**\n- Changes \u201cevery other Target service\u201d to \u201cevery other Target\u201d for `hid.id`, `sub`, and `aid.id`.\n- Adds a `-03` Document History entry recording the alignment.\n\n| File | Description |\r\n| ---- | ----------- |\r\n| `draft-skyfire-oauth-using-kyapay-tokens.md` | Updates identifier-scoping wording and records the change in Document History. |\n</details>\n\n<sub>Review effort: Balanced</sub>",
+          "createdAt": "2026-11-06T04:43:35Z",
+          "updatedAt": "2026-11-06T04:43:35Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOTVjRsc8AAAABWpLlwA",
+          "commit": {
+            "abbreviatedOid": "6539772"
+          },
+          "author": "selfissued",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-11-07T19:21:55Z",
+          "updatedAt": "2026-11-07T19:21:55Z",
           "comments": []
         }
       ]
