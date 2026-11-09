@@ -5,10 +5,10 @@
 Web Authorization Protocol                                    A. Agarwal
 Internet-Draft                                      Skyfire Systems Inc.
 Intended status: Standards Track                             M. B. Jones
-Expires: 6 May 2027                               Self-Issued Consulting
+Expires: 13 May 2027                              Self-Issued Consulting
                                                                S. Thumma
                                                                   Akamai
-                                                         2 November 2026
+                                                         9 November 2026
 
 
                           Using KYAPay Tokens
@@ -69,7 +69,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 May 2027.
+   This Internet-Draft will expire on 13 May 2027.
 
 Copyright Notice
 
@@ -1379,7 +1379,7 @@ Table of Contents
    for a given issuer and agent platform, a Target or its fraud manager
    MAY link the agent's earlier work at that service to the principal's
    eventual purchase there, for attribution, personalization and fraud
-   analysis. hid.id, sub and aid.id differ at every other Target service
+   analysis. hid.id, sub and aid.id differ at every other Target
    ([I-D.skyfire-oauth-kyapay-token]).  Linking to a purchase completed
    outside the agent session, or on a different channel, needs an
    identifier available in both places, such as an email address, which
@@ -1759,16 +1759,16 @@ Table of Contents
    [I-D.skyfire-oauth-kyapay-token]
               Agarwal, A. and M. B. Jones, "KYAPay Token", Work in
               Progress, Internet-Draft, draft-skyfire-oauth-kyapay-
-              token-02, 1 October 2026,
+              token-03, 2 November 2026,
               <https://datatracker.ietf.org/doc/html/draft-skyfire-
-              oauth-kyapay-token-02>.
+              oauth-kyapay-token-03>.
 
    [I-D.skyfire-oauth-kyapay-token-exchange]
               Agarwal, A., Jones, M. B., Hingnikar, A., and J. Hickman,
               "KYAPay Token Exchange", Work in Progress, Internet-Draft,
-              draft-skyfire-oauth-kyapay-token-exchange-01, 19 July
+              draft-skyfire-oauth-kyapay-token-exchange-02, 2 November
               2026, <https://datatracker.ietf.org/doc/html/draft-
-              skyfire-oauth-kyapay-token-exchange-01>.
+              skyfire-oauth-kyapay-token-exchange-02>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -1831,9 +1831,9 @@ Table of Contents
    [I-D.ietf-oauth-client-id-metadata-document]
               Parecki, A. and E. Smith, "OAuth Client ID Metadata
               Document", Work in Progress, Internet-Draft, draft-ietf-
-              oauth-client-id-metadata-document-02, 6 July 2026,
+              oauth-client-id-metadata-document-03, 2 November 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-oauth-
-              client-id-metadata-document-02>.
+              client-id-metadata-document-03>.
 
    [I-D.skyfire-oauth-aml-methods]
               Agarwal, A., Jones, M. B., and N. Ali, "Anti-Money
@@ -1846,16 +1846,16 @@ Table of Contents
               Agarwal, A., Jones, M. B., Ali, N., and Srinivasa,
               "Additional Authentication Method Reference Values", Work
               in Progress, Internet-Draft, draft-skyfire-oauth-amr-
-              values-02, 1 October 2026,
+              values-03, 2 November 2026,
               <https://datatracker.ietf.org/doc/html/draft-skyfire-
-              oauth-amr-values-02>.
+              oauth-amr-values-03>.
 
    [I-D.skyfire-oauth-id-verification]
               Agarwal, A., Jones, M. B., Ali, N., and Srinivasa,
               "Identity Verification Methods Values", Work in Progress,
-              Internet-Draft, draft-skyfire-oauth-id-verification-02, 1
-              October 2026, <https://datatracker.ietf.org/doc/html/
-              draft-skyfire-oauth-id-verification-02>.
+              Internet-Draft, draft-skyfire-oauth-id-verification-03, 2
+              November 2026, <https://datatracker.ietf.org/doc/html/
+              draft-skyfire-oauth-id-verification-03>.
 
    [KYAPAY-ORG]
               Skyfire Systems Inc., "KYAPay: Verified Agent Identity and
@@ -1950,6 +1950,11 @@ Acknowledgments
 Document History
 
    [[ to be removed by the RFC Editor before publication as an RFC ]]
+
+   -03
+
+   *  Aligned with KYAPay Token: hid.id, sub and aid.id differ at every
+      other Target.
 
    -02
 
