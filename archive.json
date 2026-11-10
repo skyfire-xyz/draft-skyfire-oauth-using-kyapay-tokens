@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-08T00:03:49.162861+00:00",
+  "timestamp": "2026-11-10T00:02:22.530991+00:00",
   "repo": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
   "labels": [
     {
@@ -2728,24 +2728,26 @@
       "id": "PR_kwDOTVjRsc8AAAABNO5SDw",
       "title": "Align with KYAPay Token: identifiers differ at every other Target",
       "url": "https://github.com/skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens/pull/25",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "skyfire-ankit",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Companion to token PR https://github.com/skyfire-xyz/draft-skyfire-oauth-kyapay-token/pull/69. The Using draft restated that `hid.id`, `sub` and `aid.id` differ at every other Target service; this changes it to every other Target, to match. Adds a -03 Document History entry.",
       "createdAt": "2026-11-06T04:40:40Z",
-      "updatedAt": "2026-11-07T19:21:55Z",
+      "updatedAt": "2026-11-09T00:24:21Z",
       "baseRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
       "baseRefName": "main",
       "baseRefOid": "3a9d86c4f34077d8f01abfbfb0847dadba6bf08f",
       "headRepository": "skyfire-xyz/draft-skyfire-oauth-using-kyapay-tokens",
       "headRefName": "pairwise-per-target",
       "headRefOid": "653977272f3b93e3dd0cfac7015287d007762cdf",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-11-09T00:24:19Z",
+      "mergedAt": "2026-11-09T00:24:19Z",
+      "mergedBy": "skyfire-ankit",
+      "mergeCommit": {
+        "oid": "2cb58aecc82b73fae7421801c5b5c78d8ce51f5e"
+      },
       "comments": [],
       "reviews": [
         {
